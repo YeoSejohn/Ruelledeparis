@@ -157,25 +157,26 @@ const SCRIPT_URL='https://script.google.com/macros/s/AKfycbwo5HngUA6f6zAzME6OKHF
 
 function loadSaved(){
   document.getElementById('saveTime').textContent='불러오는 중...';
-  fetch(SCRIPT_URL+'?key=bakery_data')
+  fetch(SCRIPT_URL+'?action=load')
     .then(r=>r.text())
     .then(text=>{
-      if(text){
-        const parsed=JSON.parse(text);
-        if(parsed.allQty){
-          DAYS.forEach(day=>{
-            if(parsed.allQty[day]){
-              Object.keys(parsed.allQty[day]).forEach(k=>{
-                if(allQty[day].hasOwnProperty(k)) allQty[day][k]=parsed.allQty[day][k];
-              });
-            }
-          });
-        }
-        if(parsed.day && DAYS.includes(parsed.day)){ today=parsed.day; }
+      if(text&&text!=='{}'){
+        try{
+          const parsed=JSON.parse(text);
+          if(parsed.allQty){
+            DAYS.forEach(day=>{
+              if(parsed.allQty[day]){
+                Object.keys(parsed.allQty[day]).forEach(k=>{
+                  if(allQty[day].hasOwnProperty(k)) allQty[day][k]=parsed.allQty[day][k];
+                });
+              }
+            });
+          }
+          if(parsed.day&&DAYS.includes(parsed.day)){ today=parsed.day; }
+        }catch(e){}
       }
       const t=localStorage.getItem('bakery_savetime');
-      if(t) document.getElementById('saveTime').textContent=t;
-      else document.getElementById('saveTime').textContent='—';
+      document.getElementById('saveTime').textContent=t||'—';
       renderProducts();
       setActiveDay();
     })
@@ -190,7 +191,7 @@ function saveData(){
   const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   document.getElementById('saveTime').textContent='저장 중...';
   const encoded=encodeURIComponent(JSON.stringify({allQty,day:today}));
-  fetch(SCRIPT_URL+'?action=save&key=bakery_data&value='+encoded)
+  fetch(SCRIPT_URL+'?action=save&value='+encoded)
   .then(r=>r.text())
   .then(()=>{
     localStorage.setItem('bakery_savetime',str);
