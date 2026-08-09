@@ -103,15 +103,18 @@ const PRODUCTS=[
   {name:'모닝빵',dtype:'단과자',split:50,sun:72,wd:100,sat:160},
   {name:'단팥빵',dtype:'단과자',split:50,sun:122,wd:160,sat:185},
   {name:'소보로빵',dtype:'단과자',split:50,sun:45,wd:90,sat:120},
+  {name:'팥소보로빵',dtype:'단과자',split:50,sun:30,wd:60,sat:80},
   {name:'밤식빵',dtype:'단과자',split:200,sun:45,wd:60,sat:72},
   {name:'소금빵',dtype:'식빵',split:70,sun:80,wd:130,sat:160},
   {name:'탕종식빵',dtype:'식빵',split:550,sun:40,wd:56,sat:56},
   {name:'초코 모닝빵',dtype:'식빵',split:29.1,sun:80,wd:120,sat:135},
   {name:'모카빵',dtype:'모카빵',split:150,sun:20,wd:32,sat:34},
-  {name:'잡곡모닝',dtype:'잡곡식빵',split:50,sun:117,wd:150,sat:165},
+  {name:'잡곡모닝',dtype:'잡곡모닝',split:50,sun:117,wd:150,sat:165},
   {name:'잡곡식빵',dtype:'잡곡식빵',split:550,sun:35,wd:38,sat:45},
   {name:'올리브 치아바타',dtype:'치아바타',split:195,sun:48,wd:60,sat:72},
   {name:'치즈 치아바타',dtype:'치아바타',split:190,sun:36,wd:48,sat:48},
+  {name:'하드 올리브 치아바타',dtype:'치아바타',split:195,sun:20,wd:30,sat:36},
+  {name:'하드 치즈 치아바타',dtype:'치아바타',split:190,sun:20,wd:30,sat:36},
   {name:'베지 샌드위치',dtype:'치아바타',split:195,sun:0,wd:16,sat:18},
   {name:'포카치아',dtype:'치아바타',split:155,sun:0,wd:18,sat:18},
   {name:'올리브 바타르',dtype:'바타르',split:442,sun:18,wd:19,sat:28},
@@ -132,17 +135,74 @@ const PRODUCTS=[
   {name:'애플커스터드',dtype:'크루아상',split:80,sun:20,wd:20,sat:28},
   {name:'앙시오',dtype:'크루아상',split:65,sun:18,wd:18,sat:24},
 ];
-const RECIPE_TOTALS={단과자:2270,식빵:2715,모카빵:3163,잡곡식빵:2300,치아바타:1916.6,바타르:1892,펌퍼니클:2521,크루아상:2505};
+const RECIPE_TOTALS={단과자:2270,식빵:2715,모카빵:3163,잡곡모닝:2135,잡곡식빵:2135,치아바타:1929.1,바타르:1892,펌퍼니클:2521,크루아상:2505};
 const MUKBAN=500,SIK_TOTAL=2715;
 const RECIPES={
-  단과자:{label:'단과자',total:2270,ings:[{n:'큐원',g:1135,pct:100},{n:'K-블레',g:340,pct:30},{n:'설탕',g:227,pct:20},{n:'소금',g:22.7,pct:2},{n:'생이스트',g:34,pct:3},{n:'버터',g:113.5,pct:10},{n:'전란',g:227,pct:20},{n:'우유',g:113.5,pct:10}]},
-  바타르:{label:'바타르',total:1892,ings:[{n:'지라도 T65',g:1000,pct:100},{n:'물',g:700,pct:70},{n:'레드',g:2,pct:0.2},{n:'소금',g:20,pct:2},{n:'바시나주',g:20,pct:2},{n:'호밀 르방',g:150,pct:15}]},
-  식빵:{label:'식빵',total:2715,ings:[{n:'K-블레',g:500,pct:50},{n:'큐원',g:500,pct:50},{n:'물',g:470,pct:47},{n:'설탕',g:100,pct:10},{n:'소금',g:20,pct:2},{n:'탈지분유',g:20,pct:2},{n:'생이스트',g:35,pct:3.5},{n:'S500',g:10,pct:1},{n:'버터',g:80,pct:8},{n:'물엿',g:30,pct:3},{n:'생크림',g:50,pct:5},{n:'묵반',g:500,pct:50},{n:'크루 묵반',g:200,pct:20},{n:'탕종',g:200,pct:20}]},
-  모카빵:{label:'모카빵',total:3163,ings:[{n:'K-블레',g:1000,pct:100},{n:'물',g:500,pct:50},{n:'설탕',g:150,pct:15},{n:'소금',g:18,pct:1.8},{n:'생이스트',g:25,pct:2.5},{n:'버터',g:100,pct:10},{n:'전란',g:200,pct:20},{n:'모카피',g:1000,pct:100}]},
-  잡곡식빵:{label:'잡곡식빵',total:2300,ings:[{n:'K-블레',g:1000,pct:100},{n:'물',g:580,pct:58},{n:'설탕',g:80,pct:8},{n:'소금',g:20,pct:2},{n:'생이스트',g:30,pct:3},{n:'버터',g:60,pct:6},{n:'잡곡미스',g:100,pct:10},{n:'묵반',g:500,pct:50}]},
-  펌퍼니클:{label:'펌퍼니클',total:2521,ings:[{n:'크라프트',g:217,pct:72.3},{n:'호밀',g:72.5,pct:24.2},{n:'설탕',g:23,pct:7.7},{n:'소금',g:2,pct:0.7},{n:'트레할로스',g:71.5,pct:23.8},{n:'햄프씨드',g:108.5,pct:36.2},{n:'치아씨드',g:72.5,pct:24.2},{n:'몰트액기스',g:15,pct:5},{n:'물',g:87.5,pct:29.2},{n:'우유',g:350,pct:116.7},{n:'호밀 르방',g:250,pct:83.3},{n:'호두',g:123,pct:41},{n:'꿀',g:28.5,pct:9.5}]},
-  크루아상:{label:'크루아상',total:2505,ings:[{n:'큐원',g:375,pct:75},{n:'지라도',g:125,pct:25},{n:'물',g:180,pct:36},{n:'전란',g:25,pct:5},{n:'소금',g:10,pct:2},{n:'설탕',g:70,pct:14},{n:'생이스트',g:22.5,pct:4.5},{n:'엑스트라버터',g:62.5,pct:12.5},{n:'충전용 버터',g:1930,pct:386}]},
-  치아바타:{label:'치아바타/포카치아',total:3348,ings:[{n:'T55 풀리쉬',g:450,pct:'풀리쉬'},{n:'물 풀리쉬',g:450,pct:'풀리쉬'},{n:'Dy 풀리쉬',g:18,pct:'풀리쉬'},{n:'T55 본반죽',g:250,pct:'본반죽'},{n:'버터',g:100,pct:'본반죽'},{n:'설탕',g:160,pct:'본반죽'},{n:'소금',g:40,pct:'본반죽'},{n:'DY',g:20,pct:'본반죽'},{n:'우유',g:600,pct:'본반죽'},{n:'물',g:60,pct:'본반죽'},{n:'몰트',g:20,pct:'본반죽'},{n:'롤인버터',g:1200,pct:'충전'}]},
+  단과자:{label:'단과자',total:2270,ings:[
+    {n:'큐원',g:1135,pct:100},{n:'K-블레',g:340,pct:30},
+    {n:'설탕',g:227,pct:20},{n:'소금',g:22.7,pct:2},
+    {n:'생이스트',g:34,pct:3},{n:'버터',g:113.5,pct:10},
+    {n:'전란',g:227,pct:20},{n:'우유',g:113.5,pct:10}
+  ]},
+  바타르:{label:'바타르',total:1892,ings:[
+    {n:'지라도 T65',g:1000,pct:100},{n:'물',g:700,pct:70},
+    {n:'레드',g:2,pct:0.2},{n:'소금',g:20,pct:2},
+    {n:'바시나주',g:20,pct:2},{n:'호밀 르방',g:150,pct:15}
+  ]},
+  식빵:{label:'식빵',total:2715,ings:[
+    {n:'K-블레',g:500,pct:50},{n:'큐원',g:500,pct:50},
+    {n:'물',g:470,pct:47},{n:'설탕',g:100,pct:10},
+    {n:'소금',g:20,pct:2},{n:'탈지분유',g:20,pct:2},
+    {n:'생이스트',g:35,pct:3.5},{n:'S500',g:10,pct:1},
+    {n:'버터',g:80,pct:8},{n:'물엿',g:30,pct:3},
+    {n:'생크림',g:50,pct:5},{n:'묵반',g:500,pct:50},
+    {n:'크루 묵반',g:200,pct:20},{n:'탕종',g:200,pct:20}
+  ]},
+  모카빵:{label:'모카빵',total:3163,ings:[
+    {n:'K-블레',g:1000,pct:100},{n:'물',g:500,pct:50},
+    {n:'설탕',g:150,pct:15},{n:'소금',g:18,pct:1.8},
+    {n:'생이스트',g:25,pct:2.5},{n:'버터',g:100,pct:10},
+    {n:'전란',g:200,pct:20},{n:'모카피',g:1000,pct:100}
+  ]},
+  잡곡모닝:{label:'잡곡모닝',total:2135,ings:[
+    {n:'K-블레',g:450,pct:43.3},{n:'큐원',g:350,pct:33.7},
+    {n:'크라프트',g:200,pct:19.3},{n:'설탕',g:100,pct:9.6},
+    {n:'소금',g:10,pct:1.0},{n:'골드',g:20,pct:1.9},
+    {n:'S500',g:20,pct:1.9},{n:'버터',g:100,pct:9.6},
+    {n:'우유',g:190,pct:18.3},{n:'생크림',g:95,pct:9.1},
+    {n:'물',g:300,pct:28.9},{n:'묵반',g:100,pct:9.6},{n:'탕종',g:200,pct:19.3}
+  ]},
+  잡곡식빵:{label:'잡곡식빵',total:2135,ings:[
+    {n:'K-블레',g:450,pct:43.3},{n:'큐원',g:350,pct:33.7},
+    {n:'크라프트',g:200,pct:19.3},{n:'설탕',g:100,pct:9.6},
+    {n:'소금',g:10,pct:1.0},{n:'골드',g:20,pct:1.9},
+    {n:'S500',g:20,pct:1.9},{n:'버터',g:100,pct:9.6},
+    {n:'우유',g:190,pct:18.3},{n:'생크림',g:95,pct:9.1},
+    {n:'물',g:300,pct:28.9},{n:'묵반',g:100,pct:9.6},{n:'탕종',g:200,pct:19.3}
+  ]},
+  펌퍼니클:{label:'펌퍼니클',total:2521,ings:[
+    {n:'크라프트',g:217,pct:72.3},{n:'호밀',g:72.5,pct:24.2},
+    {n:'설탕',g:23,pct:7.7},{n:'소금',g:2,pct:0.7},
+    {n:'트레할로스',g:71.5,pct:23.8},{n:'햄프씨드',g:108.5,pct:36.2},
+    {n:'치아씨드',g:72.5,pct:24.2},{n:'몰트액기스',g:15,pct:5},
+    {n:'물',g:87.5,pct:29.2},{n:'우유',g:350,pct:116.7},
+    {n:'호밀 르방',g:250,pct:83.3},{n:'호두',g:123,pct:41},{n:'꿀',g:28.5,pct:9.5}
+  ]},
+  크루아상:{label:'크루아상',total:2505,ings:[
+    {n:'큐원',g:375,pct:75},{n:'지라도',g:125,pct:25},
+    {n:'물',g:180,pct:36},{n:'전란',g:25,pct:5},
+    {n:'소금',g:10,pct:2},{n:'설탕',g:70,pct:14},
+    {n:'생이스트',g:22.5,pct:4.5},{n:'엑스트라버터',g:62.5,pct:12.5},
+    {n:'충전용 버터',g:1930,pct:386}
+  ]},
+  치아바타:{label:'치아바타/포카치아',total:1929.1,ings:[
+    {n:'T55 (풀리쉬)',g:281.5,pct:28.2},{n:'레드 (풀리쉬)',g:4.6,pct:0.5},
+    {n:'물 (풀리쉬)',g:281.5,pct:28.2},{n:'키알라',g:177,pct:17.7},
+    {n:'큐원',g:177,pct:17.7},{n:'T55 (본반죽)',g:364.5,pct:36.5},
+    {n:'소금',g:12,pct:1.2},{n:'레드 (본반죽)',g:12,pct:1.2},
+    {n:'물 (본반죽)',g:468,pct:46.8},{n:'몰트',g:12,pct:1.2},
+    {n:'오일',g:71,pct:7.1},{n:'바시나주',g:68,pct:6.8}
+  ]},
 };
 
 let today='월';
@@ -337,24 +397,42 @@ function renderRecipes(){
     card.innerHTML=`
       <div class="recipe-hdr" onclick="toggleR('${key}')">
         <span class="recipe-title">${rec.label}</span>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="recipe-badge">1배합 ${Math.round(rec.total).toLocaleString()}g</span>
-          <span class="chevron" id="chev-${key}">▾</span>
+        <div style="display:flex;align-items:center;gap:8px" onclick="event.stopPropagation()">
+          <div style="display:flex;align-items:center;gap:4px;background:#f0f4ff;border-radius:8px;padding:4px 8px">
+            <span style="font-size:11px;color:#5566aa">배합</span>
+            <input type="number" min="0.1" step="0.1" value="1" id="batch-${key}"
+              style="width:36px;text-align:center;font-size:13px;font-weight:600;border:none;background:transparent;color:#1a1a2e;font-family:inherit"
+              oninput="updateRecipeDisplay('${key}')">
+          </div>
+          <span id="chev-${key}" style="font-size:16px;color:#ccc">v</span>
         </div>
       </div>
       <div id="rbody-${key}" style="display:none">
-        <div class="recipe-body">
-          ${rec.ings.map(i=>`<div class="recipe-row">
-            <span class="ing-name">${i.n}</span>
-            <span class="ing-val">${i.g}g<span class="ing-pct">${typeof i.pct==='number'?'('+i.pct+'%)':'('+i.pct+')'}</span></span>
-          </div>`).join('')}
+        <div style="display:flex;justify-content:space-between;padding:7px 14px;background:#f8f8f8;font-size:11px;font-weight:600;color:#888">
+          <span>재료</span>
+          <div style="display:flex;gap:16px">
+            <span style="min-width:44px;text-align:right">베이커스%</span>
+            <span style="min-width:56px;text-align:right">사용량(g)</span>
+          </div>
         </div>
-        <div class="recipe-total">
+        <div id="ing-list-${key}"></div>
+        <div style="display:flex;justify-content:space-between;padding:10px 14px;border-top:1px solid #eee;background:#f9f9f9">
           <span style="font-size:13px;color:#888">1배합 총무게</span>
-          <span style="font-size:13px;font-weight:600">${Math.round(rec.total).toLocaleString()}g</span>
+          <span style="font-size:13px;font-weight:600" id="total-${key}">${Math.round(rec.total).toLocaleString()}g</span>
+        </div>
+        <div style="padding:8px 14px;border-top:1px solid #f0f0f0">
+          <button onclick="toggleEdit('${key}')" style="font-size:11px;color:#5566aa;background:#eef0ff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit">레시피 편집</button>
+        </div>
+        <div id="edit-${key}" style="display:none">
+          <div style="padding:12px 14px;border-top:1px solid #f0f0f0;background:#fafafa">
+            <div id="edit-rows-${key}"></div>
+            <button onclick="addIng('${key}')" style="width:100%;padding:8px;border-radius:8px;border:1.5px dashed #bbb;background:transparent;color:#888;font-size:13px;cursor:pointer;font-family:inherit;margin-bottom:8px">+ 재료 추가</button>
+            <button onclick="saveRecipe('${key}')" style="width:100%;padding:9px;border-radius:8px;background:#1a1a2e;color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">레시피 저장</button>
+          </div>
         </div>
       </div>`;
     list.appendChild(card);
+    updateRecipeDisplay(key);
   });
 }
 
@@ -367,6 +445,80 @@ function toggleR(key){
 }
 
 let curTab='qty';
+function toggleR(key){
+  const body=document.getElementById('rbody-'+key);
+  const chev=document.getElementById('chev-'+key);
+  const open=body.style.display==='none';
+  body.style.display=open?'block':'none';
+  chev.textContent=open?'^':'v';
+  if(open) updateRecipeDisplay(key);
+}
+
+function updateRecipeDisplay(key){
+  const rec=RECIPES[key];
+  const batch=parseFloat(document.getElementById('batch-'+key)?.value)||1;
+  const container=document.getElementById('ing-list-'+key);
+  const totalEl=document.getElementById('total-'+key);
+  if(!container) return;
+  container.innerHTML=rec.ings.map(ing=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid #f8f8f8">
+      <span style="font-size:13px;color:#555;flex:1">${ing.n}</span>
+      <div style="display:flex;gap:16px;align-items:center">
+        <span style="font-size:12px;color:#aaa;min-width:44px;text-align:right">${typeof ing.pct==='number'?ing.pct+'%':'--'}</span>
+        <span style="font-size:13px;font-weight:600;color:#111;min-width:56px;text-align:right">${(ing.g*batch).toFixed(ing.g*batch<10?1:0)}g</span>
+      </div>
+    </div>`).join('');
+  if(totalEl) totalEl.textContent=Math.round(rec.total*batch).toLocaleString()+'g';
+}
+
+function toggleEdit(key){
+  const ed=document.getElementById('edit-'+key);
+  const open=ed.style.display==='none';
+  ed.style.display=open?'block':'none';
+  if(open) renderEditRows(key);
+}
+
+function renderEditRows(key){
+  const rec=RECIPES[key];
+  const container=document.getElementById('edit-rows-'+key);
+  container.innerHTML=rec.ings.map((ing,i)=>`
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <input type="text" value="${ing.n}" id="ename-${key}-${i}"
+        style="flex:1;padding:7px 10px;border-radius:7px;border:1px solid #ddd;font-size:13px;font-family:inherit;background:#fff">
+      <input type="number" value="${ing.g}" id="eg-${key}-${i}"
+        style="width:70px;padding:7px 6px;border-radius:7px;border:1px solid #ddd;font-size:13px;font-family:inherit;background:#fff">
+      <input type="number" value="${ing.pct}" id="epct-${key}-${i}"
+        style="width:60px;padding:7px 6px;border-radius:7px;border:1px solid #ddd;font-size:13px;font-family:inherit;background:#fff">
+      <button onclick="delIng('${key}',${i})"
+        style="width:28px;height:28px;border-radius:6px;border:none;background:#fee;color:#c33;font-size:16px;cursor:pointer;flex-shrink:0">x</button>
+    </div>`).join('');
+}
+
+function addIng(key){
+  RECIPES[key].ings.push({n:'',g:0,pct:0});
+  renderEditRows(key);
+}
+
+function delIng(key,i){
+  RECIPES[key].ings.splice(i,1);
+  renderEditRows(key);
+}
+
+function saveRecipe(key){
+  const newIngs=[];
+  let total=0;
+  RECIPES[key].ings.forEach((_,i)=>{
+    const n=document.getElementById('ename-'+key+'-'+i)?.value||'';
+    const g=parseFloat(document.getElementById('eg-'+key+'-'+i)?.value)||0;
+    const pct=parseFloat(document.getElementById('epct-'+key+'-'+i)?.value)||0;
+    if(n){ newIngs.push({n,g,pct}); total+=g; }
+  });
+  RECIPES[key].ings=newIngs;
+  RECIPES[key].total=total;
+  document.getElementById('edit-'+key).style.display='none';
+  updateRecipeDisplay(key);
+  showToast('레시피 수정됨 - 저장 버튼으로 반영하세요');
+}
 function switchTab(tab){
   curTab=tab;
   ['qty','result','recipe'].forEach(t=>{
