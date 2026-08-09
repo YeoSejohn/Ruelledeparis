@@ -146,15 +146,27 @@ const RECIPES={
 };
 
 let today='월';
-const qty={};
-PRODUCTS.forEach(p=>qty[p.name]=p[DAY_TYPE['월']]);
+const allQty={};
+DAYS.forEach(day=>{
+  allQty[day]={};
+  PRODUCTS.forEach(p=>allQty[day][p.name]=p[DAY_TYPE[day]]);
+});
+function qty(){ return allQty[today]; }
 
 function loadSaved(){
   try{
-    const d=localStorage.getItem('bakery_data');
+    const d=localStorage.getItem('bakery_data_v2');
     if(d){
       const parsed=JSON.parse(d);
-      if(parsed.qty) Object.keys(parsed.qty).forEach(k=>{ if(qty.hasOwnProperty(k)) qty[k]=parsed.qty[k]; });
+      if(parsed.allQty){
+        DAYS.forEach(day=>{
+          if(parsed.allQty[day]){
+            Object.keys(parsed.allQty[day]).forEach(k=>{
+              if(allQty[day].hasOwnProperty(k)) allQty[day][k]=parsed.allQty[day][k];
+            });
+          }
+        });
+      }
       if(parsed.day && DAYS.includes(parsed.day)){ today=parsed.day; }
     }
     const t=localStorage.getItem('bakery_savetime');
@@ -166,7 +178,7 @@ function saveData(){
   try{
     const now=new Date();
     const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
-    localStorage.setItem('bakery_data',JSON.stringify({qty,day:today}));
+    localStorage.setItem('bakery_data_v2',JSON.stringify({allQty,day:today}));
     localStorage.setItem('bakery_savetime',str);
     document.getElementById('saveTime').textContent=str;
     showToast('저장했습니다');
@@ -183,7 +195,7 @@ function showToast(msg){
 function resetToDefault(){
   if(!confirm(today+'요일 기본 수량으로 초기화할까요?')) return;
   const dt=DAY_TYPE[today];
-  PRODUCTS.forEach(p=>qty[p.name]=p[dt]);
+  PRODUCTS.forEach(p=>allQty[today][p.name]=p[dt]);
   renderProducts();
   showToast('초기화했습니다');
 }
@@ -224,7 +236,7 @@ function renderProducts(){
     lbl.className='sec-label'; lbl.textContent=dtype;
     list.appendChild(lbl);
     prods.forEach(p=>{
-      const q=qty[p.name]??0;
+      const q=qty()[p.name]??0;
       const row=document.createElement('div');
       row.className='prod-row';
       row.innerHTML=`
@@ -243,12 +255,12 @@ function renderProducts(){
 }
 
 function adj(name,d){
-  qty[name]=Math.max(0,(qty[name]||0)+d);
+  qty()[name]=Math.max(0,(qty()[name]||0)+d);
   renderProducts();
   if(curTab==='result') renderResults();
 }
 function setQ(name,v){
-  qty[name]=Math.max(0,parseInt(v)||0);
+  qty()[name]=Math.max(0,parseInt(v)||0);
   if(curTab==='result') renderResults();
 }
 
@@ -262,9 +274,9 @@ function calcBatches(){
     let batches,total_g;
     if(dtype==='식빵'){
       const normal=prods.filter(p=>p.name!=='소금빵'&&p.name!=='초코 모닝빵');
-      const normalG=normal.reduce((s,p)=>s+(qty[p.name]||0)*p.split,0);
-      const sgG=(qty['소금빵']||0)*70;
-      const chocoG=(qty['초코 모닝빵']||0)*29.1;
+      const normalG=normal.reduce((s,p)=>s+(qty()[p.name]||0)*p.split,0);
+      const sgG=(qty()['소금빵']||0)*70;
+      const chocoG=(qty()['초코 모닝빵']||0)*29.1;
       const mokaB=result['모카빵']?result['모카빵'].batches:0;
       const normalB=normalG>0?Math.ceil(normalG/(SIK_TOTAL-MUKBAN)*10)/10:0;
       const mukbanG=(normalB+mokaB)*MUKBAN;
@@ -273,7 +285,7 @@ function calcBatches(){
       if(normalG>0) batches=Math.max(batches,normalB);
       total_g=batches*(SIK_TOTAL-MUKBAN);
     } else {
-      total_g=prods.reduce((s,p)=>s+(qty[p.name]||0)*p.split,0);
+      total_g=prods.reduce((s,p)=>s+(qty()[p.name]||0)*p.split,0);
       batches=total_g>0?Math.ceil(total_g/recipe*10)/10:0;
     }
     result[dtype]={batches,total_g,recipe};
