@@ -153,28 +153,23 @@ DAYS.forEach(day=>{
 });
 function qty(){ return allQty[today]; }
 
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbwo5HngUA6f6zAzME6OKHF8P5G0jx4whordIYIL8K43xACJWBXeYI2_sfjytHHMf2be0A/exec';
+const FIREBASE_URL='https://bakery-baf52-default-rtdb.firebaseio.com';
 
 function loadSaved(){
   document.getElementById('saveTime').textContent='불러오는 중...';
-  fetch(SCRIPT_URL+'?action=load')
-    .then(r=>r.text())
-    .then(text=>{
-      if(text&&text!=='{}'){
-        try{
-          const parsed=JSON.parse(text);
-          if(parsed.allQty){
-            DAYS.forEach(day=>{
-              if(parsed.allQty[day]){
-                Object.keys(parsed.allQty[day]).forEach(k=>{
-                  if(allQty[day].hasOwnProperty(k)) allQty[day][k]=parsed.allQty[day][k];
-                });
-              }
+  fetch(FIREBASE_URL+'/bakery.json')
+    .then(r=>r.json())
+    .then(parsed=>{
+      if(parsed&&parsed.allQty){
+        DAYS.forEach(day=>{
+          if(parsed.allQty[day]){
+            Object.keys(parsed.allQty[day]).forEach(k=>{
+              if(allQty[day].hasOwnProperty(k)) allQty[day][k]=parsed.allQty[day][k];
             });
           }
-          if(parsed.day&&DAYS.includes(parsed.day)){ today=parsed.day; }
-        }catch(e){}
+        });
       }
+      if(parsed&&parsed.day&&DAYS.includes(parsed.day)){ today=parsed.day; }
       const t=localStorage.getItem('bakery_savetime');
       document.getElementById('saveTime').textContent=t||'—';
       renderProducts();
@@ -190,9 +185,12 @@ function saveData(){
   const now=new Date();
   const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   document.getElementById('saveTime').textContent='저장 중...';
-  const encoded=encodeURIComponent(JSON.stringify({allQty,day:today}));
-  fetch(SCRIPT_URL+'?action=save&value='+encoded)
-  .then(r=>r.text())
+  fetch(FIREBASE_URL+'/bakery.json',{
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({allQty,day:today})
+  })
+  .then(r=>r.json())
   .then(()=>{
     localStorage.setItem('bakery_savetime',str);
     document.getElementById('saveTime').textContent=str;
