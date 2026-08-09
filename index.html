@@ -1,64 +1,80 @@
-
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="반죽 계량표">
+<title>반죽 계량표</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font-sans);background:var(--surface-0);color:var(--text-primary);font-size:15px}
-.hdr{background:#1a1a2e;color:#fff;padding:12px 16px;display:flex;align-items:center;gap:8px}
-.hdr-title{font-size:16px;font-weight:500;flex:1}
-.save-info{font-size:11px;color:rgba(255,255,255,0.55);text-align:right}
-.save-time{font-size:12px;color:rgba(255,255,255,0.8);display:block}
-.day-bar{background:#111827;padding:8px 16px;display:flex;gap:6px;overflow-x:auto}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;color:#111;font-size:15px;min-height:100vh}
+.hdr{background:#1a1a2e;color:#fff;padding:14px 16px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:20}
+.hdr-title{font-size:17px;font-weight:600;flex:1}
+.save-info{text-align:right}
+.save-lbl{font-size:10px;color:rgba(255,255,255,0.45);display:block}
+.save-time{font-size:12px;color:rgba(255,255,255,0.8);display:block;min-width:80px}
+.day-bar{background:#111827;padding:8px 12px;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .day-bar::-webkit-scrollbar{display:none}
-.day-btn{padding:5px 12px;border-radius:20px;border:1.5px solid rgba(255,255,255,0.25);background:transparent;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;white-space:nowrap;transition:all .15s}
-.day-btn.active{background:#fff;color:#1a1a2e;border-color:#fff;font-weight:500}
-.tabs{display:flex;background:var(--surface-2);border-bottom:0.5px solid var(--border)}
-.tab{flex:1;padding:10px 0;text-align:center;font-size:13px;color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
-.tab.active{color:var(--text-primary);border-color:#1a1a2e;font-weight:500}
-.save-bar{display:flex;gap:8px;padding:10px 16px;background:var(--surface-1);border-bottom:0.5px solid var(--border)}
-.save-btn{flex:1;padding:9px;border-radius:8px;background:#1a1a2e;color:#fff;border:none;font-size:13px;font-weight:500;cursor:pointer}
-.reset-btn{padding:9px 16px;border-radius:8px;background:transparent;color:var(--text-secondary);border:0.5px solid var(--border-strong);font-size:13px;cursor:pointer}
-.toast{position:absolute;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;font-size:13px;padding:8px 18px;border-radius:20px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;top:8px;z-index:20}
+.day-btn{padding:6px 13px;border-radius:20px;border:1.5px solid rgba(255,255,255,0.25);background:transparent;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit}
+.day-btn.active{background:#fff;color:#1a1a2e;border-color:#fff;font-weight:600}
+.tabs{display:flex;background:#fff;border-bottom:1px solid #e8e8e8;position:sticky;top:54px;z-index:19}
+.tab{flex:1;padding:11px 0;text-align:center;font-size:13px;color:#888;cursor:pointer;border-bottom:2.5px solid transparent;font-family:inherit}
+.tab.active{color:#1a1a2e;border-color:#1a1a2e;font-weight:600}
+.action-bar{display:flex;gap:8px;padding:10px 16px;background:#fff;border-bottom:1px solid #e8e8e8}
+.save-btn{flex:1;padding:10px;border-radius:9px;background:#1a1a2e;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.save-btn:active{opacity:0.85;transform:scale(0.98)}
+.reset-btn{padding:10px 16px;border-radius:9px;background:transparent;color:#666;border:1.5px solid #ddd;font-size:13px;cursor:pointer;font-family:inherit}
+.reset-btn:active{background:#f0f0f0}
+.toast{position:fixed;left:50%;transform:translateX(-50%);background:rgba(20,20,35,0.92);color:#fff;font-size:13px;padding:9px 20px;border-radius:22px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;bottom:24px;z-index:100;backdrop-filter:blur(4px)}
 .toast.show{opacity:1}
-.sec-label{font-size:11px;font-weight:500;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;padding:12px 16px 4px}
-.prod-row{display:flex;align-items:center;gap:8px;padding:8px 16px;border-bottom:0.5px solid var(--border)}
+.sec-label{font-size:11px;font-weight:600;color:#999;letter-spacing:.07em;text-transform:uppercase;padding:14px 16px 5px;background:#f5f5f5}
+.prod-row{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border-bottom:1px solid #f0f0f0}
 .prod-info{flex:1;min-width:0}
-.prod-name{font-size:14px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.prod-sub{font-size:11px;color:var(--text-muted)}
-.qty-ctrl{display:flex;align-items:center;flex-shrink:0}
-.qb{width:30px;height:30px;border-radius:7px;border:0.5px solid var(--border-strong);background:var(--surface-1);color:var(--text-primary);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;user-select:none}
-.qb:active{background:var(--surface-0);transform:scale(.93)}
-.qinput{width:46px;text-align:center;font-size:15px;font-weight:500;border:none;background:transparent;color:var(--text-primary);padding:0;-moz-appearance:textfield}
+.prod-name{font-size:14px;color:#111;font-weight:500}
+.prod-sub{font-size:11px;color:#aaa;margin-top:1px}
+.qty-ctrl{display:flex;align-items:center;gap:0;flex-shrink:0}
+.qb{width:34px;height:34px;border-radius:8px;border:1.5px solid #ddd;background:#f8f8f8;color:#333;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;user-select:none;font-family:inherit}
+.qb:active{background:#ebebeb;transform:scale(0.93)}
+.qinput{width:48px;text-align:center;font-size:16px;font-weight:600;border:none;background:transparent;color:#111;padding:0;font-family:inherit;-moz-appearance:textfield}
 .qinput::-webkit-inner-spin-button,.qinput::-webkit-outer-spin-button{-webkit-appearance:none}
-.rcard{background:var(--surface-2);border-radius:12px;border:0.5px solid var(--border);margin:12px 16px;overflow:hidden}
-.rcard-hdr{padding:12px 14px 8px;font-size:12px;color:var(--text-muted);font-weight:500;border-bottom:0.5px solid var(--border)}
-.rrow{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:0.5px solid var(--border)}
+.rcard{background:#fff;border-radius:12px;margin:12px 16px;overflow:hidden;border:1px solid #eee}
+.rcard-hdr{padding:12px 14px 10px;font-size:12px;font-weight:600;color:#666;letter-spacing:.04em;border-bottom:1px solid #f0f0f0;text-transform:uppercase}
+.rrow{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid #f5f5f5}
 .rrow:last-child{border-bottom:none}
-.rname{font-size:14px;font-weight:500;color:var(--text-primary)}
-.rsub{font-size:11px;color:var(--text-secondary);margin-top:2px}
-.rbatch{font-size:22px;font-weight:500;color:#1a1a2e}
-.rtotal{display:flex;justify-content:space-between;align-items:center;background:#1a1a2e;padding:12px 14px;margin:0 16px 16px;border-radius:10px}
-.rtotal-lbl{font-size:13px;color:rgba(255,255,255,.65)}
-.rtotal-val{font-size:18px;font-weight:500;color:#fff}
-.recipe-card{background:var(--surface-2);border-radius:12px;border:0.5px solid var(--border);margin:12px 16px}
-.recipe-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;border-bottom:0.5px solid var(--border)}
-.recipe-title{font-size:14px;font-weight:500;color:var(--text-primary)}
-.recipe-badge{font-size:11px;color:var(--text-muted);background:var(--surface-1);border-radius:4px;padding:2px 7px;border:0.5px solid var(--border)}
-.recipe-body{padding:8px 0}
-.recipe-row{display:flex;justify-content:space-between;padding:6px 14px;font-size:13px}
-.recipe-row:nth-child(odd){background:var(--surface-1)}
-.ing-name{color:var(--text-secondary)}
-.ing-val{font-weight:500;color:var(--text-primary)}
-.ing-pct{font-size:11px;color:var(--text-muted);margin-left:4px}
-.divider{height:0.5px;background:var(--border);margin:0 14px}
-.empty{text-align:center;padding:32px 20px;color:var(--text-muted);font-size:13px}
+.rname{font-size:14px;font-weight:600;color:#111}
+.rsub{font-size:11px;color:#aaa;margin-top:2px}
+.rbatch{font-size:24px;font-weight:700;color:#1a1a2e}
+.rbatch-unit{font-size:12px;color:#999;display:block;text-align:right}
+.rtotal{display:flex;justify-content:space-between;align-items:center;background:#1a1a2e;padding:13px 16px;margin:0 16px 16px;border-radius:10px}
+.rtotal-lbl{font-size:14px;color:rgba(255,255,255,0.65)}
+.rtotal-val{font-size:20px;font-weight:700;color:#fff}
+.recipe-card{background:#fff;border-radius:12px;border:1px solid #eee;margin:0 16px 10px;overflow:hidden}
+.recipe-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.recipe-title{font-size:14px;font-weight:600;color:#111}
+.recipe-badge{font-size:11px;color:#888;background:#f5f5f5;border-radius:5px;padding:3px 8px}
+.chevron{font-size:18px;color:#ccc;transition:transform .2s;display:inline-block}
+.recipe-body{border-top:1px solid #f0f0f0}
+.recipe-row{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid #f8f8f8}
+.recipe-row:last-child{border-bottom:none}
+.recipe-row:nth-child(odd){background:#fafafa}
+.ing-name{font-size:13px;color:#555}
+.ing-val{font-size:13px;font-weight:600;color:#111}
+.ing-pct{font-size:11px;color:#aaa;margin-left:3px;font-weight:400}
+.recipe-total{display:flex;justify-content:space-between;padding:10px 14px;border-top:1px solid #eee;background:#f9f9f9}
+.empty{text-align:center;padding:40px 20px;color:#bbb;font-size:14px}
+.spacer{height:24px}
 </style>
+</head>
+<body>
 
-<div style="position:relative">
 <div class="toast" id="toast"></div>
 
 <div class="hdr">
-  <div class="hdr-title"><i class="ti ti-bread" aria-hidden="true" style="font-size:18px;margin-right:6px"></i>반죽 계량표</div>
-  <div class="save-info" id="saveInfo">
-    <span style="display:block;font-size:11px;color:rgba(255,255,255,0.45)">최종 저장</span>
+  <div class="hdr-title">🥖 반죽 계량표</div>
+  <div class="save-info">
+    <span class="save-lbl">최종 저장</span>
     <span class="save-time" id="saveTime">—</span>
   </div>
 </div>
@@ -66,25 +82,23 @@ body{font-family:var(--font-sans);background:var(--surface-0);color:var(--text-p
 <div class="day-bar" id="dayBar"></div>
 
 <div class="tabs">
-  <div class="tab active" id="tabQty" onclick="switchTab('qty')"><i class="ti ti-list-numbers" aria-hidden="true"></i> 수량 입력</div>
-  <div class="tab" id="tabResult" onclick="switchTab('result')"><i class="ti ti-calculator" aria-hidden="true"></i> 배합수</div>
-  <div class="tab" id="tabRecipe" onclick="switchTab('recipe')"><i class="ti ti-book" aria-hidden="true"></i> 레시피</div>
+  <div class="tab active" id="tabQty" onclick="switchTab('qty')">수량 입력</div>
+  <div class="tab" id="tabResult" onclick="switchTab('result')">배합수</div>
+  <div class="tab" id="tabRecipe" onclick="switchTab('recipe')">레시피</div>
 </div>
 
-<div class="save-bar">
-  <button class="save-btn" onclick="saveData()"><i class="ti ti-device-floppy" aria-hidden="true"></i> 수량 저장</button>
-  <button class="reset-btn" onclick="resetToDefault()"><i class="ti ti-refresh" aria-hidden="true"></i> 기본값</button>
+<div class="action-bar">
+  <button class="save-btn" onclick="saveData()">💾 저장</button>
+  <button class="reset-btn" onclick="resetToDefault()">초기화</button>
 </div>
 
-<div id="qtyTab"><div id="productList"></div></div>
+<div id="qtyTab"><div id="productList"></div><div class="spacer"></div></div>
 <div id="resultTab" style="display:none"></div>
-<div id="recipeTab" style="display:none"></div>
-</div>
+<div id="recipeTab" style="display:none"><div style="height:8px"></div><div id="recipeList"></div><div class="spacer"></div></div>
 
 <script>
 const DAYS=['월','화','수','목','금','토','일'];
 const DAY_TYPE={월:'wd',화:'wd',수:'wd',목:'wd',금:'sat',토:'sat',일:'sun'};
-
 const PRODUCTS=[
   {name:'모닝빵',dtype:'단과자',split:50,sun:72,wd:100,sat:160},
   {name:'단팥빵',dtype:'단과자',split:50,sun:122,wd:160,sat:185},
@@ -118,19 +132,17 @@ const PRODUCTS=[
   {name:'애플커스터드',dtype:'크루아상',split:80,sun:20,wd:20,sat:28},
   {name:'앙시오',dtype:'크루아상',split:65,sun:18,wd:18,sat:24},
 ];
-
 const RECIPE_TOTALS={단과자:2270,식빵:2715,모카빵:3163,잡곡식빵:2300,치아바타:1916.6,바타르:1892,펌퍼니클:2521,크루아상:2505};
 const MUKBAN=500,SIK_TOTAL=2715;
-
 const RECIPES={
-  단과자:{ings:[{n:'큐원',g:1135,pct:100},{n:'K-블레',g:340,pct:30},{n:'설탕',g:227,pct:20},{n:'소금',g:22.7,pct:2},{n:'생이스트',g:34,pct:3},{n:'버터',g:113.5,pct:10},{n:'전란',g:227,pct:20},{n:'우유',g:113.5,pct:10}],total:2270},
-  바타르:{ings:[{n:'지라도(T65)',g:1000,pct:100},{n:'물',g:700,pct:70},{n:'레드',g:2,pct:0.2},{n:'소금',g:20,pct:2},{n:'바시나주',g:20,pct:2},{n:'호밀 르방',g:150,pct:15}],total:1892},
-  식빵:{ings:[{n:'K-블레',g:500,pct:50},{n:'큐원',g:500,pct:50},{n:'물',g:470,pct:47},{n:'설탕',g:100,pct:10},{n:'소금',g:20,pct:2},{n:'탈지분유',g:20,pct:2},{n:'생이스트',g:35,pct:3.5},{n:'S500',g:10,pct:1},{n:'버터',g:80,pct:8},{n:'물엿',g:30,pct:3},{n:'생크림',g:50,pct:5},{n:'묵반',g:500,pct:50},{n:'크루 묵반',g:200,pct:20},{n:'탕종',g:200,pct:20}],total:2715},
-  모카빵:{ings:[{n:'K-블레',g:1000,pct:100},{n:'물',g:500,pct:50},{n:'설탕',g:150,pct:15},{n:'소금',g:18,pct:1.8},{n:'생이스트',g:25,pct:2.5},{n:'버터',g:100,pct:10},{n:'전란',g:200,pct:20},{n:'모카피',g:1000,pct:100}],total:3163},
-  잡곡식빵:{ings:[{n:'K-블레',g:1000,pct:100},{n:'물',g:580,pct:58},{n:'설탕',g:80,pct:8},{n:'소금',g:20,pct:2},{n:'생이스트',g:30,pct:3},{n:'버터',g:60,pct:6},{n:'잡곡미스',g:100,pct:10},{n:'묵반',g:500,pct:50}],total:2300},
-  펌퍼니클:{ings:[{n:'크라프트',g:217,pct:72},{n:'호밀',g:72.5,pct:24},{n:'설탕',g:23,pct:7.7},{n:'소금',g:2,pct:0.7},{n:'트레할로스',g:71.5,pct:23.8},{n:'햄프씨드',g:108.5,pct:36.1},{n:'치아씨드',g:72.5,pct:24.1},{n:'몰트액기스',g:15,pct:5},{n:'물',g:87.5,pct:29.1},{n:'우유',g:350,pct:116},{n:'호밀 르방',g:250,pct:83.3},{n:'호두',g:123,pct:40.9},{n:'꿀',g:28.5,pct:9.5},{n:'잡곡식빵',g:1100,pct:366}],total:2521},
-  크루아상:{ings:[{n:'큐원',g:375,pct:75},{n:'지라도',g:125,pct:25},{n:'물',g:180,pct:36},{n:'전란',g:25,pct:5},{n:'소금',g:10,pct:2},{n:'설탕',g:70,pct:14},{n:'생이스트',g:22.5,pct:4.5},{n:'엑스트라버터',g:62.5,pct:12.5},{n:'충전용버터',g:1930,pct:386}],total:2505},
-  치아바타:{ings:[{n:'T55 (풀리쉬)',g:450,pct:'—'},{n:'물 (풀리쉬)',g:450,pct:'—'},{n:'Dy (풀리쉬)',g:18,pct:'—'},{n:'T55 (본반죽)',g:250,pct:'—'},{n:'우유',g:600,pct:'—'},{n:'물',g:60,pct:'—'},{n:'소금',g:40,pct:'—'},{n:'설탕',g:160,pct:'—'},{n:'버터',g:100,pct:'—'},{n:'몰트',g:20,pct:'—'},{n:'롤인버터',g:1200,pct:'—'}],total:3348},
+  단과자:{label:'단과자',total:2270,ings:[{n:'큐원',g:1135,pct:100},{n:'K-블레',g:340,pct:30},{n:'설탕',g:227,pct:20},{n:'소금',g:22.7,pct:2},{n:'생이스트',g:34,pct:3},{n:'버터',g:113.5,pct:10},{n:'전란',g:227,pct:20},{n:'우유',g:113.5,pct:10}]},
+  바타르:{label:'바타르',total:1892,ings:[{n:'지라도 T65',g:1000,pct:100},{n:'물',g:700,pct:70},{n:'레드',g:2,pct:0.2},{n:'소금',g:20,pct:2},{n:'바시나주',g:20,pct:2},{n:'호밀 르방',g:150,pct:15}]},
+  식빵:{label:'식빵',total:2715,ings:[{n:'K-블레',g:500,pct:50},{n:'큐원',g:500,pct:50},{n:'물',g:470,pct:47},{n:'설탕',g:100,pct:10},{n:'소금',g:20,pct:2},{n:'탈지분유',g:20,pct:2},{n:'생이스트',g:35,pct:3.5},{n:'S500',g:10,pct:1},{n:'버터',g:80,pct:8},{n:'물엿',g:30,pct:3},{n:'생크림',g:50,pct:5},{n:'묵반',g:500,pct:50},{n:'크루 묵반',g:200,pct:20},{n:'탕종',g:200,pct:20}]},
+  모카빵:{label:'모카빵',total:3163,ings:[{n:'K-블레',g:1000,pct:100},{n:'물',g:500,pct:50},{n:'설탕',g:150,pct:15},{n:'소금',g:18,pct:1.8},{n:'생이스트',g:25,pct:2.5},{n:'버터',g:100,pct:10},{n:'전란',g:200,pct:20},{n:'모카피',g:1000,pct:100}]},
+  잡곡식빵:{label:'잡곡식빵',total:2300,ings:[{n:'K-블레',g:1000,pct:100},{n:'물',g:580,pct:58},{n:'설탕',g:80,pct:8},{n:'소금',g:20,pct:2},{n:'생이스트',g:30,pct:3},{n:'버터',g:60,pct:6},{n:'잡곡미스',g:100,pct:10},{n:'묵반',g:500,pct:50}]},
+  펌퍼니클:{label:'펌퍼니클',total:2521,ings:[{n:'크라프트',g:217,pct:72.3},{n:'호밀',g:72.5,pct:24.2},{n:'설탕',g:23,pct:7.7},{n:'소금',g:2,pct:0.7},{n:'트레할로스',g:71.5,pct:23.8},{n:'햄프씨드',g:108.5,pct:36.2},{n:'치아씨드',g:72.5,pct:24.2},{n:'몰트액기스',g:15,pct:5},{n:'물',g:87.5,pct:29.2},{n:'우유',g:350,pct:116.7},{n:'호밀 르방',g:250,pct:83.3},{n:'호두',g:123,pct:41},{n:'꿀',g:28.5,pct:9.5}]},
+  크루아상:{label:'크루아상',total:2505,ings:[{n:'큐원',g:375,pct:75},{n:'지라도',g:125,pct:25},{n:'물',g:180,pct:36},{n:'전란',g:25,pct:5},{n:'소금',g:10,pct:2},{n:'설탕',g:70,pct:14},{n:'생이스트',g:22.5,pct:4.5},{n:'엑스트라버터',g:62.5,pct:12.5},{n:'충전용 버터',g:1930,pct:386}]},
+  치아바타:{label:'치아바타/포카치아',total:3348,ings:[{n:'T55 풀리쉬',g:450,pct:'풀리쉬'},{n:'물 풀리쉬',g:450,pct:'풀리쉬'},{n:'Dy 풀리쉬',g:18,pct:'풀리쉬'},{n:'T55 본반죽',g:250,pct:'본반죽'},{n:'버터',g:100,pct:'본반죽'},{n:'설탕',g:160,pct:'본반죽'},{n:'소금',g:40,pct:'본반죽'},{n:'DY',g:20,pct:'본반죽'},{n:'우유',g:600,pct:'본반죽'},{n:'물',g:60,pct:'본반죽'},{n:'몰트',g:20,pct:'본반죽'},{n:'롤인버터',g:1200,pct:'충전'}]},
 };
 
 let today='월';
@@ -139,68 +151,62 @@ PRODUCTS.forEach(p=>qty[p.name]=p[DAY_TYPE['월']]);
 
 function loadSaved(){
   try{
-    const s=window.storage;
-    if(!s) return;
-    s.get('bakery_qty').then(r=>{
-      if(r&&r.value){
-        const d=JSON.parse(r.value);
-        if(d.qty) Object.assign(qty,d.qty);
-        if(d.day){today=d.day;document.querySelectorAll('.day-btn').forEach(b=>{b.classList.toggle('active',b.dataset.day===today)});}
-      }
-    }).catch(()=>{});
-    s.get('bakery_savetime').then(r=>{
-      if(r&&r.value) document.getElementById('saveTime').textContent=r.value;
-    }).catch(()=>{});
+    const d=localStorage.getItem('bakery_data');
+    if(d){
+      const parsed=JSON.parse(d);
+      if(parsed.qty) Object.keys(parsed.qty).forEach(k=>{ if(qty.hasOwnProperty(k)) qty[k]=parsed.qty[k]; });
+      if(parsed.day && DAYS.includes(parsed.day)){ today=parsed.day; }
+    }
+    const t=localStorage.getItem('bakery_savetime');
+    if(t) document.getElementById('saveTime').textContent=t;
   }catch(e){}
 }
 
 function saveData(){
   try{
-    const s=window.storage;
-    if(!s){showToast('저장 기능은 독립 앱 환경에서 사용 가능합니다');return;}
     const now=new Date();
-    const timeStr=`${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    s.set('bakery_qty',JSON.stringify({qty,day:today}));
-    s.set('bakery_savetime',timeStr);
-    document.getElementById('saveTime').textContent=timeStr;
+    const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    localStorage.setItem('bakery_data',JSON.stringify({qty,day:today}));
+    localStorage.setItem('bakery_savetime',str);
+    document.getElementById('saveTime').textContent=str;
     showToast('저장했습니다');
-  }catch(e){
-    const now=new Date();
-    const timeStr=`${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    document.getElementById('saveTime').textContent=timeStr;
-    showToast('저장했습니다');
-  }
+  }catch(e){ showToast('저장 실패: '+e.message); }
 }
+function pad(n){ return String(n).padStart(2,'0'); }
 
 function showToast(msg){
   const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),1800);
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
 }
 
 function resetToDefault(){
+  if(!confirm(today+'요일 기본 수량으로 초기화할까요?')) return;
   const dt=DAY_TYPE[today];
   PRODUCTS.forEach(p=>qty[p.name]=p[dt]);
   renderProducts();
-  showToast('기본 수량으로 초기화했습니다');
+  showToast('초기화했습니다');
 }
 
+// day bar
 const dayBar=document.getElementById('dayBar');
 DAYS.forEach(d=>{
   const btn=document.createElement('button');
-  btn.className='day-btn'+(d===today?' active':'');
+  btn.className='day-btn';
   btn.textContent=d+'요일';
   btn.dataset.day=d;
   btn.onclick=()=>{
     today=d;
     document.querySelectorAll('.day-btn').forEach(b=>b.classList.toggle('active',b.dataset.day===d));
-    const dt=DAY_TYPE[d];
-    PRODUCTS.forEach(p=>{ if(qty[p.name]===undefined) qty[p.name]=p[dt]; });
     renderProducts();
     if(curTab==='result') renderResults();
   };
   dayBar.appendChild(btn);
 });
+
+function setActiveDay(){
+  document.querySelectorAll('.day-btn').forEach(b=>b.classList.toggle('active',b.dataset.day===today));
+}
 
 function getGroups(){
   const g={};
@@ -209,23 +215,28 @@ function getGroups(){
 }
 
 function renderProducts(){
+  setActiveDay();
   const list=document.getElementById('productList');
   list.innerHTML='';
   const groups=getGroups();
   Object.entries(groups).forEach(([dtype,prods])=>{
     const lbl=document.createElement('div');
-    lbl.className='sec-label';lbl.textContent=dtype;
+    lbl.className='sec-label'; lbl.textContent=dtype;
     list.appendChild(lbl);
     prods.forEach(p=>{
+      const q=qty[p.name]??0;
       const row=document.createElement('div');
       row.className='prod-row';
-      const q=qty[p.name]??0;
-      row.innerHTML=`<div class="prod-info"><div class="prod-name">${p.name}</div><div class="prod-sub">${p.split}g/개</div></div>
-      <div class="qty-ctrl">
-        <div class="qb" onclick="adj('${p.name}',-1)">−</div>
-        <input class="qinput" type="number" min="0" value="${q}" onchange="setQ('${p.name}',this.value)">
-        <div class="qb" onclick="adj('${p.name}',1)">+</div>
-      </div>`;
+      row.innerHTML=`
+        <div class="prod-info">
+          <div class="prod-name">${p.name}</div>
+          <div class="prod-sub">${p.split}g/개</div>
+        </div>
+        <div class="qty-ctrl">
+          <div class="qb" onclick="adj('${p.name}',-1)">−</div>
+          <input class="qinput" type="number" min="0" value="${q}" onchange="setQ('${p.name}',this.value)" oninput="setQ('${p.name}',this.value)">
+          <div class="qb" onclick="adj('${p.name}',1)">+</div>
+        </div>`;
       list.appendChild(row);
     });
   });
@@ -242,8 +253,8 @@ function setQ(name,v){
 }
 
 function calcBatches(){
-  const dtypes=[...new Set(PRODUCTS.map(p=>p.dtype))];
   const result={};
+  const dtypes=[...new Set(PRODUCTS.map(p=>p.dtype))];
   dtypes.forEach(dtype=>{
     const prods=PRODUCTS.filter(p=>p.dtype===dtype);
     const recipe=RECIPE_TOTALS[dtype];
@@ -274,58 +285,59 @@ function renderResults(){
   const tab=document.getElementById('resultTab');
   const batches=calcBatches();
   const LABEL={단과자:'단과자',식빵:'식빵',모카빵:'모카빵',잡곡식빵:'잡곡식빵',치아바타:'치아바타/포카치아',바타르:'바타르',펌퍼니클:'펌퍼니클',크루아상:'크루아상'};
-  let html='<div class="rcard"><div class="rcard-hdr">'+today+'요일 배합수 (0.1 단위)</div>';
-  let total=0,any=false;
+  let any=false,total=0,rows='';
   Object.entries(batches).forEach(([dtype,d])=>{
     if(!d.batches) return;
-    any=true;total+=d.batches;
-    html+=`<div class="rrow"><div><div class="rname">${LABEL[dtype]||dtype}</div><div class="rsub">${Math.round(d.total_g).toLocaleString()}g 필요</div></div><div style="text-align:right"><div class="rbatch">${d.batches.toFixed(1)}</div><div class="rsub">배합</div></div></div>`;
+    any=true; total+=d.batches;
+    rows+=`<div class="rrow">
+      <div><div class="rname">${LABEL[dtype]||dtype}</div><div class="rsub">${Math.round(d.total_g).toLocaleString()}g 필요 · 1배합 ${Math.round(d.recipe).toLocaleString()}g</div></div>
+      <div style="text-align:right"><div class="rbatch">${d.batches.toFixed(1)}</div><span class="rbatch-unit">배합</span></div>
+    </div>`;
   });
-  if(!any) html+='<div class="empty">수량을 입력하면 배합수가 계산됩니다.</div>';
+  let html=`<div class="rcard"><div class="rcard-hdr">${today}요일 배합수 (0.1 단위 올림)</div>`;
+  html+=any?rows:'<div class="empty">수량을 입력하면<br>배합수가 계산됩니다</div>';
   html+='</div>';
   if(any) html+=`<div class="rtotal"><span class="rtotal-lbl">전체 합계</span><span class="rtotal-val">${total.toFixed(1)} 배합</span></div>`;
+  html+='<div class="spacer"></div>';
   tab.innerHTML=html;
 }
 
 function renderRecipes(){
-  const tab=document.getElementById('recipeTab');
-  let html='<div style="height:8px"></div>';
-  const NAMES={단과자:'단과자',바타르:'바타르',식빵:'식빵',모카빵:'모카빵',잡곡식빵:'잡곡식빵',펌퍼니클:'펌퍼니클',크루아상:'크루아상',치아바타:'치아바타/포카치아'};
+  const list=document.getElementById('recipeList');
+  list.innerHTML='';
   Object.entries(RECIPES).forEach(([key,rec])=>{
-    const label=NAMES[key]||key;
-    html+=`<div class="recipe-card">
-    <div class="recipe-hdr" onclick="toggleRecipe('${key}')">
-      <span class="recipe-title">${label}</span>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span class="recipe-badge">1배합 ${Math.round(rec.total).toLocaleString()}g</span>
-        <i class="ti ti-chevron-down" id="icon-${key}" style="font-size:16px;color:var(--text-muted);transition:transform .2s" aria-hidden="true"></i>
+    const card=document.createElement('div');
+    card.className='recipe-card';
+    card.innerHTML=`
+      <div class="recipe-hdr" onclick="toggleR('${key}')">
+        <span class="recipe-title">${rec.label}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="recipe-badge">1배합 ${Math.round(rec.total).toLocaleString()}g</span>
+          <span class="chevron" id="chev-${key}">▾</span>
+        </div>
       </div>
-    </div>
-    <div id="recipe-${key}" style="display:none">
-      <div class="recipe-body">`;
-    rec.ings.forEach((ing,i)=>{
-      html+=`<div class="recipe-row">
-        <span class="ing-name">${ing.n}</span>
-        <span class="ing-val">${ing.g}g<span class="ing-pct">${ing.pct!=='—'?`(${ing.pct}%)`:'(풀리쉬/본반죽)'}</span></span>
+      <div id="rbody-${key}" style="display:none">
+        <div class="recipe-body">
+          ${rec.ings.map(i=>`<div class="recipe-row">
+            <span class="ing-name">${i.n}</span>
+            <span class="ing-val">${i.g}g<span class="ing-pct">${typeof i.pct==='number'?'('+i.pct+'%)':'('+i.pct+')'}</span></span>
+          </div>`).join('')}
+        </div>
+        <div class="recipe-total">
+          <span style="font-size:13px;color:#888">1배합 총무게</span>
+          <span style="font-size:13px;font-weight:600">${Math.round(rec.total).toLocaleString()}g</span>
+        </div>
       </div>`;
-    });
-    html+=`</div><div class="divider"></div>
-      <div style="display:flex;justify-content:space-between;padding:10px 14px;font-size:13px">
-        <span style="color:var(--text-secondary)">1배합 총무게</span>
-        <span style="font-weight:500">${Math.round(rec.total).toLocaleString()}g</span>
-      </div>
-    </div></div>`;
+    list.appendChild(card);
   });
-  html+='<div style="height:16px"></div>';
-  tab.innerHTML=html;
 }
 
-function toggleRecipe(key){
-  const body=document.getElementById('recipe-'+key);
-  const icon=document.getElementById('icon-'+key);
+function toggleR(key){
+  const body=document.getElementById('rbody-'+key);
+  const chev=document.getElementById('chev-'+key);
   const open=body.style.display==='none';
   body.style.display=open?'block':'none';
-  icon.style.transform=open?'rotate(180deg)':'rotate(0)';
+  chev.textContent=open?'▴':'▾';
 }
 
 let curTab='qty';
@@ -342,3 +354,5 @@ function switchTab(tab){
 loadSaved();
 renderProducts();
 </script>
+</body>
+</html>
