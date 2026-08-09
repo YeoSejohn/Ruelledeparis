@@ -153,36 +153,53 @@ DAYS.forEach(day=>{
 });
 function qty(){ return allQty[today]; }
 
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbz-gYqonSQ_r--DP2gjERFHpn8_5sCmrJo4OOLRwFeapAIWJFQVK7_wkfjq0iS4qJyDUg/exec';
+
 function loadSaved(){
-  try{
-    const d=localStorage.getItem('bakery_data_v2');
-    if(d){
-      const parsed=JSON.parse(d);
-      if(parsed.allQty){
-        DAYS.forEach(day=>{
-          if(parsed.allQty[day]){
-            Object.keys(parsed.allQty[day]).forEach(k=>{
-              if(allQty[day].hasOwnProperty(k)) allQty[day][k]=parsed.allQty[day][k];
-            });
-          }
-        });
+  document.getElementById('saveTime').textContent='불러오는 중...';
+  fetch(SCRIPT_URL+'?key=bakery_data')
+    .then(r=>r.text())
+    .then(text=>{
+      if(text){
+        const parsed=JSON.parse(text);
+        if(parsed.allQty){
+          DAYS.forEach(day=>{
+            if(parsed.allQty[day]){
+              Object.keys(parsed.allQty[day]).forEach(k=>{
+                if(allQty[day].hasOwnProperty(k)) allQty[day][k]=parsed.allQty[day][k];
+              });
+            }
+          });
+        }
+        if(parsed.day && DAYS.includes(parsed.day)){ today=parsed.day; }
       }
-      if(parsed.day && DAYS.includes(parsed.day)){ today=parsed.day; }
-    }
-    const t=localStorage.getItem('bakery_savetime');
-    if(t) document.getElementById('saveTime').textContent=t;
-  }catch(e){}
+      const t=localStorage.getItem('bakery_savetime');
+      if(t) document.getElementById('saveTime').textContent=t;
+      else document.getElementById('saveTime').textContent='—';
+      renderProducts();
+      setActiveDay();
+    })
+    .catch(()=>{
+      document.getElementById('saveTime').textContent='오프라인';
+      renderProducts();
+    });
 }
 
 function saveData(){
-  try{
-    const now=new Date();
-    const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
-    localStorage.setItem('bakery_data_v2',JSON.stringify({allQty,day:today}));
+  const now=new Date();
+  const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  document.getElementById('saveTime').textContent='저장 중...';
+  fetch(SCRIPT_URL,{
+    method:'POST',
+    body:JSON.stringify({key:'bakery_data',value:JSON.stringify({allQty,day:today})})
+  })
+  .then(r=>r.text())
+  .then(()=>{
     localStorage.setItem('bakery_savetime',str);
     document.getElementById('saveTime').textContent=str;
     showToast('저장했습니다');
-  }catch(e){ showToast('저장 실패: '+e.message); }
+  })
+  .catch(()=>showToast('저장 실패 — 인터넷 연결 확인'));
 }
 function pad(n){ return String(n).padStart(2,'0'); }
 
@@ -364,7 +381,6 @@ function switchTab(tab){
 }
 
 loadSaved();
-renderProducts();
 </script>
 </body>
 </html>
