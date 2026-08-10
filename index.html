@@ -9,66 +9,66 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f5f5;color:#111;font-size:15px}
-/* 헤더 */
-.hdr{background:#1a1a2e;color:#fff;padding:14px 16px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:30}
-.hdr-title{font-size:17px;font-weight:600;flex:1}
+.hdr{background:#1a1a2e;color:#fff;padding:12px 14px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:30}
+.hdr-title{font-size:16px;font-weight:600;flex:1}
 .save-lbl{font-size:10px;color:rgba(255,255,255,0.45);display:block;text-align:right}
-.save-time{font-size:12px;color:rgba(255,255,255,0.8);display:block;text-align:right}
-/* 요일 바 */
-.day-bar{background:#111827;padding:8px 12px;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.day-bar::-webkit-scrollbar{display:none}
-.day-btn{padding:6px 11px;border-radius:20px;border:1.5px solid rgba(255,255,255,0.25);background:transparent;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;transition:all .15s}
-.day-btn.active{background:#fff;color:#1a1a2e;border-color:#fff;font-weight:600}
-.day-btn.multi{background:#3b5bdb;border-color:#3b5bdb;color:#fff}
-/* 탭 */
-.tabs{display:flex;background:#fff;border-bottom:1px solid #e8e8e8;position:sticky;top:54px;z-index:19}
+.save-time{font-size:11px;color:rgba(255,255,255,0.8);display:block;text-align:right}
+.tabs{display:flex;background:#fff;border-bottom:1px solid #e8e8e8;position:sticky;top:48px;z-index:29}
 .tab{flex:1;padding:11px 0;text-align:center;font-size:13px;color:#888;cursor:pointer;border-bottom:2.5px solid transparent;font-family:inherit}
 .tab.active{color:#1a1a2e;border-color:#1a1a2e;font-weight:600}
-/* 액션 바 */
-.action-bar{display:flex;gap:8px;padding:10px 16px;background:#fff;border-bottom:1px solid #e8e8e8}
-.save-btn{flex:1;padding:10px;border-radius:9px;background:#1a1a2e;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.action-bar{display:flex;gap:8px;padding:9px 14px;background:#fff;border-bottom:1px solid #e8e8e8}
+.save-btn{flex:1;padding:9px;border-radius:9px;background:#1a1a2e;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
 .save-btn:active{opacity:.85}
-.reset-btn{padding:10px 14px;border-radius:9px;background:transparent;color:#666;border:1.5px solid #ddd;font-size:13px;cursor:pointer;font-family:inherit}
-/* 다중 요일 바 */
-.multi-bar{background:#eef2ff;border-bottom:1px solid #c5cae9;padding:8px 16px;display:none}
-.multi-bar.show{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.multi-info{font-size:12px;color:#3b5bdb;font-weight:600;flex:1}
-.multi-close{font-size:12px;color:#888;cursor:pointer;padding:4px 10px;border:1px solid #ccc;border-radius:6px;background:#fff;font-family:inherit}
-/* 토스트 */
+.reset-btn{padding:9px 13px;border-radius:9px;background:transparent;color:#666;border:1.5px solid #ddd;font-size:13px;cursor:pointer;font-family:inherit}
 .toast{position:fixed;left:50%;transform:translateX(-50%);background:rgba(20,20,35,0.92);color:#fff;font-size:13px;padding:9px 20px;border-radius:22px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;bottom:24px;z-index:100}
 .toast.show{opacity:1}
-/* 수량 탭 */
-.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 4px;background:#f5f5f5}
-.sec-label{font-size:11px;font-weight:600;color:#999;letter-spacing:.07em;text-transform:uppercase}
-.sec-del-btn{font-size:11px;color:#dc2626;background:#fee2e2;border:none;border-radius:6px;padding:3px 9px;cursor:pointer;font-family:inherit}
-.prod-row{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border-bottom:1px solid #f0f0f0}
-.prod-info{flex:1;min-width:0}
-.prod-name{font-size:14px;color:#111;font-weight:500}
-.prod-sub{font-size:11px;color:#aaa;margin-top:1px}
-.qty-ctrl{display:flex;align-items:center;flex-shrink:0}
-.qb{width:34px;height:34px;border-radius:8px;border:1.5px solid #ddd;background:#f8f8f8;color:#333;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none}
-.qb:active{background:#ebebeb}
-.qinput{width:48px;text-align:center;font-size:16px;font-weight:600;border:none;background:transparent;color:#111;padding:0;font-family:inherit;-moz-appearance:textfield}
-.qinput::-webkit-inner-spin-button,.qinput::-webkit-outer-spin-button{-webkit-appearance:none}
-/* 제품 추가 버튼 */
-.add-prod-row{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#fff;border-bottom:1px solid #f0f0f0;cursor:pointer}
-.add-prod-icon{width:28px;height:28px;border-radius:50%;background:#e8eaf6;color:#3b5bdb;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.add-prod-lbl{font-size:13px;color:#3b5bdb}
-/* 레시피 추가 버튼 */
-.add-dtype-btn{margin:12px 16px;padding:11px;border-radius:9px;border:1.5px dashed #3b5bdb;background:#f0f4ff;color:#3b5bdb;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;width:calc(100%-32px);display:block}
-/* 배합수 탭 */
-.rcard{background:#fff;border-radius:12px;margin:12px 16px;overflow:hidden;border:1px solid #eee}
-.rcard-hdr{padding:12px 14px 10px;font-size:12px;font-weight:600;color:#666;border-bottom:1px solid #f0f0f0;text-transform:uppercase}
-.rrow{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid #f5f5f5}
-.rrow:last-child{border-bottom:none}
-.rname{font-size:14px;font-weight:600;color:#111}
-.rsub{font-size:11px;color:#aaa;margin-top:2px}
-.rbatch{font-size:24px;font-weight:700;color:#1a1a2e}
-.rtotal{display:flex;justify-content:space-between;align-items:center;background:#1a1a2e;padding:13px 16px;margin:0 16px 16px;border-radius:10px}
-.rtotal-lbl{font-size:14px;color:rgba(255,255,255,.65)}
-.rtotal-val{font-size:20px;font-weight:700;color:#fff}
-/* 레시피 카드 */
-.recipe-card{background:#fff;border-radius:12px;border:1px solid #eee;margin:0 16px 10px;overflow:hidden}
+/* 주간 테이블 */
+.wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;background:#fff}
+.wrap::-webkit-scrollbar{height:5px}
+.wrap::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%}
+thead th{position:sticky;top:0;background:#f0f2f5;font-size:11px;font-weight:600;color:#666;padding:8px 4px;text-align:center;border-bottom:1px solid #ddd;white-space:nowrap;z-index:5}
+thead th.name-col{position:sticky;left:0;z-index:6;background:#f0f2f5;text-align:left;padding-left:12px;min-width:110px;border-right:1px solid #e0e0e0}
+thead th.day-col{min-width:52px;cursor:pointer;user-select:none}
+thead th.day-col.sel{background:#3b5bdb;color:#fff}
+thead th.day-col.weekend{color:#dc2626}
+thead th.day-col.sel.weekend{color:#fff}
+.sec-row td{background:#f5f5f5;padding:9px 12px;font-size:11px;font-weight:700;color:#666;letter-spacing:.05em;position:sticky;left:0;border-bottom:1px solid #eee}
+.sec-row .sec-inner{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sec-del{font-size:10px;color:#dc2626;background:#fee2e2;border:none;border-radius:5px;padding:2px 7px;cursor:pointer;font-family:inherit;flex-shrink:0}
+tbody td{padding:0;border-bottom:1px solid #f2f2f2;text-align:center}
+td.name-cell{position:sticky;left:0;background:#fff;z-index:4;text-align:left;padding:7px 12px;border-right:1px solid #f0f0f0;cursor:pointer;min-width:110px}
+tr:nth-child(even) td.name-cell{background:#fafafa}
+tr:nth-child(even) td.qty-cell{background:#fafafa}
+.p-name{font-size:13px;color:#111;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px}
+.p-split{font-size:10px;color:#aaa;margin-top:1px}
+td.qty-cell{min-width:52px;padding:0}
+.q-inp{width:100%;height:38px;text-align:center;font-size:15px;font-weight:600;border:none;background:transparent;color:#111;font-family:inherit;-moz-appearance:textfield;padding:0}
+.q-inp::-webkit-inner-spin-button,.q-inp::-webkit-outer-spin-button{-webkit-appearance:none}
+.q-inp:focus{outline:2px solid #3b5bdb;outline-offset:-2px;background:#fff}
+.q-inp.zero{color:#ccc}
+.q-inp.sel-day{background:#eef2ff}
+tr:nth-child(even) .q-inp.sel-day{background:#e5eaff}
+/* 배합수 테이블 */
+.batch-row td{padding:9px 4px;font-size:15px;font-weight:700;color:#1a1a2e;text-align:center}
+.batch-row td.name-cell{font-size:13px;font-weight:600;color:#111;padding:9px 12px}
+.batch-row.total-row td{background:#1a1a2e;color:#fff;font-size:14px}
+.batch-row.total-row td.name-cell{background:#1a1a2e;color:rgba(255,255,255,.7);font-weight:600}
+.batch-sub{font-size:10px;color:#aaa;font-weight:400;display:block;margin-top:1px}
+/* 다중선택 바 */
+.multi-bar{background:#eef2ff;border-bottom:1px solid #c5cae9;padding:8px 14px;display:none;align-items:center;gap:8px;flex-wrap:wrap}
+.multi-bar.show{display:flex}
+.multi-txt{font-size:12px;color:#3b5bdb;font-weight:600;flex:1;min-width:150px}
+.multi-btn{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #3b5bdb;background:#fff;color:#3b5bdb;cursor:pointer;font-family:inherit}
+.multi-btn.solid{background:#3b5bdb;color:#fff}
+/* 제품 추가 */
+.add-row td{padding:0}
+.add-inner{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;position:sticky;left:0}
+.add-ico{width:24px;height:24px;border-radius:50%;background:#e8eaf6;color:#3b5bdb;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.add-lbl{font-size:12px;color:#3b5bdb;white-space:nowrap}
+.add-dtype-btn{margin:12px 14px;padding:11px;border-radius:9px;border:1.5px dashed #3b5bdb;background:#f0f4ff;color:#3b5bdb;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;width:calc(100% - 28px);display:block}
+/* 레시피 */
+.recipe-card{background:#fff;border-radius:12px;border:1px solid #eee;margin:0 14px 10px;overflow:hidden}
 .recipe-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;cursor:pointer;user-select:none}
 .recipe-title{font-size:14px;font-weight:600;color:#111}
 .batch-wrap{display:flex;align-items:center;gap:4px;background:#f0f4ff;border-radius:8px;padding:4px 8px}
@@ -78,14 +78,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f5f5;
 .ing-hdr{display:flex;justify-content:space-between;padding:7px 14px;background:#f8f8f8;font-size:11px;font-weight:600;color:#888;border-bottom:1px solid #f0f0f0}
 .ing-row{display:flex;align-items:center;padding:8px 14px;border-bottom:1px solid #f8f8f8}
 .ing-row:nth-child(odd){background:#fafafa}
-.ing-row:last-child{border-bottom:none}
 .ing-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:8px}
 .ing-n{font-size:13px;color:#333;flex:1}
 .ing-pct{font-size:12px;color:#aaa;min-width:52px;text-align:right;margin-right:10px}
 .ing-g{font-size:13px;font-weight:600;color:#111;min-width:62px;text-align:right}
 .recipe-footer{display:flex;justify-content:space-between;padding:10px 14px;border-top:1px solid #eee;background:#f9f9f9}
 .edit-toggle-btn{font-size:11px;color:#5566aa;background:#eef0ff;border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-family:inherit}
-/* 편집 폼 */
 .edit-section{padding:12px 14px;background:#fafafa;border-top:1px solid #f0f0f0}
 .flour-info{font-size:11px;font-weight:600;color:#888;margin-bottom:10px}
 .erow{display:flex;gap:5px;align-items:flex-end;margin-bottom:8px;background:#fff;border-radius:8px;padding:8px 10px;border:1px solid #eee}
@@ -97,41 +95,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f5f5;
 .einp.eg{color:#111;font-weight:600}
 .esel{padding:5px 3px;border-radius:6px;border:1px solid #e0e0e0;font-size:12px;font-family:inherit;background:#fff;width:100%;color:#333}
 .del-ing-btn{width:28px;height:28px;border-radius:6px;border:none;background:#fee2e2;color:#dc2626;font-size:18px;font-weight:700;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;align-self:flex-end}
-.del-ing-btn:active{background:#fecaca}
 .add-ing-btn{width:100%;padding:9px;border-radius:8px;border:1.5px dashed #ccc;background:transparent;color:#888;font-size:13px;cursor:pointer;font-family:inherit;margin:4px 0 8px}
 .apply-btn{width:100%;padding:10px;border-radius:8px;background:#1a1a2e;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
-.apply-btn:active{opacity:.85}
 /* 모달 */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:50;display:none;align-items:flex-end}
 .modal-bg.show{display:flex}
-.modal{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px;width:100%;max-height:90vh;overflow-y:auto}
-.modal-title{font-size:16px;font-weight:600;color:#111;margin-bottom:4px}
+.modal{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px;width:100%;max-height:88vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:4px}
 .modal-sub{font-size:12px;color:#888;margin-bottom:16px}
 .modal-row{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
 .modal-row label{font-size:12px;font-weight:600;color:#666}
 .modal-inp{padding:10px 12px;border-radius:9px;border:1.5px solid #e0e0e0;font-size:15px;font-family:inherit;width:100%}
 .modal-inp:focus{outline:none;border-color:#1a1a2e}
-.modal-inp.small{width:100px}
 .modal-sel{padding:10px 12px;border-radius:9px;border:1.5px solid #e0e0e0;font-size:15px;font-family:inherit;width:100%;background:#fff}
 .modal-btns{display:flex;gap:8px;margin-top:16px}
 .modal-ok{flex:1;padding:12px;border-radius:10px;background:#1a1a2e;color:#fff;border:none;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
-.modal-cancel{padding:12px 20px;border-radius:10px;background:#f5f5f5;color:#666;border:none;font-size:15px;cursor:pointer;font-family:inherit}
-.modal-del{padding:12px 16px;border-radius:10px;background:#fee2e2;color:#dc2626;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
-/* 요일 체크박스 */
-.day-checks{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
-.day-check{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:20px;border:1.5px solid #ddd;cursor:pointer;font-size:13px;user-select:none;transition:all .1s}
-.day-check.on{background:#3b5bdb;border-color:#3b5bdb;color:#fff}
-.day-check input{display:none}
-.spacer{height:24px}
+.modal-cancel{padding:12px 18px;border-radius:10px;background:#f5f5f5;color:#666;border:none;font-size:15px;cursor:pointer;font-family:inherit}
+.modal-del{padding:12px 14px;border-radius:10px;background:#fee2e2;color:#dc2626;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.spacer{height:20px}
 </style>
 </head>
 <body>
 <div class="toast" id="toast"></div>
-
-<!-- 제품 추가 모달 -->
 <div class="modal-bg" id="modalBg" onclick="closeModal()">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-title" id="modalTitle">제품 추가</div>
+    <div class="modal-title" id="modalTitle"></div>
     <div class="modal-sub" id="modalSub"></div>
     <div id="modalBody"></div>
     <div class="modal-btns">
@@ -144,15 +132,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f5f5;
 
 <div class="hdr">
   <div class="hdr-title">&#127838; 반죽 계량표</div>
-  <div>
-    <span class="save-lbl">최종 저장</span>
-    <span class="save-time" id="saveTime">-</span>
-  </div>
-</div>
-<div class="day-bar" id="dayBar"></div>
-<div class="multi-bar" id="multiBar">
-  <span class="multi-info" id="multiInfo"></span>
-  <button class="multi-close" onclick="exitMulti()">단일 요일로</button>
+  <div><span class="save-lbl">최종 저장</span><span class="save-time" id="saveTime">-</span></div>
 </div>
 <div class="tabs">
   <div class="tab active" id="tabQty" onclick="switchTab('qty')">수량 입력</div>
@@ -161,10 +141,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f5f5;
 </div>
 <div class="action-bar">
   <button class="save-btn" onclick="saveData()">저장</button>
-  <button class="reset-btn" onclick="resetToDefault()">초기화</button>
+  <button class="reset-btn" onclick="resetWeek()">기본값</button>
 </div>
-<div id="qtyTab"><div id="productList"></div><div class="spacer"></div></div>
-<div id="resultTab" style="display:none"></div>
+<div class="multi-bar" id="multiBar">
+  <span class="multi-txt" id="multiTxt"></span>
+  <button class="multi-btn" onclick="selectWeekdays()">평일</button>
+  <button class="multi-btn" onclick="selectWeekend()">주말</button>
+  <button class="multi-btn solid" onclick="clearMulti()">해제</button>
+</div>
+
+<div id="qtyTab"><div class="wrap" id="qtyWrap"></div><button class="add-dtype-btn" onclick="openAddDtype()">+ 새 반죽 추가</button><div class="spacer"></div></div>
+<div id="resultTab" style="display:none"><div class="wrap" id="resultWrap"></div><div class="spacer"></div></div>
 <div id="recipeTab" style="display:none"><div style="height:8px"></div><div id="recipeList"></div><div class="spacer"></div></div>
 
 <script>
@@ -174,7 +161,6 @@ const DAY_TYPE={월:'wd',화:'wd',수:'wd',목:'wd',금:'sat',토:'sat',일:'sun
 const ING_TYPES={flour:{label:'밀가루',color:'#f59e0b'},water:{label:'물/액체',color:'#3b82f6'},sugar:{label:'설탕류',color:'#ec4899'},salt:{label:'소금',color:'#6b7280'},yeast:{label:'효모',color:'#10b981'},fat:{label:'유지류',color:'#f97316'},other:{label:'기타',color:'#8b5cf6'}};
 const MUKBAN=500,SIK_TOTAL=2715;
 
-// 제품 데이터 — dtype 그룹 기반
 let DTYPES=['단과자','식빵','모카빵','잡곡모닝','잡곡식빵','치아바타','바타르','펌퍼니클','크루아상'];
 let PRODUCTS=[
   {name:'모닝빵',dtype:'단과자',split:50,sun:72,wd:100,sat:160},
@@ -225,135 +211,161 @@ let RECIPES={
   치아바타:{label:'치아바타/포카치아',total:1929.1,ings:[{n:'T55 풀리쉬',g:281.5,pct:28.2,type:'flour'},{n:'레드 풀리쉬',g:4.6,pct:0.5,type:'yeast'},{n:'물 풀리쉬',g:281.5,pct:28.2,type:'water'},{n:'키알라',g:177,pct:17.7,type:'flour'},{n:'큐원',g:177,pct:17.7,type:'flour'},{n:'T55 본반죽',g:364.5,pct:36.5,type:'flour'},{n:'소금',g:12,pct:1.2,type:'salt'},{n:'레드 본반죽',g:12,pct:1.2,type:'yeast'},{n:'물 본반죽',g:468,pct:46.8,type:'water'},{n:'몰트',g:12,pct:1.2,type:'other'},{n:'오일',g:71,pct:7.1,type:'fat'},{n:'바시나주',g:68,pct:6.8,type:'water'}]},
 };
 
-// ── 상태 ──
-let today='월', curTab='qty';
-let multiDays=[]; // 다중 선택 요일
+let curTab='qty';
+let selDays=[];  // 다중 선택된 요일
 const allQty={};
 function initQty(p){ DAYS.forEach(d=>{ if(!allQty[d]) allQty[d]={}; if(allQty[d][p.name]===undefined) allQty[d][p.name]=p[DAY_TYPE[d]]; }); }
 PRODUCTS.forEach(initQty);
-function qty(d){ return allQty[d||today]; }
-function targetDays(){ return multiDays.length>0?multiDays:[today]; }
 
 // ── Firebase ──
 function loadSaved(){
   document.getElementById('saveTime').textContent='불러오는 중...';
   fetch(FIREBASE_URL+'/bakery.json').then(r=>r.json()).then(p=>{
-    if(p&&p.allQty) DAYS.forEach(d=>{ if(p.allQty[d]) Object.keys(p.allQty[d]).forEach(k=>{ if(!allQty[d]) allQty[d]={}; allQty[d][k]=p.allQty[d][k]; }); });
-    if(p&&p.day&&DAYS.includes(p.day)) today=p.day;
-    if(p&&p.recipes) RECIPES=p.recipes;
-    if(p&&p.products){ PRODUCTS=p.products; PRODUCTS.forEach(initQty); }
+    if(p&&p.products){ PRODUCTS=p.products; }
     if(p&&p.dtypes) DTYPES=p.dtypes;
+    PRODUCTS.forEach(initQty);
+    if(p&&p.allQty) DAYS.forEach(d=>{ if(p.allQty[d]) Object.keys(p.allQty[d]).forEach(k=>{ if(!allQty[d]) allQty[d]={}; allQty[d][k]=p.allQty[d][k]; }); });
+    if(p&&p.recipes) RECIPES=p.recipes;
     const t=localStorage.getItem('bakery_savetime');
     document.getElementById('saveTime').textContent=t||'--';
-    setActiveDay(); renderProducts();
-  }).catch(()=>{ document.getElementById('saveTime').textContent='오프라인'; renderProducts(); });
+    renderQtyTable();
+  }).catch(()=>{ document.getElementById('saveTime').textContent='오프라인'; renderQtyTable(); });
 }
 function saveData(){
   const now=new Date(); const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   document.getElementById('saveTime').textContent='저장 중...';
-  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,day:today,recipes:RECIPES,products:PRODUCTS,dtypes:DTYPES})})
+  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,products:PRODUCTS,dtypes:DTYPES})})
     .then(()=>{ localStorage.setItem('bakery_savetime',str); document.getElementById('saveTime').textContent=str; showToast('저장했습니다'); })
     .catch(()=>showToast('저장 실패'));
 }
 function pad(n){ return String(n).padStart(2,'0'); }
-function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
 
-// ── 요일 바 & 다중 선택 ──
-const dayBar=document.getElementById('dayBar');
-DAYS.forEach(d=>{
-  const btn=document.createElement('button');
-  btn.className='day-btn'; btn.textContent=d+'요일'; btn.dataset.day=d;
-  btn.onclick=()=>{
-    if(multiDays.length>0){
-      // 다중 모드: 토글
-      const idx=multiDays.indexOf(d);
-      if(idx>=0) multiDays.splice(idx,1); else multiDays.push(d);
-      if(multiDays.length===0){ exitMulti(); return; }
-      updateMultiBar();
-    } else {
-      // 일반: 길게 누르면 다중 모드 시작은 아래서
-      today=d; setActiveDay(); renderProducts();
-      if(curTab==='result') renderResults();
-    }
-  };
-  btn.oncontextmenu=(e)=>{ e.preventDefault(); startMulti(d); };
-  // 모바일 long press
-  let lt; btn.addEventListener('touchstart',()=>{ lt=setTimeout(()=>startMulti(d),600); },{passive:true});
-  btn.addEventListener('touchend',()=>clearTimeout(lt));
-  dayBar.appendChild(btn);
-});
-
-function startMulti(d){
-  if(multiDays.length===0){ multiDays=[today,d].filter((v,i,a)=>a.indexOf(v)===i); }
-  else if(!multiDays.includes(d)) multiDays.push(d);
-  updateMultiBar();
+// ── 다중 요일 선택 ──
+function toggleDay(d){
+  const i=selDays.indexOf(d);
+  if(i>=0) selDays.splice(i,1); else selDays.push(d);
+  updateMultiBar(); renderQtyTable();
 }
+function selectWeekdays(){ selDays=['월','화','수','목']; updateMultiBar(); renderQtyTable(); }
+function selectWeekend(){ selDays=['금','토']; updateMultiBar(); renderQtyTable(); }
+function clearMulti(){ selDays=[]; updateMultiBar(); renderQtyTable(); }
 function updateMultiBar(){
   const bar=document.getElementById('multiBar');
-  bar.classList.toggle('show',multiDays.length>0);
-  document.getElementById('multiInfo').textContent=multiDays.length>0?`다중 선택: ${multiDays.map(d=>d+'요일').join(', ')} — 수량 변경이 모든 선택 요일에 적용됩니다`:'';
-  document.querySelectorAll('.day-btn').forEach(b=>{
-    b.classList.toggle('multi', multiDays.length>0&&multiDays.includes(b.dataset.day));
-    b.classList.toggle('active', multiDays.length===0&&b.dataset.day===today);
-  });
+  bar.classList.toggle('show',selDays.length>0);
+  document.getElementById('multiTxt').textContent=selDays.length>0?`선택: ${selDays.join(', ')}요일 — 수량 입력 시 동시 적용`:'';
 }
-function exitMulti(){ multiDays=[]; updateMultiBar(); setActiveDay(); renderProducts(); }
-function setActiveDay(){ document.querySelectorAll('.day-btn').forEach(b=>b.classList.toggle('active',multiDays.length===0&&b.dataset.day===today)); }
 
-// ── 수량 탭 ──
-function getGroups(){ const g={}; DTYPES.forEach(dt=>{ g[dt]=PRODUCTS.filter(p=>p.dtype===dt); }); return g; }
-
-function renderProducts(){
-  const list=document.getElementById('productList'); list.innerHTML='';
-  const groups=getGroups();
+// ── 수량 테이블 ──
+function renderQtyTable(){
+  const wrap=document.getElementById('qtyWrap');
+  let h='<table><thead><tr><th class="name-col">제품 (분할g)</th>';
+  DAYS.forEach(d=>{
+    const wk=(d==='토'||d==='일')?' weekend':'';
+    const sel=selDays.includes(d)?' sel':'';
+    h+=`<th class="day-col${wk}${sel}" onclick="toggleDay('${d}')">${d}</th>`;
+  });
+  h+='</tr></thead><tbody>';
   DTYPES.forEach(dtype=>{
-    const prods=groups[dtype]||[];
-    // 섹션 헤더
-    const sec=document.createElement('div'); sec.className='sec-hdr';
-    sec.innerHTML=`<div class="sec-label">${dtype}</div><div style="display:flex;gap:6px"><button class="sec-del-btn" onclick="confirmDelDtype('${dtype}')">반죽 삭제</button></div>`;
-    list.appendChild(sec);
-    // 제품 행
+    const prods=PRODUCTS.filter(p=>p.dtype===dtype);
+    h+=`<tr class="sec-row"><td colspan="${DAYS.length+1}"><div class="sec-inner"><span>${dtype}</span><button class="sec-del" onclick="delDtype('${dtype}')">삭제</button></div></td></tr>`;
     prods.forEach(p=>{
-      const q=qty()[p.name]??0; const row=document.createElement('div'); row.className='prod-row';
-      row.innerHTML=`<div class="prod-info" onclick="openEditProd('${p.name}')" style="cursor:pointer"><div class="prod-name">${p.name}</div><div class="prod-sub">${p.split}g/개</div></div><div class="qty-ctrl"><div class="qb" onclick="adj('${p.name}',-1)">-</div><input class="qinput" type="number" min="0" value="${q}" oninput="setQ('${p.name}',this.value)"><div class="qb" onclick="adj('${p.name}',1)">+</div></div>`;
-      list.appendChild(row);
+      h+=`<tr><td class="name-cell" onclick="openEditProd('${p.name.replace(/'/g,"\\'")}')"><div class="p-name">${p.name}</div><div class="p-split">${p.split}g</div></td>`;
+      DAYS.forEach(d=>{
+        const v=allQty[d]?.[p.name]??0;
+        const zc=v===0?' zero':'';
+        const sc=selDays.includes(d)?' sel-day':'';
+        h+=`<td class="qty-cell"><input class="q-inp${zc}${sc}" type="number" min="0" value="${v}" data-day="${d}" data-name="${p.name.replace(/"/g,'&quot;')}" oninput="onQty(this)"></td>`;
+      });
+      h+='</tr>';
     });
-    // 제품 추가 버튼
-    const addRow=document.createElement('div'); addRow.className='add-prod-row';
-    addRow.onclick=()=>openAddProd(dtype);
-    addRow.innerHTML=`<div class="add-prod-icon">+</div><span class="add-prod-lbl">${dtype} 제품 추가</span>`;
-    list.appendChild(addRow);
+    h+=`<tr class="add-row"><td colspan="${DAYS.length+1}"><div class="add-inner" onclick="openAddProd('${dtype}')"><div class="add-ico">+</div><span class="add-lbl">${dtype} 제품 추가</span></div></td></tr>`;
   });
-  // 반죽 추가 버튼
-  const addDt=document.createElement('button'); addDt.className='add-dtype-btn';
-  addDt.textContent='+ 새 반죽 추가'; addDt.onclick=openAddDtype;
-  list.appendChild(addDt);
-  list.appendChild(Object.assign(document.createElement('div'),{className:'spacer'}));
+  h+='</tbody></table>';
+  wrap.innerHTML=h;
 }
 
-function adj(name,d){
-  targetDays().forEach(day=>{ allQty[day][name]=Math.max(0,(allQty[day][name]||0)+d); });
-  renderProducts(); if(curTab==='result') renderResults();
+function onQty(el){
+  const day=el.dataset.day, name=el.dataset.name;
+  const val=Math.max(0,parseInt(el.value)||0);
+  if(selDays.length>0 && selDays.includes(day)){
+    // 선택된 모든 요일에 적용
+    selDays.forEach(d=>{ if(allQty[d]) allQty[d][name]=val; });
+    // 화면의 같은 제품 다른 선택요일 셀도 업데이트
+    document.querySelectorAll(`.q-inp[data-name="${CSS.escape(name)}"]`).forEach(inp=>{
+      if(selDays.includes(inp.dataset.day)&&inp!==el){ inp.value=val; inp.classList.toggle('zero',val===0); }
+    });
+  } else {
+    allQty[day][name]=val;
+  }
+  el.classList.toggle('zero',val===0);
+  if(curTab==='result') renderResultTable();
 }
-function setQ(name,v){
-  const val=Math.max(0,parseInt(v)||0);
-  targetDays().forEach(day=>{ allQty[day][name]=val; });
-  if(curTab==='result') renderResults();
+
+function resetWeek(){
+  if(!confirm('전체 요일 수량을 기본값으로 초기화할까요?')) return;
+  PRODUCTS.forEach(p=>DAYS.forEach(d=>{ allQty[d][p.name]=p[DAY_TYPE[d]]; }));
+  renderQtyTable(); showToast('초기화했습니다');
 }
-function resetToDefault(){
-  if(!confirm(today+'요일 기본 수량으로 초기화할까요?')) return;
-  PRODUCTS.forEach(p=>{ allQty[today][p.name]=p[DAY_TYPE[today]]; });
-  renderProducts(); showToast('초기화했습니다');
+
+// ── 배합수 테이블 ──
+function calcBatchesFor(day){
+  const result={}; const q=allQty[day]||{};
+  DTYPES.forEach(dtype=>{
+    const prods=PRODUCTS.filter(p=>p.dtype===dtype);
+    const recipe=RECIPE_TOTALS[dtype]; if(!recipe||!prods.length) return;
+    let batches,total_g;
+    if(dtype==='식빵'){
+      const normal=prods.filter(p=>p.name!=='소금빵'&&p.name!=='초코 모닝빵');
+      const normalG=normal.reduce((s,p)=>s+(q[p.name]||0)*p.split,0);
+      const sgG=(q['소금빵']||0)*70, chocoG=(q['초코 모닝빵']||0)*29.1;
+      const mokaB=result['모카빵']?result['모카빵'].batches:0;
+      const normalB=normalG>0?Math.ceil(normalG/(SIK_TOTAL-MUKBAN)*10)/10:0;
+      const need=sgG+chocoG+(normalB+mokaB)*MUKBAN;
+      batches=Math.max(normalB, need>0?Math.ceil(need/(SIK_TOTAL-MUKBAN)*10)/10:0);
+      total_g=batches*(SIK_TOTAL-MUKBAN);
+    } else {
+      total_g=prods.reduce((s,p)=>s+(q[p.name]||0)*p.split,0);
+      batches=total_g>0?Math.ceil(total_g/recipe*10)/10:0;
+    }
+    result[dtype]={batches,total_g};
+  });
+  return result;
+}
+
+function renderResultTable(){
+  const wrap=document.getElementById('resultWrap');
+  const byDay={}; DAYS.forEach(d=>byDay[d]=calcBatchesFor(d));
+  let h='<table><thead><tr><th class="name-col">반죽</th>';
+  DAYS.forEach(d=>{ const wk=(d==='토'||d==='일')?' weekend':''; h+=`<th class="day-col${wk}">${d}</th>`; });
+  h+='</tr></thead><tbody>';
+  const totals={}; DAYS.forEach(d=>totals[d]=0);
+  DTYPES.forEach(dtype=>{
+    if(!RECIPE_TOTALS[dtype]) return;
+    const hasAny=DAYS.some(d=>byDay[d][dtype]?.batches>0);
+    if(!hasAny) return;
+    h+=`<tr class="batch-row"><td class="name-cell">${dtype}</td>`;
+    DAYS.forEach(d=>{
+      const b=byDay[d][dtype]?.batches||0;
+      totals[d]+=b;
+      h+=`<td>${b>0?b.toFixed(1):'<span style="color:#ddd">-</span>'}</td>`;
+    });
+    h+='</tr>';
+  });
+  h+='<tr class="batch-row total-row"><td class="name-cell">합계</td>';
+  DAYS.forEach(d=>{ h+=`<td>${totals[d].toFixed(1)}</td>`; });
+  h+='</tr></tbody></table>';
+  wrap.innerHTML=h;
 }
 
 // ── 모달 ──
 let modalMode=null, modalData={};
-function openModal(title,sub,bodyHtml,okLabel,mode,data){
+function openModal(title,sub,body,ok,mode,data){
   modalMode=mode; modalData=data||{};
   document.getElementById('modalTitle').textContent=title;
   document.getElementById('modalSub').textContent=sub;
-  document.getElementById('modalBody').innerHTML=bodyHtml;
-  document.getElementById('modalOk').textContent=okLabel||'확인';
+  document.getElementById('modalBody').innerHTML=body;
+  document.getElementById('modalOk').textContent=ok||'확인';
   document.getElementById('modalDelBtn').innerHTML='';
   document.getElementById('modalBg').classList.add('show');
 }
@@ -362,175 +374,116 @@ function modalOk(){
   if(modalMode==='addDtype') doAddDtype();
   else if(modalMode==='addProd') doAddProd();
   else if(modalMode==='editProd') doEditProd();
-  else if(modalMode==='delProd') doDelProd();
 }
-
-// 반죽 추가
 function openAddDtype(){
-  openModal('새 반죽 추가','레시피 이름과 동일하게 입력하면 레시피와 연동됩니다',
-    `<div class="modal-row"><label>반죽 이름</label><input class="modal-inp" id="mi-dtype" placeholder="예: 하드계열"></div>
-     <div class="modal-row"><label>레시피 연동 (선택)</label><select class="modal-sel" id="mi-recipe"><option value="">연동 없음</option>${Object.keys(RECIPES).map(k=>`<option value="${k}">${RECIPES[k].label}</option>`).join('')}</select></div>`,
-    '추가','addDtype');
+  openModal('새 반죽 추가','레시피 이름과 같게 하면 배합수가 자동 계산됩니다',
+    `<div class="modal-row"><label>반죽 이름</label><input class="modal-inp" id="mi-dtype" placeholder="예: 하드계열"></div>`,'추가','addDtype');
 }
 function doAddDtype(){
-  const name=document.getElementById('mi-dtype')?.value?.trim();
-  if(!name){ showToast('이름을 입력하세요'); return; }
-  if(DTYPES.includes(name)){ showToast('이미 존재합니다'); return; }
-  DTYPES.push(name);
-  closeModal(); renderProducts(); showToast(`'${name}' 반죽 추가됨`);
+  const n=document.getElementById('mi-dtype')?.value?.trim();
+  if(!n){ showToast('이름을 입력하세요'); return; }
+  if(DTYPES.includes(n)){ showToast('이미 존재합니다'); return; }
+  DTYPES.push(n); closeModal(); renderQtyTable(); showToast(`'${n}' 추가됨`);
 }
-
-// 반죽 삭제
-function confirmDelDtype(dtype){
-  const cnt=PRODUCTS.filter(p=>p.dtype===dtype).length;
-  if(!confirm(`'${dtype}' 반죽과 소속 제품 ${cnt}개를 삭제할까요?`)) return;
+function delDtype(dtype){
+  const c=PRODUCTS.filter(p=>p.dtype===dtype).length;
+  if(!confirm(`'${dtype}'와 소속 제품 ${c}개를 삭제할까요?`)) return;
   PRODUCTS=PRODUCTS.filter(p=>p.dtype!==dtype);
   DTYPES=DTYPES.filter(d=>d!==dtype);
-  renderProducts(); showToast(`'${dtype}' 삭제됨`);
+  renderQtyTable(); showToast(`'${dtype}' 삭제됨`);
 }
-
-// 제품 추가
 function openAddProd(dtype){
   openModal(`${dtype} 제품 추가`,'제품명과 분할 중량을 입력하세요',
     `<div class="modal-row"><label>제품명</label><input class="modal-inp" id="mi-pname" placeholder="예: 크랜베리 식빵"></div>
-     <div class="modal-row"><label>분할 중량 (g)</label><input class="modal-inp" id="mi-split" type="number" min="1" placeholder="예: 200"></div>
-     <div class="modal-row"><label>기본 수량 (일요일)</label><input class="modal-inp" id="mi-sun" type="number" min="0" value="0"></div>
-     <div class="modal-row"><label>기본 수량 (평일 월~목)</label><input class="modal-inp" id="mi-wd" type="number" min="0" value="0"></div>
-     <div class="modal-row"><label>기본 수량 (주말 금~토)</label><input class="modal-inp" id="mi-sat" type="number" min="0" value="0"></div>`,
+     <div class="modal-row"><label>분할 중량 (g)</label><input class="modal-inp" id="mi-split" type="number" min="1" placeholder="200"></div>
+     <div class="modal-row"><label>기본 수량 - 평일(월~목)</label><input class="modal-inp" id="mi-wd" type="number" min="0" value="0"></div>
+     <div class="modal-row"><label>기본 수량 - 주말(금~토)</label><input class="modal-inp" id="mi-sat" type="number" min="0" value="0"></div>
+     <div class="modal-row"><label>기본 수량 - 일요일</label><input class="modal-inp" id="mi-sun" type="number" min="0" value="0"></div>`,
     '추가','addProd',{dtype});
 }
 function doAddProd(){
   const name=document.getElementById('mi-pname')?.value?.trim();
   const split=parseFloat(document.getElementById('mi-split')?.value)||0;
-  const sun=parseInt(document.getElementById('mi-sun')?.value)||0;
   const wd=parseInt(document.getElementById('mi-wd')?.value)||0;
   const sat=parseInt(document.getElementById('mi-sat')?.value)||0;
+  const sun=parseInt(document.getElementById('mi-sun')?.value)||0;
   if(!name||!split){ showToast('제품명과 중량을 입력하세요'); return; }
   if(PRODUCTS.find(p=>p.name===name)){ showToast('이미 존재하는 제품입니다'); return; }
   const prod={name,dtype:modalData.dtype,split,sun,wd,sat};
   PRODUCTS.push(prod); initQty(prod);
-  closeModal(); renderProducts(); showToast(`'${name}' 추가됨`);
+  closeModal(); renderQtyTable(); showToast(`'${name}' 추가됨`);
 }
-
-// 제품 편집
 function openEditProd(name){
   const p=PRODUCTS.find(x=>x.name===name); if(!p) return;
-  openModal(`제품 편집: ${name}`,'제품 정보를 수정하세요',
+  openModal(`제품 편집`,name,
     `<div class="modal-row"><label>제품명</label><input class="modal-inp" id="mi-pname" value="${p.name}"></div>
      <div class="modal-row"><label>분할 중량 (g)</label><input class="modal-inp" id="mi-split" type="number" value="${p.split}"></div>
-     <div class="modal-row"><label>기본 수량 (일요일)</label><input class="modal-inp" id="mi-sun" type="number" value="${p.sun}"></div>
-     <div class="modal-row"><label>기본 수량 (평일 월~목)</label><input class="modal-inp" id="mi-wd" type="number" value="${p.wd}"></div>
-     <div class="modal-row"><label>기본 수량 (주말 금~토)</label><input class="modal-inp" id="mi-sat" type="number" value="${p.sat}"></div>`,
+     <div class="modal-row"><label>기본 수량 - 평일(월~목)</label><input class="modal-inp" id="mi-wd" type="number" value="${p.wd}"></div>
+     <div class="modal-row"><label>기본 수량 - 주말(금~토)</label><input class="modal-inp" id="mi-sat" type="number" value="${p.sat}"></div>
+     <div class="modal-row"><label>기본 수량 - 일요일</label><input class="modal-inp" id="mi-sun" type="number" value="${p.sun}"></div>`,
     '저장','editProd',{oldName:name});
-  // 삭제 버튼 추가
-  document.getElementById('modalDelBtn').innerHTML=`<button class="modal-del" onclick="openDelProd('${name}')">제품 삭제</button>`;
+  document.getElementById('modalDelBtn').innerHTML=`<button class="modal-del" onclick="delProd('${name.replace(/'/g,"\\'")}')">삭제</button>`;
 }
 function doEditProd(){
   const oldName=modalData.oldName;
   const newName=document.getElementById('mi-pname')?.value?.trim();
   const split=parseFloat(document.getElementById('mi-split')?.value)||0;
-  const sun=parseInt(document.getElementById('mi-sun')?.value)||0;
   const wd=parseInt(document.getElementById('mi-wd')?.value)||0;
   const sat=parseInt(document.getElementById('mi-sat')?.value)||0;
+  const sun=parseInt(document.getElementById('mi-sun')?.value)||0;
   if(!newName||!split){ showToast('제품명과 중량을 입력하세요'); return; }
   const p=PRODUCTS.find(x=>x.name===oldName); if(!p) return;
-  // 이름 변경 시 allQty 키도 변경
-  if(newName!==oldName){ DAYS.forEach(d=>{ if(allQty[d]){ allQty[d][newName]=allQty[d][oldName]; delete allQty[d][oldName]; } }); }
-  Object.assign(p,{name:newName,split,sun,wd,sat});
-  closeModal(); renderProducts(); showToast(`'${newName}' 수정됨`);
+  if(newName!==oldName) DAYS.forEach(d=>{ if(allQty[d]){ allQty[d][newName]=allQty[d][oldName]; delete allQty[d][oldName]; } });
+  Object.assign(p,{name:newName,split,wd,sat,sun});
+  closeModal(); renderQtyTable(); showToast('수정됨');
 }
-function openDelProd(name){
+function delProd(name){
   closeModal();
   if(!confirm(`'${name}' 제품을 삭제할까요?`)) return;
   PRODUCTS=PRODUCTS.filter(p=>p.name!==name);
   DAYS.forEach(d=>{ if(allQty[d]) delete allQty[d][name]; });
-  renderProducts(); showToast(`'${name}' 삭제됨`);
-}
-function doDelProd(){ openDelProd(modalData.oldName); }
-
-// ── 배합수 탭 ──
-function calcBatches(){
-  const result={};
-  DTYPES.forEach(dtype=>{
-    const prods=PRODUCTS.filter(p=>p.dtype===dtype);
-    const recipe=RECIPE_TOTALS[dtype]; if(!recipe||!prods.length) return;
-    let batches,total_g;
-    if(dtype==='식빵'){
-      const normal=prods.filter(p=>p.name!=='소금빵'&&p.name!=='초코 모닝빵');
-      const normalG=normal.reduce((s,p)=>s+(qty()[p.name]||0)*p.split,0);
-      const sgG=(qty()['소금빵']||0)*70,chocoG=(qty()['초코 모닝빵']||0)*29.1;
-      const mokaB=result['모카빵']?result['모카빵'].batches:0;
-      const normalB=normalG>0?Math.ceil(normalG/(SIK_TOTAL-MUKBAN)*10)/10:0;
-      const need=sgG+chocoG+(normalB+mokaB)*MUKBAN;
-      batches=Math.max(normalB,need>0?Math.ceil(need/(SIK_TOTAL-MUKBAN)*10)/10:0);
-      total_g=batches*(SIK_TOTAL-MUKBAN);
-    } else {
-      total_g=prods.reduce((s,p)=>s+(qty()[p.name]||0)*p.split,0);
-      batches=total_g>0?Math.ceil(total_g/recipe*10)/10:0;
-    }
-    result[dtype]={batches,total_g,recipe};
-  });
-  return result;
-}
-function renderResults(){
-  const tab=document.getElementById('resultTab'); const batches=calcBatches();
-  let any=false,total=0,rows='';
-  Object.entries(batches).forEach(([dtype,d])=>{
-    if(!d.batches) return; any=true; total+=d.batches;
-    rows+=`<div class="rrow"><div><div class="rname">${dtype}</div><div style="font-size:11px;color:#aaa;margin-top:2px">${Math.round(d.total_g).toLocaleString()}g 필요</div></div><div style="text-align:right"><div class="rbatch">${d.batches.toFixed(1)}</div><span style="font-size:12px;color:#999;display:block">배합</span></div></div>`;
-  });
-  let html=`<div class="rcard"><div class="rcard-hdr">${multiDays.length>0?targetDays().map(d=>d+'요').join('/')+'요일':today+'요일'} 배합수 (0.1 단위 올림)</div>${any?rows:'<div style="text-align:center;padding:32px;color:#bbb;font-size:14px">수량을 입력하면 계산됩니다</div>'}</div>`;
-  if(any) html+=`<div class="rtotal"><span class="rtotal-lbl">전체 합계</span><span class="rtotal-val">${total.toFixed(1)} 배합</span></div>`;
-  html+='<div class="spacer"></div>'; tab.innerHTML=html;
+  renderQtyTable(); showToast('삭제됨');
 }
 
 // ── 레시피 탭 ──
 function flourTotal(ings){ return ings.filter(i=>i.type==='flour').reduce((s,i)=>s+i.g,0); }
 function typeOptions(sel){ return Object.entries(ING_TYPES).map(([k,t])=>`<option value="${k}" ${k===sel?'selected':''}>${t.label}</option>`).join(''); }
-
 function renderRecipes(){
   const list=document.getElementById('recipeList'); list.innerHTML='';
   Object.entries(RECIPES).forEach(([key,rec])=>{
     const card=document.createElement('div'); card.className='recipe-card';
-    card.innerHTML=`<div class="recipe-hdr" onclick="toggleR('${key}')"><span class="recipe-title">${rec.label}</span><div style="display:flex;align-items:center;gap:6px" onclick="event.stopPropagation()"><div class="batch-wrap"><span class="batch-lbl">배합</span><input class="batch-inp" type="number" min="0.1" step="0.1" value="1" id="batch-${key}" oninput="updateView('${key}')"></div><span id="chev-${key}" style="font-size:14px;color:#ccc;margin-left:4px">&#9660;</span></div></div><div id="rbody-${key}" style="display:none"><div class="ing-hdr"><span>재료</span><div style="display:flex;gap:8px"><span style="min-width:52px;text-align:right">베이커스%</span><span style="min-width:62px;text-align:right">사용량(g)</span></div></div><div id="ing-view-${key}"></div><div class="recipe-footer"><span style="font-size:13px;color:#888">밀가루합계 / 총무게</span><span style="font-size:13px;font-weight:600" id="total-${key}">-</span></div><div style="padding:8px 14px;border-top:1px solid #f0f0f0;display:flex;flex-wrap:wrap;align-items:center;gap:8px"><button class="edit-toggle-btn" onclick="toggleEdit('${key}')">레시피 편집</button><div style="display:flex;gap:5px;flex-wrap:wrap">${Object.entries(ING_TYPES).map(([k,t])=>`<span style="display:flex;align-items:center;gap:3px;font-size:10px;color:#888"><span style="width:7px;height:7px;border-radius:50%;background:${t.color};display:inline-block"></span>${t.label}</span>`).join('')}</div></div><div id="edit-${key}" style="display:none"></div></div>`;
+    card.innerHTML=`<div class="recipe-hdr" onclick="toggleR('${key}')"><span class="recipe-title">${rec.label}</span><div style="display:flex;align-items:center;gap:6px" onclick="event.stopPropagation()"><div class="batch-wrap"><span class="batch-lbl">배합</span><input class="batch-inp" type="number" min="0.1" step="0.1" value="1" id="batch-${key}" oninput="updateView('${key}')"></div><span id="chev-${key}" style="font-size:14px;color:#ccc">&#9660;</span></div></div><div id="rbody-${key}" style="display:none"><div class="ing-hdr"><span>재료</span><div style="display:flex;gap:8px"><span style="min-width:52px;text-align:right">베이커스%</span><span style="min-width:62px;text-align:right">사용량(g)</span></div></div><div id="ing-view-${key}"></div><div class="recipe-footer"><span style="font-size:13px;color:#888">밀가루합계 / 총무게</span><span style="font-size:13px;font-weight:600" id="total-${key}">-</span></div><div style="padding:8px 14px;border-top:1px solid #f0f0f0;display:flex;flex-wrap:wrap;align-items:center;gap:8px"><button class="edit-toggle-btn" onclick="toggleEdit('${key}')">레시피 편집</button><div style="display:flex;gap:5px;flex-wrap:wrap">${Object.entries(ING_TYPES).map(([k,t])=>`<span style="display:flex;align-items:center;gap:3px;font-size:10px;color:#888"><span style="width:7px;height:7px;border-radius:50%;background:${t.color};display:inline-block"></span>${t.label}</span>`).join('')}</div></div><div id="edit-${key}" style="display:none"></div></div>`;
     list.appendChild(card); updateView(key);
   });
 }
 function updateView(key){
-  const rec=RECIPES[key]; const batch=parseFloat(document.getElementById('batch-'+key)?.value)||1;
+  const rec=RECIPES[key]; const b=parseFloat(document.getElementById('batch-'+key)?.value)||1;
   const ft=flourTotal(rec.ings); const c=document.getElementById('ing-view-'+key); const te=document.getElementById('total-'+key);
   if(!c) return;
-  c.innerHTML=rec.ings.map(ing=>{ const t=ING_TYPES[ing.type||'other']; const gv=ing.g*batch; const gs=gv>=100?Math.round(gv).toString():(gv>=10?gv.toFixed(1):gv.toFixed(2)); return `<div class="ing-row"><div class="ing-dot" style="background:${t.color}"></div><span class="ing-n">${ing.n}</span><span class="ing-pct">${typeof ing.pct==='number'?ing.pct.toFixed(1)+'%':'--'}</span><span class="ing-g">${gs}g</span></div>`; }).join('');
-  if(te){ const tot=rec.ings.reduce((s,i)=>s+i.g,0)*batch; te.textContent=`${Math.round(ft*batch).toLocaleString()}g / ${Math.round(tot).toLocaleString()}g`; }
+  c.innerHTML=rec.ings.map(i=>{ const t=ING_TYPES[i.type||'other']; const gv=i.g*b; const gs=gv>=100?Math.round(gv).toString():(gv>=10?gv.toFixed(1):gv.toFixed(2)); return `<div class="ing-row"><div class="ing-dot" style="background:${t.color}"></div><span class="ing-n">${i.n}</span><span class="ing-pct">${typeof i.pct==='number'?i.pct.toFixed(1)+'%':'--'}</span><span class="ing-g">${gs}g</span></div>`; }).join('');
+  if(te){ const tot=rec.ings.reduce((s,i)=>s+i.g,0)*b; te.textContent=`${Math.round(ft*b).toLocaleString()}g / ${Math.round(tot).toLocaleString()}g`; }
 }
-function toggleR(key){ const body=document.getElementById('rbody-'+key); const chev=document.getElementById('chev-'+key); const open=body.style.display==='none'; body.style.display=open?'block':'none'; chev.innerHTML=open?'&#9650;':'&#9660;'; if(open) updateView(key); }
-function toggleEdit(key){ const ed=document.getElementById('edit-'+key); const open=ed.style.display==='none'; ed.style.display=open?'block':'none'; if(open) renderEditForm(key); }
-function renderEditForm(key){
-  const rec=RECIPES[key]; const ed=document.getElementById('edit-'+key); const ft=flourTotal(rec.ings);
-  ed.innerHTML=`<div class="edit-section"><div class="flour-info">밀가루 합계: <span id="ef-${key}" style="color:#f59e0b;font-weight:700">${ft.toFixed(1)}g</span></div><div id="erows-${key}"></div><button class="add-ing-btn" onclick="addIng('${key}')">+ 재료 추가</button><button class="apply-btn" onclick="saveRecipe('${key}')">레시피 적용</button></div>`;
-  renderERows(key);
-}
-function renderERows(key){
-  const rec=RECIPES[key]; const c=document.getElementById('erows-'+key); if(!c) return;
-  c.innerHTML=rec.ings.map((ing,i)=>`<div class="erow"><div class="ecol" style="flex:2"><label>재료명</label><input class="einp" type="text" value="${ing.n}" id="en-${key}-${i}" oninput="RECIPES['${key}'].ings[${i}].n=this.value"></div><div class="ecol" style="width:64px"><label>g</label><input class="einp eg" type="number" min="0" step="0.1" value="${ing.g}" id="eg-${key}-${i}" oninput="onG('${key}',${i})"></div><div class="ecol" style="width:58px"><label>베이커스%</label><input class="einp ep" type="number" min="0" step="0.1" value="${typeof ing.pct==='number'?ing.pct:0}" id="ep-${key}-${i}" oninput="onP('${key}',${i})"></div><div class="ecol" style="width:68px"><label>종류</label><select class="esel" id="et-${key}-${i}" onchange="onT('${key}',${i})">${typeOptions(ing.type||'other')}</select></div><button class="del-ing-btn" onclick="delIng('${key}',${i})">&#215;</button></div>`).join('');
-}
-function onG(key,i){ const rec=RECIPES[key]; rec.ings[i].g=parseFloat(document.getElementById('eg-'+key+'-'+i)?.value)||0; const ft=flourTotal(rec.ings); if(ft>0) rec.ings.forEach((ing,idx)=>{ ing.pct=parseFloat((ing.g/ft*100).toFixed(2)); const el=document.getElementById('ep-'+key+'-'+idx); if(el) el.value=ing.pct; }); const fl=document.getElementById('ef-'+key); if(fl) fl.textContent=ft.toFixed(1)+'g'; updateView(key); }
-function onP(key,i){ const rec=RECIPES[key]; const pct=parseFloat(document.getElementById('ep-'+key+'-'+i)?.value)||0; rec.ings[i].pct=pct; const ft=flourTotal(rec.ings); if(ft>0){ const g=parseFloat((pct/100*ft).toFixed(2)); rec.ings[i].g=g; const el=document.getElementById('eg-'+key+'-'+i); if(el) el.value=g; } updateView(key); }
-function onT(key,i){ const rec=RECIPES[key]; const old=rec.ings[i].type; const nw=document.getElementById('et-'+key+'-'+i)?.value; rec.ings[i].type=nw; if(old==='flour'||nw==='flour'){ const ft=flourTotal(rec.ings); if(ft>0) rec.ings.forEach((ing,idx)=>{ ing.pct=parseFloat((ing.g/ft*100).toFixed(2)); const el=document.getElementById('ep-'+key+'-'+idx); if(el) el.value=ing.pct; }); const fl=document.getElementById('ef-'+key); if(fl) fl.textContent=ft.toFixed(1)+'g'; } updateView(key); }
+function toggleR(key){ const b=document.getElementById('rbody-'+key); const c=document.getElementById('chev-'+key); const o=b.style.display==='none'; b.style.display=o?'block':'none'; c.innerHTML=o?'&#9650;':'&#9660;'; if(o) updateView(key); }
+function toggleEdit(key){ const e=document.getElementById('edit-'+key); const o=e.style.display==='none'; e.style.display=o?'block':'none'; if(o) renderEditForm(key); }
+function renderEditForm(key){ const rec=RECIPES[key]; const e=document.getElementById('edit-'+key); const ft=flourTotal(rec.ings); e.innerHTML=`<div class="edit-section"><div class="flour-info">밀가루 합계: <span id="ef-${key}" style="color:#f59e0b;font-weight:700">${ft.toFixed(1)}g</span></div><div id="erows-${key}"></div><button class="add-ing-btn" onclick="addIng('${key}')">+ 재료 추가</button><button class="apply-btn" onclick="saveRecipe('${key}')">레시피 적용</button></div>`; renderERows(key); }
+function renderERows(key){ const rec=RECIPES[key]; const c=document.getElementById('erows-'+key); if(!c) return; c.innerHTML=rec.ings.map((ing,i)=>`<div class="erow"><div class="ecol" style="flex:2"><label>재료명</label><input class="einp" type="text" value="${ing.n}" id="en-${key}-${i}" oninput="RECIPES['${key}'].ings[${i}].n=this.value"></div><div class="ecol" style="width:64px"><label>g</label><input class="einp eg" type="number" min="0" step="0.1" value="${ing.g}" id="eg-${key}-${i}" oninput="onG('${key}',${i})"></div><div class="ecol" style="width:58px"><label>%</label><input class="einp ep" type="number" min="0" step="0.1" value="${typeof ing.pct==='number'?ing.pct:0}" id="ep-${key}-${i}" oninput="onP('${key}',${i})"></div><div class="ecol" style="width:68px"><label>종류</label><select class="esel" id="et-${key}-${i}" onchange="onT('${key}',${i})">${typeOptions(ing.type||'other')}</select></div><button class="del-ing-btn" onclick="delIng('${key}',${i})">&#215;</button></div>`).join(''); }
+function onG(key,i){ const r=RECIPES[key]; r.ings[i].g=parseFloat(document.getElementById('eg-'+key+'-'+i)?.value)||0; const ft=flourTotal(r.ings); if(ft>0) r.ings.forEach((ing,x)=>{ ing.pct=parseFloat((ing.g/ft*100).toFixed(2)); const el=document.getElementById('ep-'+key+'-'+x); if(el) el.value=ing.pct; }); const f=document.getElementById('ef-'+key); if(f) f.textContent=ft.toFixed(1)+'g'; updateView(key); }
+function onP(key,i){ const r=RECIPES[key]; const p=parseFloat(document.getElementById('ep-'+key+'-'+i)?.value)||0; r.ings[i].pct=p; const ft=flourTotal(r.ings); if(ft>0){ const g=parseFloat((p/100*ft).toFixed(2)); r.ings[i].g=g; const el=document.getElementById('eg-'+key+'-'+i); if(el) el.value=g; } updateView(key); }
+function onT(key,i){ const r=RECIPES[key]; const o=r.ings[i].type; const n=document.getElementById('et-'+key+'-'+i)?.value; r.ings[i].type=n; if(o==='flour'||n==='flour'){ const ft=flourTotal(r.ings); if(ft>0) r.ings.forEach((ing,x)=>{ ing.pct=parseFloat((ing.g/ft*100).toFixed(2)); const el=document.getElementById('ep-'+key+'-'+x); if(el) el.value=ing.pct; }); const f=document.getElementById('ef-'+key); if(f) f.textContent=ft.toFixed(1)+'g'; } updateView(key); }
 function addIng(key){ RECIPES[key].ings.push({n:'',g:0,pct:0,type:'other'}); renderERows(key); }
-function delIng(key,i){ if(!confirm('재료를 삭제할까요?')) return; RECIPES[key].ings.splice(i,1); const ft=flourTotal(RECIPES[key].ings); if(ft>0) RECIPES[key].ings.forEach(ing=>{ ing.pct=parseFloat((ing.g/ft*100).toFixed(2)); }); renderERows(key); updateView(key); const fl=document.getElementById('ef-'+key); if(fl) fl.textContent=ft.toFixed(1)+'g'; }
-function saveRecipe(key){ RECIPES[key].total=RECIPES[key].ings.reduce((s,i)=>s+i.g,0); document.getElementById('edit-'+key).style.display='none'; updateView(key); showToast('레시피 적용됨 - 저장 버튼으로 서버에 반영하세요'); }
+function delIng(key,i){ if(!confirm('재료를 삭제할까요?')) return; RECIPES[key].ings.splice(i,1); const ft=flourTotal(RECIPES[key].ings); if(ft>0) RECIPES[key].ings.forEach(ing=>{ ing.pct=parseFloat((ing.g/ft*100).toFixed(2)); }); renderERows(key); updateView(key); const f=document.getElementById('ef-'+key); if(f) f.textContent=ft.toFixed(1)+'g'; }
+function saveRecipe(key){ RECIPES[key].total=RECIPES[key].ings.reduce((s,i)=>s+i.g,0); document.getElementById('edit-'+key).style.display='none'; updateView(key); showToast('적용됨 - 저장 버튼으로 서버 반영'); }
 
-// ── 탭 전환 ──
 function switchTab(tab){
   curTab=tab;
   ['qty','result','recipe'].forEach(t=>{ document.getElementById(t+'Tab').style.display=t===tab?'block':'none'; document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active',t===tab); });
-  if(tab==='result') renderResults();
+  document.getElementById('multiBar').style.display=(tab==='qty'&&selDays.length>0)?'flex':'none';
+  if(tab==='result') renderResultTable();
   if(tab==='recipe') renderRecipes();
 }
 
 loadSaved();
-renderProducts();
+renderQtyTable();
 </script>
 </body>
 </html>
