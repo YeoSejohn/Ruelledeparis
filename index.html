@@ -169,6 +169,48 @@ tr.pumper-row td.prod-q{color:#e65100;font-weight:600}
 .modal-cancel{padding:12px 18px;border-radius:10px;background:#f5f5f5;color:#666;border:none;font-size:15px;cursor:pointer;font-family:inherit}
 .modal-del{padding:12px 14px;border-radius:10px;background:#fee2e2;color:#dc2626;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
 .spacer{height:20px}
+/* 계량표 */
+.scale-picker{display:flex;gap:6px;padding:10px 14px;background:#fff;border-bottom:1px solid #eee;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.scale-picker::-webkit-scrollbar{display:none}
+.sc-chip{padding:7px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#666;font-size:13px;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit}
+.sc-chip.on{background:#1a1a2e;border-color:#1a1a2e;color:#fff;font-weight:600}
+.scale-table th.sc-name{min-width:100px}
+.scale-table th.sc-col{min-width:66px;padding:7px 4px;line-height:1.3}
+.sc-sub{display:block;font-size:9px;color:#aaa;font-weight:400;margin-top:1px}
+th.sc-fixed{background:#e8eaf6!important;color:#3b5bdb}
+th.sc-fixed .sc-sub{color:#7986cb}
+th.sc-custom{background:#fff3e0!important;color:#e65100}
+th.sc-custom .sc-sub{color:#ffb74d}
+td.sc-cell{text-align:center;font-size:13px;padding:7px 3px;color:#333;font-weight:500}
+td.sc-fixed{background:#f5f6ff;color:#3b5bdb;font-weight:600}
+tr:nth-child(even) td.sc-fixed{background:#eef0ff}
+td.sc-custom{background:#fffaf5;color:#e65100;font-weight:600}
+tr:nth-child(even) td.sc-custom{background:#fff5eb}
+td.sc-name-cell{font-size:13px;color:#333;padding:7px 12px;display:flex;align-items:center;gap:6px}
+.sc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+tr.sc-stage td{background:#1a1a2e;color:#fff;font-size:11px;font-weight:700;padding:7px 12px;letter-spacing:.06em;position:sticky;left:0}
+tr.sc-subtotal td{background:#f0f2f5;font-weight:700;font-size:13px;text-align:center;padding:8px 3px;color:#555;border-top:1px solid #ddd}
+tr.sc-subtotal td.name-cell{background:#f0f2f5;text-align:left;padding-left:12px;font-size:12px}
+tr.sc-total td{background:#1a1a2e;color:#fff;font-weight:700;font-size:14px;text-align:center;padding:10px 3px}
+tr.sc-total td.name-cell{background:#1a1a2e;text-align:left;padding-left:12px;font-size:13px}
+.sc-input-bar{display:flex;align-items:center;gap:10px;padding:14px;background:#fff;border-top:1px solid #eee;flex-wrap:wrap}
+.sc-input-lbl{font-size:13px;color:#666;font-weight:600}
+.sc-input{width:80px;padding:9px 12px;border-radius:9px;border:1.5px solid #ffcc80;background:#fffaf5;font-size:16px;font-weight:700;color:#e65100;text-align:center;font-family:inherit;-moz-appearance:textfield}
+.sc-input::-webkit-inner-spin-button,.sc-input::-webkit-outer-spin-button{-webkit-appearance:none}
+.sc-input:focus{outline:none;border-color:#e65100}
+.sc-input-hint{font-size:11px;color:#aaa}
+.stage-inp{color:#7986cb!important;background:#f8f9ff!important}
+.max-tag{font-size:9px;background:#e8f5e9;color:#1a6b3c;border:1px solid #a5d6a7;border-radius:4px;padding:1px 5px;margin-left:5px;font-weight:600;white-space:nowrap}
+.split-hint{display:block;font-size:10px;color:#1a6b3c;font-weight:600;margin-top:1px}
+.split-txt{color:#1a6b3c;font-weight:700;font-size:12px}
+tr.maxb-row td{background:#f1f8f4}
+tr.maxb-row td.name-cell{background:#f1f8f4;color:#1a6b3c}
+.maxb-inp{border-color:#a5d6a7!important;color:#1a6b3c!important}
+th.sc-split{background:#e8f5e9!important;color:#1a6b3c}
+th.sc-split .sc-sub{color:#66bb6a}
+td.sc-split{background:#f5fbf6;color:#1a6b3c;font-weight:600}
+tr:nth-child(even) td.sc-split{background:#eef7f0}
+.sc-max-note{padding:10px 14px;font-size:12px;color:#1a6b3c;background:#f1f8f4;border-top:1px solid #c8e6c9}
 </style>
 </head>
 <body>
@@ -193,6 +235,7 @@ tr.pumper-row td.prod-q{color:#e65100;font-weight:600}
 <div class="tabs">
   <div class="tab active" id="tabQty" onclick="switchTab('qty')">수량 입력</div>
   <div class="tab" id="tabResult" onclick="switchTab('result')">배합수</div>
+  <div class="tab" id="tabScale" onclick="switchTab('scale')">계량표</div>
   <div class="tab" id="tabRecipe" onclick="switchTab('recipe')">레시피</div>
 </div>
 <div class="action-bar">
@@ -209,6 +252,11 @@ tr.pumper-row td.prod-q{color:#e65100;font-weight:600}
 
 <div id="qtyTab"><div class="wrap" id="qtyWrap"></div><button class="add-dtype-btn" onclick="openAddDtype()">+ 새 반죽 추가</button><div class="spacer"></div></div>
 <div id="resultTab" style="display:none"><div class="wrap" id="resultWrap"></div><div class="spacer"></div></div>
+<div id="scaleTab" style="display:none">
+  <div class="scale-picker" id="scalePicker"></div>
+  <div class="wrap" id="scaleWrap"></div>
+  <div class="spacer"></div>
+</div>
 <div id="recipeTab" style="display:none"><div style="height:8px"></div><div id="recipeList"></div><div class="spacer"></div></div>
 
 <script>
@@ -266,8 +314,23 @@ let RECIPES={
   잡곡모닝:{label:'잡곡모닝',total:2135,ings:[{n:'K-블레',g:450,pct:43.3,type:'flour'},{n:'큐원',g:350,pct:33.7,type:'flour'},{n:'크라프트',g:200,pct:19.3,type:'flour'},{n:'설탕',g:100,pct:9.6,type:'sugar'},{n:'소금',g:10,pct:1,type:'salt'},{n:'골드',g:20,pct:1.9,type:'other'},{n:'S500',g:20,pct:1.9,type:'other'},{n:'버터',g:100,pct:9.6,type:'fat'},{n:'우유',g:190,pct:18.3,type:'water'},{n:'생크림',g:95,pct:9.1,type:'fat'},{n:'물',g:300,pct:28.9,type:'water'},{n:'묵반',g:100,pct:9.6,type:'other'},{n:'탕종',g:200,pct:19.3,type:'other'}]},
   잡곡식빵:{label:'잡곡식빵',total:2135,ings:[{n:'K-블레',g:450,pct:43.3,type:'flour'},{n:'큐원',g:350,pct:33.7,type:'flour'},{n:'크라프트',g:200,pct:19.3,type:'flour'},{n:'설탕',g:100,pct:9.6,type:'sugar'},{n:'소금',g:10,pct:1,type:'salt'},{n:'골드',g:20,pct:1.9,type:'other'},{n:'S500',g:20,pct:1.9,type:'other'},{n:'버터',g:100,pct:9.6,type:'fat'},{n:'우유',g:190,pct:18.3,type:'water'},{n:'생크림',g:95,pct:9.1,type:'fat'},{n:'물',g:300,pct:28.9,type:'water'},{n:'묵반',g:100,pct:9.6,type:'other'},{n:'탕종',g:200,pct:19.3,type:'other'}]},
   펌퍼니클:{label:'펌퍼니클',total:2521,ings:[{n:'크라프트',g:217,pct:72.3,type:'flour'},{n:'호밀',g:72.5,pct:24.2,type:'flour'},{n:'설탕',g:23,pct:7.7,type:'sugar'},{n:'소금',g:2,pct:0.7,type:'salt'},{n:'트레할로스',g:71.5,pct:23.8,type:'sugar'},{n:'햄프씨드',g:108.5,pct:36.2,type:'other'},{n:'치아씨드',g:72.5,pct:24.2,type:'other'},{n:'몰트액기스',g:15,pct:5,type:'other'},{n:'물',g:87.5,pct:29.2,type:'water'},{n:'우유',g:350,pct:116.7,type:'water'},{n:'호밀 르방',g:250,pct:83.3,type:'other'},{n:'호두',g:123,pct:41,type:'other'},{n:'꿀',g:28.5,pct:9.5,type:'sugar'}]},
-  크루아상:{label:'크루아상',total:2505,ings:[{n:'큐원',g:375,pct:75,type:'flour'},{n:'지라도',g:125,pct:25,type:'flour'},{n:'물',g:180,pct:36,type:'water'},{n:'전란',g:25,pct:5,type:'other'},{n:'소금',g:10,pct:2,type:'salt'},{n:'설탕',g:70,pct:14,type:'sugar'},{n:'생이스트',g:22.5,pct:4.5,type:'yeast'},{n:'엑스트라버터',g:62.5,pct:12.5,type:'fat'},{n:'충전용 버터',g:1930,pct:386,type:'fat'}]},
-  치아바타:{label:'치아바타/포카치아',total:1929.1,ings:[{n:'T55 풀리쉬',g:281.5,pct:28.2,type:'flour'},{n:'레드 풀리쉬',g:4.6,pct:0.5,type:'yeast'},{n:'물 풀리쉬',g:281.5,pct:28.2,type:'water'},{n:'키알라',g:177,pct:17.7,type:'flour'},{n:'큐원',g:177,pct:17.7,type:'flour'},{n:'T55 본반죽',g:364.5,pct:36.5,type:'flour'},{n:'소금',g:12,pct:1.2,type:'salt'},{n:'레드 본반죽',g:12,pct:1.2,type:'yeast'},{n:'물 본반죽',g:468,pct:46.8,type:'water'},{n:'몰트',g:12,pct:1.2,type:'other'},{n:'오일',g:71,pct:7.1,type:'fat'},{n:'바시나주',g:68,pct:6.8,type:'water'}]},
+  크루아상:{label:'크루아상',total:2055,ings:[
+    {n:'T55',g:225,pct:15,type:'flour',stage:'풀리쉬'},
+    {n:'레드',g:10,pct:0.7,type:'yeast',stage:'풀리쉬'},
+    {n:'물',g:225,pct:15,type:'water',stage:'풀리쉬'},
+    {n:'로저스',g:375,pct:25,type:'flour',stage:'본반죽'},
+    {n:'백설',g:375,pct:25,type:'flour',stage:'본반죽'},
+    {n:'T55',g:125,pct:8.3,type:'flour',stage:'본반죽'},
+    {n:'설탕',g:80,pct:5.3,type:'sugar',stage:'본반죽'},
+    {n:'소금',g:20,pct:1.3,type:'salt',stage:'본반죽'},
+    {n:'레드',g:10,pct:0.7,type:'yeast',stage:'본반죽'},
+    {n:'우유',g:350,pct:23.3,type:'water',stage:'본반죽'},
+    {n:'물',g:40,pct:2.7,type:'water',stage:'본반죽'},
+    {n:'몰트',g:10,pct:0.7,type:'other',stage:'본반죽'},
+    {n:'묵은반죽',g:100,pct:6.7,type:'other',stage:'본반죽'},
+    {n:'버터',g:110,pct:7.3,type:'fat',stage:'본반죽'}
+  ]},
+  치아바타:{label:'치아바타/포카치아',total:1929.1,ings:[{n:'T55',g:281.5,pct:28.2,type:'flour',stage:'풀리쉬'},{n:'레드',g:4.6,pct:0.5,type:'yeast',stage:'풀리쉬'},{n:'물',g:281.5,pct:28.2,type:'water',stage:'풀리쉬'},{n:'키알라',g:177,pct:17.7,type:'flour',stage:'본반죽'},{n:'큐원',g:177,pct:17.7,type:'flour',stage:'본반죽'},{n:'T55',g:364.5,pct:36.5,type:'flour',stage:'본반죽'},{n:'소금',g:12,pct:1.2,type:'salt',stage:'본반죽'},{n:'레드',g:12,pct:1.2,type:'yeast',stage:'본반죽'},{n:'물',g:468,pct:46.8,type:'water',stage:'본반죽'},{n:'몰트',g:12,pct:1.2,type:'other',stage:'본반죽'},{n:'오일',g:71,pct:7.1,type:'fat',stage:'본반죽'},{n:'바시나주',g:68,pct:6.8,type:'water',stage:'본반죽'}]},
 };
 
 let curTab='qty';
@@ -276,6 +339,7 @@ let OFFSETS={};  // 제품별 생산일 오프셋 (0=당일, 1=다음날...)
 let BATCH_MODE={치아바타:true};  // true면 개수 대신 배합수 직접 입력
 let GROUPED={};  // 묶음 계량: GROUPED[제품명]={weighDay:'토',days:['일','월']}
 let sortMode=false;  // 순서 변경 모드
+let MAXBATCH={};  // 반죽별 1회 최대 배합수 (초과 시 분할)
 let batchQty={};  // 배합수 직접입력 값: batchQty[요일][반죽]=배합수
 DAYS.forEach(d=>batchQty[d]={});  // 다중 선택된 요일
 const allQty={};
@@ -290,11 +354,35 @@ function loadSaved(){
     if(p&&p.dtypes) DTYPES=p.dtypes;
     PRODUCTS.forEach(initQty);
     if(p&&p.allQty) DAYS.forEach(d=>{ if(p.allQty[d]) Object.keys(p.allQty[d]).forEach(k=>{ if(!allQty[d]) allQty[d]={}; allQty[d][k]=p.allQty[d][k]; }); });
-    if(p&&p.recipes) RECIPES=p.recipes;
+    if(p&&p.recipes){
+      // 서버 레시피 로드 후 stage 필드 보정 (재료명에 '풀리쉬'가 있으면 자동 분류)
+      Object.keys(p.recipes).forEach(k=>{
+        const r=p.recipes[k];
+        if(!r.ings) return;
+        const hasStage=r.ings.some(i=>i.stage);
+        if(!hasStage){
+          r.ings.forEach(i=>{
+            if(/풀리쉬|폴리쉬|poolish/i.test(i.n)){
+              i.stage='풀리쉬';
+              i.n=i.n.replace(/\s*\(?(풀리쉬|폴리쉬|poolish)\)?\s*/gi,'').trim()||i.n;
+            } else if(/본반죽/i.test(i.n)){
+              i.stage='본반죽';
+              i.n=i.n.replace(/\s*\(?본반죽\)?\s*/g,'').trim()||i.n;
+            }
+          });
+          // 풀리쉬가 하나라도 있으면 나머지는 본반죽으로
+          if(r.ings.some(i=>i.stage==='풀리쉬')){
+            r.ings.forEach(i=>{ if(!i.stage) i.stage='본반죽'; });
+          }
+        }
+      });
+      RECIPES=p.recipes;
+    }
     if(p&&p.recipeTotals) RECIPE_TOTALS={...RECIPE_TOTALS,...p.recipeTotals};
     if(p&&p.offsets) OFFSETS=p.offsets;
     if(p&&p.batchMode) BATCH_MODE=p.batchMode;
     if(p&&p.grouped) GROUPED=p.grouped;
+    if(p&&p.maxBatch) MAXBATCH=p.maxBatch;
     if(p&&p.batchQty) DAYS.forEach(d=>{ if(p.batchQty[d]) batchQty[d]={...batchQty[d],...p.batchQty[d]}; });
     const t=localStorage.getItem('bakery_savetime');
     document.getElementById('saveTime').textContent=t||'--';
@@ -304,7 +392,7 @@ function loadSaved(){
 function saveData(){
   const now=new Date(); const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   document.getElementById('saveTime').textContent='저장 중...';
-  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,recipeTotals:RECIPE_TOTALS,products:PRODUCTS,dtypes:DTYPES,offsets:OFFSETS,batchMode:BATCH_MODE,batchQty,grouped:GROUPED})})
+  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,recipeTotals:RECIPE_TOTALS,products:PRODUCTS,dtypes:DTYPES,offsets:OFFSETS,batchMode:BATCH_MODE,batchQty,grouped:GROUPED,maxBatch:MAXBATCH})})
     .then(()=>{ localStorage.setItem('bakery_savetime',str); document.getElementById('saveTime').textContent=str; showToast('저장했습니다'); })
     .catch(()=>showToast('저장 실패'));
 }
@@ -597,15 +685,29 @@ function renderResultTable(){
     const isOpen=expandedDtypes[dtype];
     // 반죽 행
     const dispName=dtype==='잡곡식빵'?'잡곡식빵 <span class="incl-tag">펌퍼니클 포함</span>':dtype;
+    const mx=MAXBATCH[dtype]||0;
     h+=`<tr class="batch-row"><td class="name-cell dtype-cell" onclick="toggleDtypeProds('${dtype}')">
-      <span class="exp-arrow">${isOpen?'&#9662;':'&#9656;'}</span>${dispName}${BATCH_MODE[dtype]?'<span class="direct-tag">직접</span>':''}</td>`;
+      <span class="exp-arrow">${isOpen?'&#9662;':'&#9656;'}</span>${dispName}${BATCH_MODE[dtype]?'<span class="direct-tag">직접</span>':''}${mx?`<span class="max-tag">최대 ${mx}</span>`:''}</td>`;
     h+=`<td class="off-cell off-mixed">${mixedOffsetLabel(prods)}</td>`;
     DAYS.forEach(d=>{
       const b=byDay[d][dtype]?.batches||0;
       totals[d]+=b;
-      h+=`<td>${b>0?b.toFixed(1):'<span style="color:#ddd">-</span>'}</td>`;
+      const parts=splitBatch(b,mx);
+      const need=mx&&b>mx;
+      h+=`<td>${b>0?b.toFixed(1)+(need?`<span class="split-hint">${parts.join('+')}</span>`:''):'<span style="color:#ddd">-</span>'}</td>`;
     });
     h+='</tr>';
+    // 최대 배합수 설정 행 (펼침 시)
+    if(isOpen){
+      h+=`<tr class="prod-off-row maxb-row"><td class="name-cell prod-sub-cell">1회 최대 배합수<span class="prod-g">초과 시 자동 분할</span></td>`;
+      h+=`<td class="off-cell"><input class="off-inp maxb-inp" type="number" min="0" step="0.5" value="${mx||''}" placeholder="-" data-dtype="${dtype}" oninput="onMaxBatch(this)"><span class="off-hint">${mx?'배합':'무제한'}</span></td>`;
+      DAYS.forEach(d=>{
+        const b=byDay[d][dtype]?.batches||0;
+        const parts=splitBatch(b,mx);
+        h+=`<td class="prod-q">${b>0&&mx&&b>mx?`<span class="split-txt">${parts.join(' + ')}</span>`:'<span style="color:#ddd">-</span>'}</td>`;
+      });
+      h+='</tr>';
+    }
     // 제품별 생산일 입력 행 (펼쳐진 경우)
     if(isOpen){
       if(BATCH_MODE[dtype]){
@@ -661,6 +763,13 @@ function mixedOffsetLabel(prods){
 
 function toggleDtypeProds(dtype){
   expandedDtypes[dtype]=!expandedDtypes[dtype];
+  renderResultTable();
+}
+
+function onMaxBatch(el){
+  const dtype=el.dataset.dtype;
+  const v=Math.max(0,parseFloat(el.value)||0);
+  if(v) MAXBATCH[dtype]=v; else delete MAXBATCH[dtype];
   renderResultTable();
 }
 
@@ -865,19 +974,154 @@ function updateView(key){
 function toggleR(key){ const b=document.getElementById('rbody-'+key); const c=document.getElementById('chev-'+key); const o=b.style.display==='none'; b.style.display=o?'block':'none'; c.innerHTML=o?'&#9650;':'&#9660;'; if(o) updateView(key); }
 function toggleEdit(key){ const e=document.getElementById('edit-'+key); const o=e.style.display==='none'; e.style.display=o?'block':'none'; if(o) renderEditForm(key); }
 function renderEditForm(key){ const rec=RECIPES[key]; const e=document.getElementById('edit-'+key); const ft=flourTotal(rec.ings); e.innerHTML=`<div class="edit-section"><div class="flour-info">밀가루 합계: <span id="ef-${key}" style="color:#f59e0b;font-weight:700">${ft.toFixed(1)}g</span></div><div id="erows-${key}"></div><button class="add-ing-btn" onclick="addIng('${key}')">+ 재료 추가</button><button class="apply-btn" onclick="saveRecipe('${key}')">레시피 적용</button></div>`; renderERows(key); }
-function renderERows(key){ const rec=RECIPES[key]; const c=document.getElementById('erows-'+key); if(!c) return; c.innerHTML=rec.ings.map((ing,i)=>`<div class="erow"><div class="ecol" style="flex:2"><label>재료명</label><input class="einp" type="text" value="${ing.n}" id="en-${key}-${i}" oninput="RECIPES['${key}'].ings[${i}].n=this.value"></div><div class="ecol" style="width:64px"><label>g</label><input class="einp eg" type="number" min="0" step="0.1" value="${ing.g}" id="eg-${key}-${i}" oninput="onG('${key}',${i})"></div><div class="ecol" style="width:58px"><label>%</label><input class="einp ep" type="number" min="0" step="0.1" value="${typeof ing.pct==='number'?ing.pct:0}" id="ep-${key}-${i}" oninput="onP('${key}',${i})"></div><div class="ecol" style="width:68px"><label>종류</label><select class="esel" id="et-${key}-${i}" onchange="onT('${key}',${i})">${typeOptions(ing.type||'other')}</select></div><button class="del-ing-btn" onclick="delIng('${key}',${i})">&#215;</button></div>`).join(''); }
+function renderERows(key){ const rec=RECIPES[key]; const c=document.getElementById('erows-'+key); if(!c) return; c.innerHTML=rec.ings.map((ing,i)=>`<div class="erow"><div class="ecol" style="flex:2"><label>재료명</label><input class="einp" type="text" value="${ing.n}" id="en-${key}-${i}" oninput="RECIPES['${key}'].ings[${i}].n=this.value"><input class="einp stage-inp" type="text" value="${ing.stage||''}" placeholder="단계 (예: 풀리쉬)" id="es-${key}-${i}" oninput="RECIPES['${key}'].ings[${i}].stage=this.value.trim()||undefined" style="margin-top:4px;font-size:11px;padding:4px 7px"></div><div class="ecol" style="width:64px"><label>g</label><input class="einp eg" type="number" min="0" step="0.1" value="${ing.g}" id="eg-${key}-${i}" oninput="onG('${key}',${i})"></div><div class="ecol" style="width:58px"><label>%</label><input class="einp ep" type="number" min="0" step="0.1" value="${typeof ing.pct==='number'?ing.pct:0}" id="ep-${key}-${i}" oninput="onP('${key}',${i})"></div><div class="ecol" style="width:68px"><label>종류</label><select class="esel" id="et-${key}-${i}" onchange="onT('${key}',${i})">${typeOptions(ing.type||'other')}</select></div><button class="del-ing-btn" onclick="delIng('${key}',${i})">&#215;</button></div>`).join(''); }
 function onG(key,i){ const r=RECIPES[key]; r.ings[i].g=parseFloat(document.getElementById('eg-'+key+'-'+i)?.value)||0; const ft=flourTotal(r.ings); if(ft>0) r.ings.forEach((ing,x)=>{ ing.pct=parseFloat((ing.g/ft*100).toFixed(2)); const el=document.getElementById('ep-'+key+'-'+x); if(el) el.value=ing.pct; }); const f=document.getElementById('ef-'+key); if(f) f.textContent=ft.toFixed(1)+'g'; updateView(key); }
 function onP(key,i){ const r=RECIPES[key]; const p=parseFloat(document.getElementById('ep-'+key+'-'+i)?.value)||0; r.ings[i].pct=p; const ft=flourTotal(r.ings); if(ft>0){ const g=parseFloat((p/100*ft).toFixed(2)); r.ings[i].g=g; const el=document.getElementById('eg-'+key+'-'+i); if(el) el.value=g; } updateView(key); }
 function onT(key,i){ const r=RECIPES[key]; const o=r.ings[i].type; const n=document.getElementById('et-'+key+'-'+i)?.value; r.ings[i].type=n; if(o==='flour'||n==='flour'){ const ft=flourTotal(r.ings); if(ft>0) r.ings.forEach((ing,x)=>{ ing.pct=parseFloat((ing.g/ft*100).toFixed(2)); const el=document.getElementById('ep-'+key+'-'+x); if(el) el.value=ing.pct; }); const f=document.getElementById('ef-'+key); if(f) f.textContent=ft.toFixed(1)+'g'; } updateView(key); }
-function addIng(key){ RECIPES[key].ings.push({n:'',g:0,pct:0,type:'other'}); renderERows(key); }
+function addIng(key){ RECIPES[key].ings.push({n:'',g:0,pct:0,type:'other',stage:''}); renderERows(key); }
 function delIng(key,i){ if(!confirm('재료를 삭제할까요?')) return; RECIPES[key].ings.splice(i,1); const ft=flourTotal(RECIPES[key].ings); if(ft>0) RECIPES[key].ings.forEach(ing=>{ ing.pct=parseFloat((ing.g/ft*100).toFixed(2)); }); renderERows(key); updateView(key); const f=document.getElementById('ef-'+key); if(f) f.textContent=ft.toFixed(1)+'g'; }
 function saveRecipe(key){ RECIPES[key].total=RECIPES[key].ings.reduce((s,i)=>s+i.g,0); document.getElementById('edit-'+key).style.display='none'; updateView(key); showToast('적용됨 - 저장 버튼으로 서버 반영'); }
 
+// 배합수를 최대치 기준으로 분할
+// 예) 14.4배합, max 8 → 올림 15 → 2통 → [8,7]
+function splitBatch(batches,max){
+  if(!batches||batches<=0) return [];
+  if(!max||max<=0||batches<=max) return [batches];
+  const rounded=Math.ceil(batches);          // 반올림(올림)
+  const n=Math.ceil(rounded/max);            // 통 개수
+  const base=Math.floor(rounded/n);          // 기본 배합
+  const rem=rounded-base*n;                  // 나머지
+  const out=[];
+  for(let i=0;i<n;i++) out.push(base+(i<rem?1:0));
+  return out.sort((a,b)=>b-a);               // 큰 것부터
+}
+
+// ══════════════════════════════════════════
+// 계량표 탭
+// ══════════════════════════════════════════
+let scaleDtype=null;   // 선택된 반죽
+let scaleCustom=1;     // 직접 입력 배합수
+
+function renderScale(){
+  const picker=document.getElementById('scalePicker');
+  const avail=DTYPES.filter(dt=>RECIPES[dt]&&RECIPES[dt].ings?.length);
+  if(!scaleDtype||!avail.includes(scaleDtype)) scaleDtype=avail[0]||null;
+
+  picker.innerHTML=avail.map(dt=>
+    `<button class="sc-chip ${dt===scaleDtype?'on':''}" onclick="pickScale('${dt}')">${dt}</button>`
+  ).join('')||'<div style="padding:20px;color:#bbb;font-size:13px">레시피가 등록된 반죽이 없습니다</div>';
+
+  renderScaleTable();
+}
+
+function pickScale(dt){ scaleDtype=dt; renderScale(); }
+
+function renderScaleTable(){
+  const wrap=document.getElementById('scaleWrap');
+  if(!scaleDtype||!RECIPES[scaleDtype]){ wrap.innerHTML=''; return; }
+  const rec=RECIPES[scaleDtype];
+
+  // 요일별 배합수 (0 제외, 중복 제거)
+  const byDay={}; DAYS.forEach(d=>byDay[d]=calcBatchesFor(d));
+  const dayBatch=DAYS.map(d=>({day:d,b:byDay[d][scaleDtype]?.batches||0})).filter(x=>x.b>0);
+
+  // 열 구성: 1배합 고정 + 요일별 배합수 + 직접입력
+  const mx=MAXBATCH[scaleDtype]||0;
+  const cols=[{label:'1배합',sub:'기준',mult:1,fixed:true}];
+  dayBatch.forEach(x=>{
+    const parts=splitBatch(x.b,mx);
+    if(parts.length>1){
+      // 분할: 통별로 열 생성
+      parts.forEach((pb,i)=>{
+        cols.push({label:x.day,sub:`${i+1}통 ${pb}배합`,mult:pb,split:true});
+      });
+    } else {
+      cols.push({label:x.day,sub:x.b.toFixed(1)+'배합',mult:x.b});
+    }
+  });
+  cols.push({label:'직접',sub:'입력',mult:scaleCustom,custom:true});
+
+  // 단계별 그룹핑
+  const stages={};
+  rec.ings.forEach(ing=>{
+    const st=ing.stage||'본반죽';
+    if(!stages[st]) stages[st]=[];
+    stages[st].push(ing);
+  });
+  const ORDER=['풀리쉬','폴리쉬','사전반죽','탕종','본반죽','충전'];
+  const stageNames=Object.keys(stages).sort((a,b)=>{
+    const ia=ORDER.indexOf(a), ib=ORDER.indexOf(b);
+    return (ia<0?99:ia)-(ib<0?99:ib);
+  });
+
+  let h=`<table class="scale-table"><thead><tr><th class="name-col sc-name">재료</th>`;
+  cols.forEach((c,i)=>{
+    const cls=c.fixed?' sc-fixed':(c.custom?' sc-custom':(c.split?' sc-split':''));
+    h+=`<th class="sc-col${cls}">${c.label}<span class="sc-sub">${c.sub}</span></th>`;
+  });
+  h+='</tr></thead><tbody>';
+
+  let grandTotals=cols.map(()=>0);
+
+  stageNames.forEach(st=>{
+    const ings=stages[st];
+    const showStage=stageNames.length>1;
+    if(showStage){
+      h+=`<tr class="sc-stage"><td colspan="${cols.length+1}">${st}</td></tr>`;
+    }
+    const stTotals=cols.map(()=>0);
+    ings.forEach(ing=>{
+      h+=`<tr><td class="name-cell sc-name-cell"><span class="sc-dot" style="background:${ING_TYPES[ing.type||'other'].color}"></span>${ing.n}</td>`;
+      cols.forEach((c,i)=>{
+        const g=ing.g*c.mult;
+        stTotals[i]+=g; grandTotals[i]+=g;
+        h+=`<td class="sc-cell${c.fixed?' sc-fixed':''}${c.custom?' sc-custom':''}${c.split?' sc-split':''}">${fmtG(g)}</td>`;
+      });
+      h+='</tr>';
+    });
+    if(showStage){
+      h+=`<tr class="sc-subtotal"><td class="name-cell">${st} 합계</td>`;
+      stTotals.forEach((t,i)=>{ h+=`<td class="${cols[i].fixed?'sc-fixed':''}${cols[i].custom?'sc-custom':''}${cols[i].split?'sc-split':''}">${fmtG(t)}</td>`; });
+      h+='</tr>';
+    }
+  });
+
+  h+=`<tr class="sc-total"><td class="name-cell">총합계</td>`;
+  grandTotals.forEach((t,i)=>{ h+=`<td>${fmtG(t)}</td>`; });
+  h+='</tr></tbody></table>';
+
+  // 직접입력 컨트롤
+  if(mx) h+=`<div class="sc-max-note">1회 최대 <b>${mx}배합</b> 설정 — 초과분은 통별로 나눠 표시됩니다</div>`;
+  h+=`<div class="sc-input-bar">
+    <span class="sc-input-lbl">직접 입력 배합수</span>
+    <input class="sc-input" type="number" min="0.1" step="0.1" value="${scaleCustom}" oninput="onScaleCustom(this)">
+    <span class="sc-input-hint">입력하면 '직접' 열이 자동 계산됩니다</span>
+  </div>`;
+  wrap.innerHTML=h;
+}
+
+function fmtG(g){
+  if(g===0) return '<span style="color:#ddd">-</span>';
+  if(g>=1000) return Math.round(g).toLocaleString();
+  if(g>=100) return Math.round(g).toString();
+  if(g>=10) return (Math.round(g*10)/10).toString();
+  return (Math.round(g*100)/100).toString();
+}
+
+function onScaleCustom(el){
+  scaleCustom=Math.max(0,parseFloat(el.value)||0);
+  const cur=el.value;
+  renderScaleTable();
+  const ni=document.querySelector('.sc-input');
+  if(ni){ ni.value=cur; ni.focus(); }
+}
+
 function switchTab(tab){
   curTab=tab;
-  ['qty','result','recipe'].forEach(t=>{ document.getElementById(t+'Tab').style.display=t===tab?'block':'none'; document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active',t===tab); });
+  ['qty','result','scale','recipe'].forEach(t=>{ document.getElementById(t+'Tab').style.display=t===tab?'block':'none'; document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active',t===tab); });
   document.getElementById('multiBar').style.display=(tab==='qty'&&selDays.length>0)?'flex':'none';
   if(tab==='result') renderResultTable();
+  if(tab==='scale') renderScale();
   if(tab==='recipe') renderRecipes();
 }
 
