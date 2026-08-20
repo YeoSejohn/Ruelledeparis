@@ -73,6 +73,17 @@ tr.prod-off-row td.name-cell{background:#fbfcff;padding:6px 12px 6px 26px;font-s
 .prod-g{font-size:10px;color:#bbb;margin-left:6px}
 td.prod-q{font-size:12px;color:#666;font-weight:500;text-align:center}
 .sale-day{display:block;font-size:9px;color:#c5cae9;margin-top:1px}
+.batch-tag{font-size:9px;background:#3b5bdb;color:#fff;border-radius:4px;padding:1px 6px;margin-left:6px;font-weight:600;letter-spacing:0}
+.sec-mode{font-size:10px;color:#3b5bdb;background:#e8eaf6;border:none;border-radius:5px;padding:2px 8px;cursor:pointer;font-family:inherit;flex-shrink:0}
+tr.batch-input-row td.name-cell{background:#eef2ff}
+tr.batch-input-row td.qty-cell{background:#f5f7ff}
+.batch-inp-cell{color:#3b5bdb!important;font-size:16px!important;font-weight:700!important}
+.batch-inp-cell.zero{color:#c5cae9!important}
+tr.ref-prod-row td{background:#fcfcfc;border-bottom:1px solid #f5f5f5}
+tr.ref-prod-row td.name-cell{background:#fcfcfc;padding:5px 12px 5px 22px}
+.p-name-sm{font-size:12px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:96px}
+td.ref-cell{color:#ddd;font-size:12px;text-align:center;padding:5px 2px}
+.direct-tag{font-size:9px;background:#3b5bdb;color:#fff;border-radius:4px;padding:1px 5px;margin-left:6px;font-weight:600}
 /* 다중선택 바 */
 .multi-bar{background:#eef2ff;border-bottom:1px solid #c5cae9;padding:8px 14px;display:none;align-items:center;gap:8px;flex-wrap:wrap}
 .multi-bar.show{display:flex}
@@ -231,7 +242,10 @@ let RECIPES={
 
 let curTab='qty';
 let selDays=[];
-let OFFSETS={};  // 제품별 생산일 오프셋 (0=당일, 1=다음날...)  // 다중 선택된 요일
+let OFFSETS={};  // 제품별 생산일 오프셋 (0=당일, 1=다음날...)
+let BATCH_MODE={치아바타:true};  // true면 개수 대신 배합수 직접 입력
+let batchQty={};  // 배합수 직접입력 값: batchQty[요일][반죽]=배합수
+DAYS.forEach(d=>batchQty[d]={});  // 다중 선택된 요일
 const allQty={};
 function initQty(p){ DAYS.forEach(d=>{ if(!allQty[d]) allQty[d]={}; if(allQty[d][p.name]===undefined) allQty[d][p.name]=p[DAY_TYPE[d]]; }); }
 PRODUCTS.forEach(initQty);
@@ -246,6 +260,8 @@ function loadSaved(){
     if(p&&p.allQty) DAYS.forEach(d=>{ if(p.allQty[d]) Object.keys(p.allQty[d]).forEach(k=>{ if(!allQty[d]) allQty[d]={}; allQty[d][k]=p.allQty[d][k]; }); });
     if(p&&p.recipes) RECIPES=p.recipes;
     if(p&&p.offsets) OFFSETS=p.offsets;
+    if(p&&p.batchMode) BATCH_MODE=p.batchMode;
+    if(p&&p.batchQty) DAYS.forEach(d=>{ if(p.batchQty[d]) batchQty[d]={...batchQty[d],...p.batchQty[d]}; });
     const t=localStorage.getItem('bakery_savetime');
     document.getElementById('saveTime').textContent=t||'--';
     renderQtyTable();
@@ -254,7 +270,7 @@ function loadSaved(){
 function saveData(){
   const now=new Date(); const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   document.getElementById('saveTime').textContent='저장 중...';
-  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,products:PRODUCTS,dtypes:DTYPES,offsets:OFFSETS})})
+  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,products:PRODUCTS,dtypes:DTYPES,offsets:OFFSETS,batchMode:BATCH_MODE,batchQty})})
     .then(()=>{ localStorage.setItem('bakery_savetime',str); document.getElementById('saveTime').textContent=str; showToast('저장했습니다'); })
     .catch(()=>showToast('저장 실패'));
 }
@@ -289,7 +305,30 @@ function renderQtyTable(){
   h+='</tr></thead><tbody>';
   DTYPES.forEach(dtype=>{
     const prods=PRODUCTS.filter(p=>p.dtype===dtype);
-    h+=`<tr class="sec-row"><td colspan="${DAYS.length+1}"><div class="sec-inner"><span>${dtype}</span><button class="sec-del" onclick="delDtype('${dtype}')">삭제</button></div></td></tr>`;
+    const isBatch=BATCH_MODE[dtype];
+    h+=`<tr class="sec-row"><td colspan="${DAYS.length+1}"><div class="sec-inner"><span>${dtype}${isBatch?' <span class="batch-tag">배합수 입력</span>':''}</span><div style="display:flex;gap:5px"><button class="sec-mode" onclick="toggleBatchMode('${dtype}')">${isBatch?'개수로':'배합수로'}</button><button class="sec-del" onclick="delDtype('${dtype}')">삭제</button></div></div></td></tr>`;
+
+    // 배합수 직접입력 모드
+    if(isBatch){
+      const rowIdx=rowCounter++;
+      h+=`<tr class="batch-input-row"><td class="name-cell" style="cursor:default"><div class="p-name">${dtype} 배합수</div><div class="p-split">0.1 단위</div></td>`;
+      DAYS.forEach((d,di)=>{
+        const v=batchQty[d]?.[dtype]??0;
+        const zc=v===0?' zero':'';
+        const sc=selDays.includes(d)?' sel-day':'';
+        h+=`<td class="qty-cell"><input class="q-inp batch-inp-cell${zc}${sc}" type="number" min="0" step="0.1" value="${v}" data-day="${d}" data-col="${di}" data-row="${rowIdx}" data-dtype="${dtype}" oninput="onBatchQty(this)" onkeydown="onCellKey(event,this)"></td>`;
+      });
+      h+='</tr>';
+      // 참고용 제품 목록 (읽기 전용)
+      prods.forEach(p=>{
+        h+=`<tr class="ref-prod-row"><td class="name-cell" onclick="openEditProd('${p.name.replace(/'/g,"\\'")}')"><div class="p-name-sm">${p.name}</div><div class="p-split">${p.split}g</div></td>`;
+        DAYS.forEach(d=>{ h+=`<td class="ref-cell">-</td>`; });
+        h+='</tr>';
+      });
+      h+=`<tr class="add-row"><td colspan="${DAYS.length+1}"><div class="add-inner" onclick="openAddProd('${dtype}')"><div class="add-ico">+</div><span class="add-lbl">${dtype} 제품 추가</span></div></td></tr>`;
+      return;
+    }
+
     prods.forEach(p=>{
       const rowIdx=rowCounter++;
       h+=`<tr><td class="name-cell" onclick="openEditProd('${p.name.replace(/'/g,"\\'")}')"><div class="p-name">${p.name}</div><div class="p-split">${p.split}g</div></td>`;
@@ -322,6 +361,28 @@ function onQty(el){
   }
   el.classList.toggle('zero',val===0);
   if(curTab==='result') renderResultTable();
+}
+
+function onBatchQty(el){
+  const day=el.dataset.day, dtype=el.dataset.dtype;
+  const val=Math.max(0,parseFloat(el.value)||0);
+  if(selDays.length>0 && selDays.includes(day)){
+    selDays.forEach(d=>{ if(!batchQty[d]) batchQty[d]={}; batchQty[d][dtype]=val; });
+    document.querySelectorAll(`.batch-inp-cell[data-dtype="${CSS.escape(dtype)}"]`).forEach(inp=>{
+      if(selDays.includes(inp.dataset.day)&&inp!==el){ inp.value=val; inp.classList.toggle('zero',val===0); }
+    });
+  } else {
+    if(!batchQty[day]) batchQty[day]={};
+    batchQty[day][dtype]=val;
+  }
+  el.classList.toggle('zero',val===0);
+  if(curTab==='result') renderResultTable();
+}
+
+function toggleBatchMode(dtype){
+  BATCH_MODE[dtype]=!BATCH_MODE[dtype];
+  renderQtyTable();
+  showToast(BATCH_MODE[dtype]?`'${dtype}' 배합수 직접 입력 모드`:`'${dtype}' 개수 입력 모드`);
 }
 
 // Tab/Enter → 같은 요일의 다음 제품(아래)으로 이동
@@ -365,6 +426,15 @@ function calcBatchesFor(day){
     const prods=PRODUCTS.filter(p=>p.dtype===dtype);
     const recipe=RECIPE_TOTALS[dtype]; if(!recipe||!prods.length) return;
     let batches,total_g;
+    // 배합수 직접입력 모드
+    if(BATCH_MODE[dtype]){
+      const off=prods.length?(OFFSETS[prods[0].name]||0):0;
+      const sd=saleDay(day,off);
+      batches=batchQty[sd]?.[dtype]||0;
+      total_g=batches*recipe;
+      result[dtype]={batches,total_g,direct:true};
+      return;
+    }
     if(dtype==='식빵'){
       const normal=prods.filter(p=>p.name!=='소금빵'&&p.name!=='초코 모닝빵');
       const normalG=normal.reduce((s,p)=>s+qtyFor(p,day)*p.split,0);
@@ -400,12 +470,12 @@ function renderResultTable(){
     if(!RECIPE_TOTALS[dtype]) return;
     const prods=PRODUCTS.filter(p=>p.dtype===dtype);
     if(!prods.length) return;
-    const hasAny=DAYS.some(d=>byDay[d][dtype]?.batches>0);
+    const hasAny=DAYS.some(d=>byDay[d][dtype]?.batches>0)||BATCH_MODE[dtype];
     if(!hasAny) return;
     const isOpen=expandedDtypes[dtype];
     // 반죽 행
     h+=`<tr class="batch-row"><td class="name-cell dtype-cell" onclick="toggleDtypeProds('${dtype}')">
-      <span class="exp-arrow">${isOpen?'&#9662;':'&#9656;'}</span>${dtype}</td>`;
+      <span class="exp-arrow">${isOpen?'&#9662;':'&#9656;'}</span>${dtype}${BATCH_MODE[dtype]?'<span class="direct-tag">직접</span>':''}</td>`;
     h+=`<td class="off-cell off-mixed">${mixedOffsetLabel(prods)}</td>`;
     DAYS.forEach(d=>{
       const b=byDay[d][dtype]?.batches||0;
@@ -415,6 +485,18 @@ function renderResultTable(){
     h+='</tr>';
     // 제품별 생산일 입력 행 (펼쳐진 경우)
     if(isOpen){
+      if(BATCH_MODE[dtype]){
+        // 배합수 직접입력 반죽: 대표 오프셋 1개만
+        const off=prods.length?(OFFSETS[prods[0].name]||0):0;
+        h+=`<tr class="prod-off-row"><td class="name-cell prod-sub-cell">배합수 직접 입력<span class="prod-g">전체 적용</span></td>`;
+        h+=`<td class="off-cell"><input class="off-inp" type="number" min="0" max="6" value="${off}" data-pname="${prods.length?prods[0].name.replace(/"/g,'&quot;'):''}" data-batchdtype="${dtype}" oninput="onOffset(this)"><span class="off-hint">${off===0?'당일':'+'+off}</span></td>`;
+        DAYS.forEach(d=>{
+          const sd=saleDay(d,off);
+          const b=batchQty[sd]?.[dtype]||0;
+          h+=`<td class="prod-q">${b>0?b.toFixed(1):'<span style="color:#ddd">-</span>'}<span class="sale-day">${sd}</span></td>`;
+        });
+        h+='</tr>';
+      } else {
       prods.forEach(p=>{
         const off=OFFSETS[p.name]||0;
         h+=`<tr class="prod-off-row"><td class="name-cell prod-sub-cell">${p.name}<span class="prod-g">${p.split}g</span></td>`;
@@ -426,6 +508,7 @@ function renderResultTable(){
         });
         h+='</tr>';
       });
+      }
     }
   });
 
@@ -449,9 +532,14 @@ function toggleDtypeProds(dtype){
 }
 
 function onOffset(el){
-  const pname=el.dataset.pname;
   const v=Math.max(0,Math.min(6,parseInt(el.value)||0));
-  OFFSETS[pname]=v;
+  const bd=el.dataset.batchdtype;
+  if(bd){
+    // 배합수 모드: 소속 제품 전체에 동일 적용
+    PRODUCTS.filter(p=>p.dtype===bd).forEach(p=>{ OFFSETS[p.name]=v; });
+  } else {
+    OFFSETS[el.dataset.pname]=v;
+  }
   renderResultTable();
 }
 
