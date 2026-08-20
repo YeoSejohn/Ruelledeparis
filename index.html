@@ -488,11 +488,16 @@ function loadSaved(){
     if(p&&p.fillings) FILLINGS=p.fillings;
     if(p&&p.levain) LEVAIN={...LEVAIN,...p.levain};
     if(p&&p.scaleOpts){
-      roundUpBy=(p.scaleOpts.roundUpBy&&typeof p.scaleOpts.roundUpBy==='object')?p.scaleOpts.roundUpBy:{};
-      fillSumBy=(p.scaleOpts.fillSumBy&&typeof p.scaleOpts.fillSumBy==='object')?p.scaleOpts.fillSumBy:{};
+      roundUpBy=(p.scaleOpts.roundUpBy&&typeof p.scaleOpts.roundUpBy==='object')?{...p.scaleOpts.roundUpBy}:{};
+      fillSumBy=(p.scaleOpts.fillSumBy&&typeof p.scaleOpts.fillSumBy==='object')?{...p.scaleOpts.fillSumBy}:{};
       if(p.scaleOpts.custom) scaleCustom=p.scaleOpts.custom;
       if(p.scaleOpts.dtype) scaleDtype=p.scaleOpts.dtype;
     }
+    // 누락된 반죽에 기본값 채우기
+    DTYPES.forEach(dt=>{
+      if(roundUpBy[dt]===undefined) roundUpBy[dt]=true;
+      if(fillSumBy[dt]===undefined) fillSumBy[dt]=true;
+    });
     if(p&&p.batchQty) DAYS.forEach(d=>{ if(p.batchQty[d]) batchQty[d]={...batchQty[d],...p.batchQty[d]}; });
     const t=localStorage.getItem('bakery_savetime');
     document.getElementById('saveTime').textContent=t||'--';
@@ -1431,9 +1436,9 @@ function renderLevain(){
 let scaleDtype=null;   // 선택된 반죽
 let scaleCustom=1;     // 직접 입력 배합수
 let roundUpBy={};      // 반죽별 올림 적용 여부
-function isRoundUp(){ return roundUpBy[scaleDtype]!==false; }  // 기본 true
+function isRoundUp(){ return scaleDtype?(roundUpBy[scaleDtype]!==false):true; }
 let fillSumBy={};      // 반죽별 충전물 재료 총합 표시 여부
-function showSum(){ return fillSumBy[scaleDtype]!==false; }  // 기본 true
+function showSum(){ return scaleDtype?(fillSumBy[scaleDtype]!==false):true; }
 
 function renderScale(){
   const picker=document.getElementById('scalePicker');
@@ -1454,8 +1459,21 @@ function renderScale(){
 }
 
 function pickScale(dt){ scaleDtype=dt; renderScale(); }
-function toggleRoundUp(){ if(!scaleDtype) return; roundUpBy[scaleDtype]=!isRoundUp(); renderScale(); showToast(`${scaleDtype} ${isRoundUp()?'올림 적용':'실제 배합수'}`); }
-function toggleFillSum(){ if(!scaleDtype) return; fillSumBy[scaleDtype]=!showSum(); renderScale(); showToast(`${scaleDtype} 재료합 ${showSum()?'표시':'숨김'} - 저장 버튼으로 유지`); }
+function toggleRoundUp(){
+  if(!scaleDtype) return;
+  // 모든 반죽에 기본값을 먼저 채워 넣어 Firebase 누락 방지
+  DTYPES.forEach(dt=>{ if(roundUpBy[dt]===undefined) roundUpBy[dt]=true; });
+  roundUpBy[scaleDtype]=!roundUpBy[scaleDtype];
+  renderScale();
+  showToast(`${scaleDtype}: 올림 ${roundUpBy[scaleDtype]?'ON':'OFF'}`);
+}
+function toggleFillSum(){
+  if(!scaleDtype) return;
+  DTYPES.forEach(dt=>{ if(fillSumBy[dt]===undefined) fillSumBy[dt]=true; });
+  fillSumBy[scaleDtype]=!fillSumBy[scaleDtype];
+  renderScale();
+  showToast(`${scaleDtype}: 재료합 ${fillSumBy[scaleDtype]?'ON':'OFF'}`);
+}
 
 // 특정 제품·충전물·열에 대한 충전물 총량
 function fillAmount(p,f,c,doughPerBatch){
