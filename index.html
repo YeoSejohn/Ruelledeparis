@@ -89,6 +89,10 @@ tr.batch-sum-row td.name-cell{background:#e8eaf6}
 tr.batch-sum-row .p-name{color:#3b5bdb;font-weight:700}
 tr.batch-sum-row .p-split{color:#7986cb}
 td.batch-sum-cell{text-align:center;font-size:15px;font-weight:700;color:#3b5bdb;padding:8px 2px}
+.incl-tag{font-size:9px;background:#fff3e0;color:#e65100;border:1px solid #ffcc80;border-radius:4px;padding:1px 5px;margin-left:5px;font-weight:600;white-space:nowrap}
+tr.pumper-row td{background:#fff8f0}
+tr.pumper-row td.name-cell{background:#fff8f0;color:#e65100;font-weight:500}
+tr.pumper-row td.prod-q{color:#e65100;font-weight:600}
 /* 다중선택 바 */
 .multi-bar{background:#eef2ff;border-bottom:1px solid #c5cae9;padding:8px 14px;display:none;align-items:center;gap:8px;flex-wrap:wrap}
 .multi-bar.show{display:flex}
@@ -194,6 +198,7 @@ const DAYS=['월','화','수','목','금','토','일'];
 const DAY_TYPE={월:'wd',화:'wd',수:'wd',목:'wd',금:'sat',토:'sat',일:'sun'};
 const ING_TYPES={flour:{label:'밀가루',color:'#f59e0b'},water:{label:'물/액체',color:'#3b82f6'},sugar:{label:'설탕류',color:'#ec4899'},salt:{label:'소금',color:'#6b7280'},yeast:{label:'효모',color:'#10b981'},fat:{label:'유지류',color:'#f97316'},other:{label:'기타',color:'#8b5cf6'}};
 const MUKBAN=500,SIK_TOTAL=2715;
+const PUMPER_JAPGOK=1100;  // 펌퍼니클 1배합당 잡곡식빵 반죽 사용량(g)
 
 let DTYPES=['단과자','식빵','탕종식빵','모카빵','잡곡모닝','잡곡식빵','치아바타','바타르','펌퍼니클','크루아상'];
 let PRODUCTS=[
@@ -450,8 +455,9 @@ function qtyFor(p,day){
 
 function calcBatchesFor(day){
   const result={};
-  // 식빵은 다른 반죽의 묵반 소요량을 참조하므로 마지막에 계산
-  const order=[...DTYPES.filter(d=>d!=='식빵'),...DTYPES.filter(d=>d==='식빵')];
+  // 의존 순서: 펌퍼니클 → 잡곡식빵 → 식빵(묵반) 순으로 계산
+  const LAST=['잡곡식빵','식빵'];
+  const order=[...DTYPES.filter(d=>!LAST.includes(d)),...LAST.filter(d=>DTYPES.includes(d))];
   order.forEach(dtype=>{
     const prods=PRODUCTS.filter(p=>p.dtype===dtype);
     const recipe=RECIPE_TOTALS[dtype]; if(!recipe||!prods.length) return;
@@ -470,12 +476,21 @@ function calcBatchesFor(day){
     if(dtype==='식빵'){
       // 소금빵 + 초코모닝빵 + 다른 반죽에 들어가는 묵반 소요량
       const ownG=prods.reduce((s,p)=>s+qtyFor(p,day)*p.split,0);
-      // 묵반을 쓰는 반죽들의 배합수 합 (탕종식빵, 모카빵, 잡곡류)
       const mukbanUsers=['탕종식빵','모카빵','잡곡모닝','잡곡식빵'];
       const mukbanB=mukbanUsers.reduce((s,dt)=>s+(result[dt]?.batches||0),0);
       const need=ownG+mukbanB*MUKBAN;
       batches=need>0?Math.ceil(need/(SIK_TOTAL-MUKBAN)*10)/10:0;
       total_g=batches*(SIK_TOTAL-MUKBAN);
+    } else if(dtype==='잡곡식빵'){
+      // 잡곡식빵 자체 + 펌퍼니클이 쓰는 잡곡식빵 반죽(1배합당 1,100g)
+      const ownG=prods.reduce((s,p)=>s+qtyFor(p,day)*p.split,0);
+      const pumperB=result['펌퍼니클']?.batches||0;
+      const pumperG=pumperB*PUMPER_JAPGOK;
+      const need=ownG+pumperG;
+      batches=need>0?Math.ceil(need/recipe*10)/10:0;
+      total_g=need;
+      result[dtype]={batches,total_g,pumperG,ownG};
+      return;
     } else {
       total_g=prods.reduce((s,p)=>s+qtyFor(p,day)*p.split,0);
       batches=total_g>0?Math.ceil(total_g/recipe*10)/10:0;
@@ -503,8 +518,9 @@ function renderResultTable(){
     if(!hasAny) return;
     const isOpen=expandedDtypes[dtype];
     // 반죽 행
+    const dispName=dtype==='잡곡식빵'?'잡곡식빵 <span class="incl-tag">펌퍼니클 포함</span>':dtype;
     h+=`<tr class="batch-row"><td class="name-cell dtype-cell" onclick="toggleDtypeProds('${dtype}')">
-      <span class="exp-arrow">${isOpen?'&#9662;':'&#9656;'}</span>${dtype}${BATCH_MODE[dtype]?'<span class="direct-tag">직접</span>':''}</td>`;
+      <span class="exp-arrow">${isOpen?'&#9662;':'&#9656;'}</span>${dispName}${BATCH_MODE[dtype]?'<span class="direct-tag">직접</span>':''}</td>`;
     h+=`<td class="off-cell off-mixed">${mixedOffsetLabel(prods)}</td>`;
     DAYS.forEach(d=>{
       const b=byDay[d][dtype]?.batches||0;
@@ -527,6 +543,15 @@ function renderResultTable(){
           h+='</tr>';
         });
       } else {
+      // 잡곡식빵: 펌퍼니클 소요량 안내 행
+      if(dtype==='잡곡식빵'){
+        h+=`<tr class="prod-off-row pumper-row"><td class="name-cell prod-sub-cell">↳ 펌퍼니클용<span class="prod-g">1배합당 ${PUMPER_JAPGOK.toLocaleString()}g</span></td><td class="off-cell"><span class="off-summary" style="font-size:10px">자동</span></td>`;
+        DAYS.forEach(d=>{
+          const pg=byDay[d]['잡곡식빵']?.pumperG||0;
+          h+=`<td class="prod-q">${pg>0?Math.round(pg).toLocaleString()+'g':'<span style="color:#ddd">-</span>'}</td>`;
+        });
+        h+='</tr>';
+      }
       prods.forEach(p=>{
         const off=OFFSETS[p.name]||0;
         h+=`<tr class="prod-off-row"><td class="name-cell prod-sub-cell">${p.name}<span class="prod-g">${p.split}g</span></td>`;
