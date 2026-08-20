@@ -176,12 +176,12 @@ tr.pumper-row td.prod-q{color:#e65100;font-weight:600}
 .scale-picker{background:#fff;border-bottom:1px solid #eee}
 .sc-chips{display:flex;gap:6px;padding:10px 14px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .sc-chips::-webkit-scrollbar{display:none}
-.sc-toggles{display:flex;gap:6px;padding:0 14px 9px}
-.sc-tg{padding:4px 11px;border-radius:14px;border:1px solid #ffcc80;background:#fff;color:#e65100;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.sc-toggles{display:flex;gap:5px;padding:0 14px 8px;align-items:center}
+.sc-tg{padding:3px 8px;border-radius:12px;border:1px solid #ffcc80;background:#fff;color:#e65100;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;line-height:1.5}
 .sc-tg.on{background:#e65100;border-color:#e65100;color:#fff}
 .sc-tg.blue{border-color:#90caf9;color:#1565c0}
 .sc-tg.blue.on{background:#1565c0;border-color:#1565c0;color:#fff}
-.sc-tg-hint{font-size:10px;color:#bbb;align-self:center;margin-left:2px}
+.sc-tg-hint{font-size:9px;color:#ccc;margin-left:auto}
 .sc-chip{padding:7px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#666;font-size:13px;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit}
 .sc-chip.on{background:#1a1a2e;border-color:#1a1a2e;color:#fff;font-weight:600}
 tr.sc-fill-note-row td{background:#fff8f0;color:#bf5000;font-size:10px;padding:7px 12px;text-align:center;line-height:1.5}
@@ -488,7 +488,7 @@ function loadSaved(){
     if(p&&p.fillings) FILLINGS=p.fillings;
     if(p&&p.levain) LEVAIN={...LEVAIN,...p.levain};
     if(p&&p.scaleOpts){
-      if(typeof p.scaleOpts.roundUp==='boolean') scaleRoundUp=p.scaleOpts.roundUp;
+      roundUpBy=(p.scaleOpts.roundUpBy&&typeof p.scaleOpts.roundUpBy==='object')?p.scaleOpts.roundUpBy:{};
       fillSumBy=(p.scaleOpts.fillSumBy&&typeof p.scaleOpts.fillSumBy==='object')?p.scaleOpts.fillSumBy:{};
       if(p.scaleOpts.custom) scaleCustom=p.scaleOpts.custom;
       if(p.scaleOpts.dtype) scaleDtype=p.scaleOpts.dtype;
@@ -502,7 +502,7 @@ function loadSaved(){
 function saveData(){
   const now=new Date(); const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   document.getElementById('saveTime').textContent='저장 중...';
-  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,recipeTotals:RECIPE_TOTALS,products:PRODUCTS,dtypes:DTYPES,offsets:OFFSETS,batchMode:BATCH_MODE,batchQty,grouped:GROUPED,maxBatch:MAXBATCH,fillings:FILLINGS,levain:LEVAIN,scaleOpts:{roundUp:scaleRoundUp,fillSumBy,custom:scaleCustom,dtype:scaleDtype}})})
+  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,recipeTotals:RECIPE_TOTALS,products:PRODUCTS,dtypes:DTYPES,offsets:OFFSETS,batchMode:BATCH_MODE,batchQty,grouped:GROUPED,maxBatch:MAXBATCH,fillings:FILLINGS,levain:LEVAIN,scaleOpts:{roundUpBy,fillSumBy,custom:scaleCustom,dtype:scaleDtype}})})
     .then(()=>{ localStorage.setItem('bakery_savetime',str); document.getElementById('saveTime').textContent=str; showToast('저장했습니다'); })
     .catch(()=>showToast('저장 실패'));
 }
@@ -1430,7 +1430,8 @@ function renderLevain(){
 // ══════════════════════════════════════════
 let scaleDtype=null;   // 선택된 반죽
 let scaleCustom=1;     // 직접 입력 배합수
-let scaleRoundUp=true; // 배합수 올림 적용 여부
+let roundUpBy={};      // 반죽별 올림 적용 여부
+function isRoundUp(){ return roundUpBy[scaleDtype]!==false; }  // 기본 true
 let fillSumBy={};      // 반죽별 충전물 재료 총합 표시 여부
 function showSum(){ return fillSumBy[scaleDtype]!==false; }  // 기본 true
 
@@ -1444,7 +1445,7 @@ function renderScale(){
     ||'<div style="padding:14px;color:#bbb;font-size:13px">레시피가 등록된 반죽이 없습니다</div>'
   }</div>
   <div class="sc-toggles">
-    <button class="sc-tg ${scaleRoundUp?'on':''}" onclick="toggleRoundUp()">올림 ${scaleRoundUp?'ON':'OFF'}</button>
+    <button class="sc-tg ${isRoundUp()?'on':''}" onclick="toggleRoundUp()">올림 ${isRoundUp()?'ON':'OFF'}</button>
     <button class="sc-tg blue ${showSum()?'on':''}" onclick="toggleFillSum()">재료합 ${showSum()?'ON':'OFF'}</button>
     <span class="sc-tg-hint">${scaleDtype||''} 설정</span>
   </div>`;
@@ -1453,7 +1454,7 @@ function renderScale(){
 }
 
 function pickScale(dt){ scaleDtype=dt; renderScale(); }
-function toggleRoundUp(){ scaleRoundUp=!scaleRoundUp; renderScale(); showToast((scaleRoundUp?'올림 적용':'실제 배합수')+' - 저장 버튼으로 유지'); }
+function toggleRoundUp(){ if(!scaleDtype) return; roundUpBy[scaleDtype]=!isRoundUp(); renderScale(); showToast(`${scaleDtype} ${isRoundUp()?'올림 적용':'실제 배합수'}`); }
 function toggleFillSum(){ if(!scaleDtype) return; fillSumBy[scaleDtype]=!showSum(); renderScale(); showToast(`${scaleDtype} 재료합 ${showSum()?'표시':'숨김'} - 저장 버튼으로 유지`); }
 
 // 특정 제품·충전물·열에 대한 충전물 총량
@@ -1506,7 +1507,7 @@ function renderScaleTable(){
   // 필요한 배합 단위를 모두 수집 (분할 포함) → 낮은 것부터 정렬
   const unitMap=new Map();  // key: 배합수, val: {mult, days:Set}
   dayBatch.forEach(x=>{
-    const parts=splitBatch(x.b,mx,scaleRoundUp);
+    const parts=splitBatch(x.b,mx,isRoundUp());
     parts.forEach(pb=>{
       const k=pb.toString();
       if(!unitMap.has(k)) unitMap.set(k,{mult:pb,days:new Set()});
@@ -1646,7 +1647,7 @@ function renderScaleTable(){
   let dayNote='<div class="sc-day-summary"><div class="sc-day-title">요일별 배합수</div><div class="sc-day-grid">';
   DAYS.forEach(d=>{
     const b=byDay[d][scaleDtype]?.batches||0;
-    const parts=splitBatch(b,mx,scaleRoundUp);
+    const parts=splitBatch(b,mx,isRoundUp());
     const wk=(d==='토'||d==='일')?' wk':'';
     if(b>0){
       const up=Math.ceil(b);
@@ -1660,7 +1661,7 @@ function renderScaleTable(){
 
   h=dayNote+h;
 
-  h+=`<div class="sc-max-note">${scaleRoundUp?'배합수 <b>올림</b> 적용 중 (예: 9.2배 → 10배)':'실제 계산된 배합수 그대로 표시'}${mx?` · 1회 최대 <b>${mx}배합</b> 초과 시 통별 분할`:''}</div>`;
+  h+=`<div class="sc-max-note">${isRoundUp()?'배합수 <b>올림</b> 적용 중 (예: 9.2배 → 10배)':'실제 계산된 배합수 그대로 표시'}${mx?` · 1회 최대 <b>${mx}배합</b> 초과 시 통별 분할`:''}</div>`;
   h+=`<div class="sc-input-bar">
     <span class="sc-input-lbl">직접 입력 배합수</span>
     <input class="sc-input" type="number" min="0.1" step="0.1" value="${scaleCustom}" oninput="onScaleCustom(this)">
