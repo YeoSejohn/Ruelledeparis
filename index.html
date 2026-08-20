@@ -55,6 +55,15 @@ tr:nth-child(even) .q-inp.sel-day{background:#e5eaff}
 .batch-row.total-row td{background:#1a1a2e;color:#fff;font-size:14px}
 .batch-row.total-row td.name-cell{background:#1a1a2e;color:rgba(255,255,255,.7);font-weight:600}
 .batch-sub{font-size:10px;color:#aaa;font-weight:400;display:block;margin-top:1px}
+thead th.off-col{min-width:64px;background:#e8eaf6;color:#3b5bdb;font-size:10px}
+td.off-cell{min-width:64px;background:#f5f6ff;padding:4px 2px;text-align:center}
+tr:nth-child(even) td.off-cell{background:#eef0ff}
+.off-inp{width:34px;height:28px;text-align:center;font-size:14px;font-weight:700;border:1.5px solid #c5cae9;border-radius:6px;background:#fff;color:#3b5bdb;font-family:inherit;-moz-appearance:textfield}
+.off-inp::-webkit-inner-spin-button,.off-inp::-webkit-outer-spin-button{-webkit-appearance:none}
+.off-inp:focus{outline:none;border-color:#3b5bdb}
+.off-hint{display:block;font-size:9px;color:#7986cb;margin-top:1px}
+.batch-row.total-row td.off-cell{background:#1a1a2e}
+.off-guide{padding:12px 14px;font-size:11px;color:#888;line-height:1.6;background:#fff;border-top:1px solid #f0f0f0}
 /* 다중선택 바 */
 .multi-bar{background:#eef2ff;border-bottom:1px solid #c5cae9;padding:8px 14px;display:none;align-items:center;gap:8px;flex-wrap:wrap}
 .multi-bar.show{display:flex}
@@ -212,7 +221,8 @@ let RECIPES={
 };
 
 let curTab='qty';
-let selDays=[];  // 다중 선택된 요일
+let selDays=[];
+let OFFSETS={};  // 반죽별 생산일 오프셋 (0=당일, 1=다음날...)  // 다중 선택된 요일
 const allQty={};
 function initQty(p){ DAYS.forEach(d=>{ if(!allQty[d]) allQty[d]={}; if(allQty[d][p.name]===undefined) allQty[d][p.name]=p[DAY_TYPE[d]]; }); }
 PRODUCTS.forEach(initQty);
@@ -226,6 +236,7 @@ function loadSaved(){
     PRODUCTS.forEach(initQty);
     if(p&&p.allQty) DAYS.forEach(d=>{ if(p.allQty[d]) Object.keys(p.allQty[d]).forEach(k=>{ if(!allQty[d]) allQty[d]={}; allQty[d][k]=p.allQty[d][k]; }); });
     if(p&&p.recipes) RECIPES=p.recipes;
+    if(p&&p.offsets) OFFSETS=p.offsets;
     const t=localStorage.getItem('bakery_savetime');
     document.getElementById('saveTime').textContent=t||'--';
     renderQtyTable();
@@ -234,7 +245,7 @@ function loadSaved(){
 function saveData(){
   const now=new Date(); const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   document.getElementById('saveTime').textContent='저장 중...';
-  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,products:PRODUCTS,dtypes:DTYPES})})
+  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,products:PRODUCTS,dtypes:DTYPES,offsets:OFFSETS})})
     .then(()=>{ localStorage.setItem('bakery_savetime',str); document.getElementById('saveTime').textContent=str; showToast('저장했습니다'); })
     .catch(()=>showToast('저장 실패'));
 }
@@ -259,6 +270,7 @@ function updateMultiBar(){
 // ── 수량 테이블 ──
 function renderQtyTable(){
   const wrap=document.getElementById('qtyWrap');
+  let rowCounter=0;
   let h='<table><thead><tr><th class="name-col">제품 (분할g)</th>';
   DAYS.forEach(d=>{
     const wk=(d==='토'||d==='일')?' weekend':'';
@@ -270,12 +282,13 @@ function renderQtyTable(){
     const prods=PRODUCTS.filter(p=>p.dtype===dtype);
     h+=`<tr class="sec-row"><td colspan="${DAYS.length+1}"><div class="sec-inner"><span>${dtype}</span><button class="sec-del" onclick="delDtype('${dtype}')">삭제</button></div></td></tr>`;
     prods.forEach(p=>{
+      const rowIdx=rowCounter++;
       h+=`<tr><td class="name-cell" onclick="openEditProd('${p.name.replace(/'/g,"\\'")}')"><div class="p-name">${p.name}</div><div class="p-split">${p.split}g</div></td>`;
-      DAYS.forEach(d=>{
+      DAYS.forEach((d,di)=>{
         const v=allQty[d]?.[p.name]??0;
         const zc=v===0?' zero':'';
         const sc=selDays.includes(d)?' sel-day':'';
-        h+=`<td class="qty-cell"><input class="q-inp${zc}${sc}" type="number" min="0" value="${v}" data-day="${d}" data-name="${p.name.replace(/"/g,'&quot;')}" oninput="onQty(this)"></td>`;
+        h+=`<td class="qty-cell"><input class="q-inp${zc}${sc}" type="number" min="0" value="${v}" data-day="${d}" data-col="${di}" data-row="${rowIdx}" data-name="${p.name.replace(/"/g,'&quot;')}" oninput="onQty(this)" onkeydown="onCellKey(event,this)"></td>`;
       });
       h+='</tr>';
     });
@@ -302,6 +315,22 @@ function onQty(el){
   if(curTab==='result') renderResultTable();
 }
 
+// Tab/Enter → 같은 요일의 다음 제품(아래)으로 이동
+function onCellKey(e,el){
+  if(e.key!=='Tab'&&e.key!=='Enter') return;
+  e.preventDefault();
+  const col=el.dataset.col, row=parseInt(el.dataset.row);
+  const dir=e.shiftKey?-1:1;
+  const next=document.querySelector(`.q-inp[data-col="${col}"][data-row="${row+dir}"]`);
+  if(next){ next.focus(); next.select(); }
+  else {
+    // 끝이면 다음/이전 요일 첫 행으로
+    const nc=parseInt(col)+dir;
+    const wrapEl=document.querySelector(`.q-inp[data-col="${nc}"][data-row="${dir>0?0:row}"]`);
+    if(wrapEl){ wrapEl.focus(); wrapEl.select(); }
+  }
+}
+
 function resetWeek(){
   if(!confirm('전체 요일 수량을 기본값으로 초기화할까요?')) return;
   PRODUCTS.forEach(p=>DAYS.forEach(d=>{ allQty[d][p.name]=p[DAY_TYPE[d]]; }));
@@ -309,11 +338,20 @@ function resetWeek(){
 }
 
 // ── 배합수 테이블 ──
+// 계량일(day)에서 offset일 후의 판매 요일 반환
+function saleDay(day,offset){
+  const i=DAYS.indexOf(day);
+  return DAYS[(i+(offset||0))%7];
+}
+
 function calcBatchesFor(day){
-  const result={}; const q=allQty[day]||{};
+  const result={};
   DTYPES.forEach(dtype=>{
     const prods=PRODUCTS.filter(p=>p.dtype===dtype);
     const recipe=RECIPE_TOTALS[dtype]; if(!recipe||!prods.length) return;
+    // 이 반죽의 생산일 오프셋 적용 → 판매일 수량 사용
+    const off=OFFSETS[dtype]||0;
+    const q=allQty[saleDay(day,off)]||{};
     let batches,total_g;
     if(dtype==='식빵'){
       const normal=prods.filter(p=>p.name!=='소금빵'&&p.name!=='초코 모닝빵');
@@ -336,7 +374,7 @@ function calcBatchesFor(day){
 function renderResultTable(){
   const wrap=document.getElementById('resultWrap');
   const byDay={}; DAYS.forEach(d=>byDay[d]=calcBatchesFor(d));
-  let h='<table><thead><tr><th class="name-col">반죽</th>';
+  let h='<table><thead><tr><th class="name-col">반죽</th><th class="off-col">생산일</th>';
   DAYS.forEach(d=>{ const wk=(d==='토'||d==='일')?' weekend':''; h+=`<th class="day-col${wk}">${d}</th>`; });
   h+='</tr></thead><tbody>';
   const totals={}; DAYS.forEach(d=>totals[d]=0);
@@ -344,7 +382,9 @@ function renderResultTable(){
     if(!RECIPE_TOTALS[dtype]) return;
     const hasAny=DAYS.some(d=>byDay[d][dtype]?.batches>0);
     if(!hasAny) return;
+    const off=OFFSETS[dtype]||0;
     h+=`<tr class="batch-row"><td class="name-cell">${dtype}</td>`;
+    h+=`<td class="off-cell"><input class="off-inp" type="number" min="0" max="6" value="${off}" data-dtype="${dtype}" oninput="onOffset(this)"><span class="off-hint">${off===0?'당일':'+'+off+'일'}</span></td>`;
     DAYS.forEach(d=>{
       const b=byDay[d][dtype]?.batches||0;
       totals[d]+=b;
@@ -352,10 +392,18 @@ function renderResultTable(){
     });
     h+='</tr>';
   });
-  h+='<tr class="batch-row total-row"><td class="name-cell">합계</td>';
+  h+='<tr class="batch-row total-row"><td class="name-cell">합계</td><td class="off-cell"></td>';
   DAYS.forEach(d=>{ h+=`<td>${totals[d].toFixed(1)}</td>`; });
   h+='</tr></tbody></table>';
+  h+='<div class="off-guide">생산일: 0=계량 당일 판매, 1=다음 날 판매, 2=이틀 뒤 판매 &nbsp;|&nbsp; 배합수는 <b>계량하는 날</b> 기준으로 표시됩니다</div>';
   wrap.innerHTML=h;
+}
+
+function onOffset(el){
+  const dtype=el.dataset.dtype;
+  const v=Math.max(0,Math.min(6,parseInt(el.value)||0));
+  OFFSETS[dtype]=v;
+  renderResultTable();
 }
 
 // ── 모달 ──
