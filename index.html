@@ -41,7 +41,7 @@ td.name-cell{position:sticky;left:0;background:#fff;z-index:4;text-align:left;pa
 tr:nth-child(even) td.name-cell{background:#fafafa}
 tr:nth-child(even) td.qty-cell{background:#fafafa}
 .p-name{font-size:13px;color:#111;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px;display:flex;align-items:center;gap:5px}
-.drag-handle{color:#ccc;font-size:14px;cursor:grab;flex-shrink:0;padding:2px 1px;line-height:1;letter-spacing:-1px;touch-action:none;user-select:none}
+.drag-handle{color:#bbb;font-size:16px;cursor:grab;flex-shrink:0;padding:6px 5px;margin:-6px -2px -6px -5px;line-height:1;letter-spacing:-1px;touch-action:none;user-select:none;-webkit-user-select:none}
 .drag-handle:active{cursor:grabbing;color:#3b5bdb}
 tr.dragging{opacity:.65;background:#eef2ff!important}
 tr.dragging td{background:#eef2ff!important}
@@ -379,75 +379,106 @@ function renderQtyTable(){
   bindDrag();
 }
 
-// ── 드래그 앤 드롭 정렬 ──
+// ── 드래그 앤 드롭 정렬 (위/아래 버튼 + 드래그) ──
 let dragState=null;
 
 function bindDrag(){
-  document.querySelectorAll('.drag-row').forEach(row=>{
-    const handle=row.querySelector('.drag-handle');
-    if(!handle) return;
+  document.querySelectorAll('.drag-handle').forEach(handle=>{
+    const row=handle.closest('tr');
+    if(!row) return;
 
-    // 터치 (모바일)
-    let pressTimer=null;
+    let timer=null, startY=0, moved=false;
+
+    const begin=(y)=>{
+      dragState={row, dtype:row.dataset.dtype, startY:y};
+      row.classList.add('dragging');
+      document.body.style.overflow='hidden';
+      if(navigator.vibrate) navigator.vibrate(30);
+    };
+
+    // ── 터치 ──
     handle.addEventListener('touchstart',e=>{
-      pressTimer=setTimeout(()=>startDrag(row,e.touches[0].clientY),350);
+      startY=e.touches[0].clientY; moved=false;
+      timer=setTimeout(()=>begin(startY),300);
     },{passive:true});
+
     handle.addEventListener('touchmove',e=>{
-      if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; }
-      if(dragState){ e.preventDefault(); moveDrag(e.touches[0].clientY); }
+      const y=e.touches[0].clientY;
+      if(!dragState){
+        if(Math.abs(y-startY)>8&&timer){ clearTimeout(timer); timer=null; }
+        return;
+      }
+      e.preventDefault();
+      moved=true;
+      doMove(y);
     },{passive:false});
+
     handle.addEventListener('touchend',()=>{
-      if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; }
-      if(dragState) endDrag();
+      if(timer){ clearTimeout(timer); timer=null; }
+      if(dragState) finish();
+    });
+    handle.addEventListener('touchcancel',()=>{
+      if(timer){ clearTimeout(timer); timer=null; }
+      if(dragState) finish();
     });
 
-    // 마우스 (데스크탑)
+    // ── 마우스 ──
     handle.addEventListener('mousedown',e=>{
-      e.preventDefault();
-      startDrag(row,e.clientY);
-      const mm=ev=>{ if(dragState) moveDrag(ev.clientY); };
-      const mu=()=>{ if(dragState) endDrag(); document.removeEventListener('mousemove',mm); document.removeEventListener('mouseup',mu); };
+      e.preventDefault(); e.stopPropagation();
+      begin(e.clientY);
+      const mm=ev=>{ if(dragState) doMove(ev.clientY); };
+      const mu=()=>{
+        document.removeEventListener('mousemove',mm);
+        document.removeEventListener('mouseup',mu);
+        if(dragState) finish();
+      };
       document.addEventListener('mousemove',mm);
       document.addEventListener('mouseup',mu);
     });
   });
 }
 
-function startDrag(row,y){
-  dragState={row,dtype:row.dataset.dtype,name:row.dataset.pname,startY:y};
-  row.classList.add('dragging');
-  if(navigator.vibrate) navigator.vibrate(30);
-  showToast('위아래로 끌어 순서를 바꾸세요');
-}
-
-function moveDrag(y){
+function doMove(y){
   if(!dragState) return;
   const {row,dtype}=dragState;
-  const siblings=[...document.querySelectorAll(`.drag-row[data-dtype="${CSS.escape(dtype)}"]`)];
-  for(const s of siblings){
-    if(s===row) continue;
-    const r=s.getBoundingClientRect();
-    const mid=r.top+r.height/2;
-    if(y<mid && s.compareDocumentPosition(row)&Node.DOCUMENT_POSITION_FOLLOWING){
-      s.parentNode.insertBefore(row,s); return;
+  const rows=[...document.querySelectorAll(`tr.drag-row[data-dtype="${CSS.escape(dtype)}"]`)];
+  const idx=rows.indexOf(row);
+  if(idx<0) return;
+
+  // 위로
+  if(idx>0){
+    const prev=rows[idx-1];
+    const r=prev.getBoundingClientRect();
+    if(y < r.top + r.height/2){
+      prev.parentNode.insertBefore(row, prev);
+      return;
     }
-    if(y>mid && s.compareDocumentPosition(row)&Node.DOCUMENT_POSITION_PRECEDING){
-      s.parentNode.insertBefore(row,s.nextSibling); return;
+  }
+  // 아래로
+  if(idx < rows.length-1){
+    const next=rows[idx+1];
+    const r=next.getBoundingClientRect();
+    if(y > r.top + r.height/2){
+      next.parentNode.insertBefore(row, next.nextSibling);
+      return;
     }
   }
 }
 
-function endDrag(){
+function finish(){
   if(!dragState) return;
   const {row,dtype}=dragState;
   row.classList.remove('dragging');
-  // 화면에 보이는 순서대로 해당 dtype 제품 재정렬
-  const order=[...document.querySelectorAll(`.drag-row[data-dtype="${CSS.escape(dtype)}"]`)].map(r=>r.dataset.pname);
-  const reordered=order.map(n=>PRODUCTS.find(p=>p.name===n)).filter(Boolean);
-  // PRODUCTS에서 해당 dtype 자리만 교체 (다른 dtype 위치는 그대로)
-  let k=0;
-  PRODUCTS=PRODUCTS.map(p=>p.dtype===dtype?(reordered[k++]||p):p);
+  document.body.style.overflow='';
   dragState=null;
+
+  const order=[...document.querySelectorAll(`tr.drag-row[data-dtype="${CSS.escape(dtype)}"]`)]
+    .map(r=>r.dataset.pname);
+  const reordered=order.map(n=>PRODUCTS.find(p=>p.name===n)).filter(Boolean);
+  if(reordered.length!==order.length) { renderQtyTable(); return; }
+
+  let k=0;
+  PRODUCTS=PRODUCTS.map(p=>p.dtype===dtype ? (reordered[k++]||p) : p);
   renderQtyTable();
   showToast('순서 변경됨 - 저장 버튼을 눌러주세요');
 }
