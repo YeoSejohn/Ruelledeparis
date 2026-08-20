@@ -176,11 +176,12 @@ tr.pumper-row td.prod-q{color:#e65100;font-weight:600}
 .scale-picker{background:#fff;border-bottom:1px solid #eee}
 .sc-chips{display:flex;gap:6px;padding:10px 14px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .sc-chips::-webkit-scrollbar{display:none}
-.sc-toggles{display:flex;gap:8px;padding:0 14px 10px}
-.sc-tg{flex:1;padding:8px 10px;border-radius:9px;border:1.5px solid #ffcc80;background:#fff;color:#e65100;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.sc-toggles{display:flex;gap:6px;padding:0 14px 9px}
+.sc-tg{padding:4px 11px;border-radius:14px;border:1px solid #ffcc80;background:#fff;color:#e65100;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
 .sc-tg.on{background:#e65100;border-color:#e65100;color:#fff}
 .sc-tg.blue{border-color:#90caf9;color:#1565c0}
 .sc-tg.blue.on{background:#1565c0;border-color:#1565c0;color:#fff}
+.sc-tg-hint{font-size:10px;color:#bbb;align-self:center;margin-left:2px}
 .sc-chip{padding:7px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#666;font-size:13px;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit}
 .sc-chip.on{background:#1a1a2e;border-color:#1a1a2e;color:#fff;font-weight:600}
 tr.sc-fill-note-row td{background:#fff8f0;color:#bf5000;font-size:10px;padding:7px 12px;text-align:center;line-height:1.5}
@@ -488,7 +489,7 @@ function loadSaved(){
     if(p&&p.levain) LEVAIN={...LEVAIN,...p.levain};
     if(p&&p.scaleOpts){
       if(typeof p.scaleOpts.roundUp==='boolean') scaleRoundUp=p.scaleOpts.roundUp;
-      if(p.scaleOpts.fillSumBy) fillSumBy=p.scaleOpts.fillSumBy;
+      fillSumBy=(p.scaleOpts.fillSumBy&&typeof p.scaleOpts.fillSumBy==='object')?p.scaleOpts.fillSumBy:{};
       if(p.scaleOpts.custom) scaleCustom=p.scaleOpts.custom;
       if(p.scaleOpts.dtype) scaleDtype=p.scaleOpts.dtype;
     }
@@ -1445,6 +1446,7 @@ function renderScale(){
   <div class="sc-toggles">
     <button class="sc-tg ${scaleRoundUp?'on':''}" onclick="toggleRoundUp()">올림 ${scaleRoundUp?'ON':'OFF'}</button>
     <button class="sc-tg blue ${showSum()?'on':''}" onclick="toggleFillSum()">재료합 ${showSum()?'ON':'OFF'}</button>
+    <span class="sc-tg-hint">${scaleDtype||''} 설정</span>
   </div>`;
 
   renderScaleTable();
