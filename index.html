@@ -181,9 +181,7 @@ tr.pumper-row td.prod-q{color:#e65100;font-weight:600}
 .sc-round-btn.on{background:#e65100;border-color:#e65100;color:#fff}
 tr.sc-fill-note-row td{background:#fff8f0;color:#bf5000;font-size:10px;padding:7px 12px;text-align:center;line-height:1.5}
 .base-g{font-size:10px;color:#ffb74d;margin-left:5px;font-weight:500;white-space:nowrap}
-.fp-line{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.fp-name{flex-shrink:0}
-.fp-qty{font-size:10px;color:#bf5000;font-weight:600;background:#ffe9d6;border-radius:5px;padding:2px 8px;white-space:nowrap}
+td.fp-qty-cell{background:#e3f2fd;color:#1565c0;font-size:12px;font-weight:700;text-align:center;padding:5px 3px;border-bottom:1px solid #bbdefb}
 .scale-table th.sc-name{min-width:100px}
 .scale-table th.sc-col{min-width:66px;padding:7px 4px;line-height:1.3}
 .sc-sub{display:block;font-size:9px;color:#aaa;font-weight:400;margin-top:1px}
@@ -234,7 +232,7 @@ tr:nth-child(even) td.sc-split{background:#eef7f0}
 .sc-day-b{color:#999!important;font-size:11px!important;font-weight:500!important}
 /* 충전물 - 계량표 */
 tr.sc-fill-divider td{background:#e65100;color:#fff;font-size:11px;font-weight:700;padding:8px 12px;letter-spacing:.08em;position:sticky;left:0;border-top:3px solid #bf360c}
-tr.sc-fill-prod td{background:#fff3e0;color:#e65100;font-size:12px;font-weight:700;padding:6px 12px;position:sticky;left:0}
+tr.sc-fill-prod td.name-cell{background:#fff3e0;color:#e65100;font-size:12px;font-weight:700;padding:6px 12px;position:sticky;left:0;z-index:4}
 .sc-fill-note{font-size:10px;color:#ff9800;font-weight:400;margin-left:6px}
 tr.sc-fill-row td.name-cell{background:#fffaf5;padding-left:22px}
 td.sc-fill-cell{background:#fffaf5;color:#e65100;font-weight:600}
@@ -1523,14 +1521,29 @@ function renderScaleTable(){
     fillProds.forEach(p=>{
       const fl=FILLINGS[p.name];
       const fpc=fillPerPc(p.name);
-      // 요일별 수량 요약
-      const qtySummary=DAYS.map(d=>{
-        const q=BATCH_MODE[scaleDtype]
-          ? (batchQty[saleDay(d,OFFSETS[p.name]||0)]?.[p.name]||0)
-          : qtyFor(p,d);
-        return q>0?`${d} ${BATCH_MODE[scaleDtype]?q.toFixed(1)+'배':q+'개'}`:null;
-      }).filter(Boolean).join(' · ');
-      h+=`<tr class="sc-fill-prod"><td class="name-cell" colspan="${cols.length+1}"><div class="fp-line"><span class="fp-name">${p.name} <span class="sc-fill-note">완제품 ${p.split}g${fpc>0?` (충전 ${fmtG(fpc)})`:''}</span></span><span class="fp-qty">${qtySummary||'수량 없음'}</span></div></td></tr>`;
+      // 제품 헤더 (좌측 이름 + 각 열 위치에 수량)
+      h+=`<tr class="sc-fill-prod"><td class="name-cell">${p.name} <span class="sc-fill-note">완제품 ${p.split}g${fpc>0?` (충전 ${fmtG(fpc)})`:''}</span></td>`;
+      cols.forEach(c=>{
+        let qtxt='';
+        if(c.fixed){
+          qtxt='1배합';
+        } else if(c.custom){
+          qtxt='직접';
+        } else if(c.days&&c.days.length){
+          const qs=c.days.map(d=>BATCH_MODE[scaleDtype]
+            ? (batchQty[saleDay(d,OFFSETS[p.name]||0)]?.[p.name]||0)
+            : qtyFor(p,d));
+          const avg=qs.reduce((s,q)=>s+q,0)/qs.length;
+          const uniq=[...new Set(qs)];
+          qtxt=avg>0
+            ? (uniq.length===1
+                ? `${BATCH_MODE[scaleDtype]?uniq[0].toFixed(1)+'배':uniq[0]+'개'}`
+                : `${BATCH_MODE[scaleDtype]?avg.toFixed(1)+'배':Math.round(avg)+'개'}`)
+            : '-';
+        }
+        h+=`<td class="fp-qty-cell">${qtxt}</td>`;
+      });
+      h+='</tr>';
 
       fl.forEach(f=>{
         const isPc=(f.per||'pc')==='pc';
