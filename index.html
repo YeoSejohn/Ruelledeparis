@@ -173,17 +173,19 @@ tr.pumper-row td.prod-q{color:#e65100;font-weight:600}
 .modal-del{padding:12px 14px;border-radius:10px;background:#fee2e2;color:#dc2626;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
 .spacer{height:20px}
 /* 계량표 */
-.scale-picker{display:flex;gap:6px;padding:10px 14px;background:#fff;border-bottom:1px solid #eee;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.scale-picker::-webkit-scrollbar{display:none}
+.scale-picker{background:#fff;border-bottom:1px solid #eee}
+.sc-chips{display:flex;gap:6px;padding:10px 14px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sc-chips::-webkit-scrollbar{display:none}
+.sc-toggles{display:flex;gap:8px;padding:0 14px 10px}
+.sc-tg{flex:1;padding:8px 10px;border-radius:9px;border:1.5px solid #ffcc80;background:#fff;color:#e65100;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.sc-tg.on{background:#e65100;border-color:#e65100;color:#fff}
+.sc-tg.blue{border-color:#90caf9;color:#1565c0}
+.sc-tg.blue.on{background:#1565c0;border-color:#1565c0;color:#fff}
 .sc-chip{padding:7px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#666;font-size:13px;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit}
 .sc-chip.on{background:#1a1a2e;border-color:#1a1a2e;color:#fff;font-weight:600}
-.sc-round-btn{padding:7px 12px;border-radius:20px;border:1.5px solid #ffcc80;background:#fff;color:#e65100;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit;margin-left:auto;font-weight:600}
-.sc-round-btn.on{background:#e65100;border-color:#e65100;color:#fff}
 tr.sc-fill-note-row td{background:#fff8f0;color:#bf5000;font-size:10px;padding:7px 12px;text-align:center;line-height:1.5}
 .base-g{font-size:10px;color:#ffb74d;margin-left:5px;font-weight:500;white-space:nowrap}
 td.fp-qty-cell{background:#e3f2fd;color:#1565c0;font-size:12px;font-weight:700;text-align:center;padding:5px 3px;border-bottom:1px solid #bbdefb}
-.sc-sum-btn{padding:7px 12px;border-radius:20px;border:1.5px solid #90caf9;background:#fff;color:#1565c0;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit;font-weight:600}
-.sc-sum-btn.on{background:#1565c0;border-color:#1565c0;color:#fff}
 tr.sc-fillsum-hdr td{background:#1565c0;color:#fff;font-size:11px;font-weight:700;padding:8px 12px;letter-spacing:.06em;position:sticky;left:0;border-top:3px solid #0d47a1}
 tr.sc-fillsum-row td.name-cell{background:#e8f2fc;color:#0d47a1;font-weight:600;padding-left:14px}
 td.sc-fillsum-cell{background:#e8f2fc;color:#0d47a1;font-weight:700}
@@ -483,6 +485,13 @@ function loadSaved(){
     if(p&&p.grouped) GROUPED=p.grouped;
     if(p&&p.maxBatch) MAXBATCH=p.maxBatch;
     if(p&&p.fillings) FILLINGS=p.fillings;
+    if(p&&p.levain) LEVAIN={...LEVAIN,...p.levain};
+    if(p&&p.scaleOpts){
+      if(typeof p.scaleOpts.roundUp==='boolean') scaleRoundUp=p.scaleOpts.roundUp;
+      if(typeof p.scaleOpts.showSum==='boolean') showFillSum=p.scaleOpts.showSum;
+      if(p.scaleOpts.custom) scaleCustom=p.scaleOpts.custom;
+      if(p.scaleOpts.dtype) scaleDtype=p.scaleOpts.dtype;
+    }
     if(p&&p.batchQty) DAYS.forEach(d=>{ if(p.batchQty[d]) batchQty[d]={...batchQty[d],...p.batchQty[d]}; });
     const t=localStorage.getItem('bakery_savetime');
     document.getElementById('saveTime').textContent=t||'--';
@@ -492,7 +501,7 @@ function loadSaved(){
 function saveData(){
   const now=new Date(); const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   document.getElementById('saveTime').textContent='저장 중...';
-  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,recipeTotals:RECIPE_TOTALS,products:PRODUCTS,dtypes:DTYPES,offsets:OFFSETS,batchMode:BATCH_MODE,batchQty,grouped:GROUPED,maxBatch:MAXBATCH,fillings:FILLINGS,levain:LEVAIN})})
+  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,recipeTotals:RECIPE_TOTALS,products:PRODUCTS,dtypes:DTYPES,offsets:OFFSETS,batchMode:BATCH_MODE,batchQty,grouped:GROUPED,maxBatch:MAXBATCH,fillings:FILLINGS,levain:LEVAIN,scaleOpts:{roundUp:scaleRoundUp,showSum:showFillSum,custom:scaleCustom,dtype:scaleDtype}})})
     .then(()=>{ localStorage.setItem('bakery_savetime',str); document.getElementById('saveTime').textContent=str; showToast('저장했습니다'); })
     .catch(()=>showToast('저장 실패'));
 }
@@ -1428,18 +1437,21 @@ function renderScale(){
   const avail=DTYPES.filter(dt=>RECIPES[dt]&&RECIPES[dt].ings?.length);
   if(!scaleDtype||!avail.includes(scaleDtype)) scaleDtype=avail[0]||null;
 
-  picker.innerHTML=(avail.map(dt=>
-    `<button class="sc-chip ${dt===scaleDtype?'on':''}" onclick="pickScale('${dt}')">${dt}</button>`
-  ).join('')||'<div style="padding:20px;color:#bbb;font-size:13px">레시피가 등록된 반죽이 없습니다</div>')
-  +`<button class="sc-round-btn ${scaleRoundUp?'on':''}" onclick="toggleRoundUp()">${scaleRoundUp?'올림 ON':'올림 OFF'}</button>`
-  +`<button class="sc-sum-btn ${showFillSum?'on':''}" onclick="toggleFillSum()">재료합 ${showFillSum?'ON':'OFF'}</button>`;
+  picker.innerHTML=`<div class="sc-chips">${
+    avail.map(dt=>`<button class="sc-chip ${dt===scaleDtype?'on':''}" onclick="pickScale('${dt}')">${dt}</button>`).join('')
+    ||'<div style="padding:14px;color:#bbb;font-size:13px">레시피가 등록된 반죽이 없습니다</div>'
+  }</div>
+  <div class="sc-toggles">
+    <button class="sc-tg ${scaleRoundUp?'on':''}" onclick="toggleRoundUp()">올림 ${scaleRoundUp?'ON':'OFF'}</button>
+    <button class="sc-tg blue ${showFillSum?'on':''}" onclick="toggleFillSum()">재료합 ${showFillSum?'ON':'OFF'}</button>
+  </div>`;
 
   renderScaleTable();
 }
 
 function pickScale(dt){ scaleDtype=dt; renderScale(); }
-function toggleRoundUp(){ scaleRoundUp=!scaleRoundUp; renderScale(); showToast(scaleRoundUp?'배합수 올림 적용':'실제 배합수로 표시'); }
-function toggleFillSum(){ showFillSum=!showFillSum; renderScale(); }
+function toggleRoundUp(){ scaleRoundUp=!scaleRoundUp; renderScale(); showToast((scaleRoundUp?'올림 적용':'실제 배합수')+' - 저장 버튼으로 유지'); }
+function toggleFillSum(){ showFillSum=!showFillSum; renderScale(); showToast('재료합 '+(showFillSum?'표시':'숨김')+' - 저장 버튼으로 유지'); }
 
 // 특정 제품·충전물·열에 대한 충전물 총량
 function fillAmount(p,f,c,doughPerBatch){
