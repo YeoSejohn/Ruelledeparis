@@ -195,7 +195,7 @@ const DAY_TYPE={월:'wd',화:'wd',수:'wd',목:'wd',금:'sat',토:'sat',일:'sun
 const ING_TYPES={flour:{label:'밀가루',color:'#f59e0b'},water:{label:'물/액체',color:'#3b82f6'},sugar:{label:'설탕류',color:'#ec4899'},salt:{label:'소금',color:'#6b7280'},yeast:{label:'효모',color:'#10b981'},fat:{label:'유지류',color:'#f97316'},other:{label:'기타',color:'#8b5cf6'}};
 const MUKBAN=500,SIK_TOTAL=2715;
 
-let DTYPES=['단과자','식빵','모카빵','잡곡모닝','잡곡식빵','치아바타','바타르','펌퍼니클','크루아상'];
+let DTYPES=['단과자','식빵','탕종식빵','모카빵','잡곡모닝','잡곡식빵','치아바타','바타르','펌퍼니클','크루아상'];
 let PRODUCTS=[
   {name:'모닝빵',dtype:'단과자',split:50,sun:72,wd:100,sat:160},
   {name:'단팥빵',dtype:'단과자',split:50,sun:122,wd:160,sat:185},
@@ -203,7 +203,7 @@ let PRODUCTS=[
   {name:'팥소보로빵',dtype:'단과자',split:50,sun:30,wd:60,sat:80},
   {name:'밤식빵',dtype:'단과자',split:200,sun:45,wd:60,sat:72},
   {name:'소금빵',dtype:'식빵',split:70,sun:80,wd:130,sat:160},
-  {name:'탕종식빵',dtype:'식빵',split:550,sun:40,wd:56,sat:56},
+  {name:'탕종식빵',dtype:'탕종식빵',split:550,sun:40,wd:56,sat:56},
   {name:'초코 모닝빵',dtype:'식빵',split:29.1,sun:80,wd:120,sat:135},
   {name:'모카빵',dtype:'모카빵',split:150,sun:20,wd:32,sat:34},
   {name:'잡곡모닝',dtype:'잡곡모닝',split:50,sun:117,wd:150,sat:165},
@@ -232,11 +232,12 @@ let PRODUCTS=[
   {name:'애플커스터드',dtype:'크루아상',split:80,sun:20,wd:20,sat:28},
   {name:'앙시오',dtype:'크루아상',split:65,sun:18,wd:18,sat:24},
 ];
-const RECIPE_TOTALS={단과자:2270,식빵:2715,모카빵:3163,잡곡모닝:2135,잡곡식빵:2135,치아바타:1929.1,바타르:1892,펌퍼니클:2521,크루아상:2505};
+const RECIPE_TOTALS={단과자:2270,식빵:2715,탕종식빵:2715,모카빵:3163,잡곡모닝:2135,잡곡식빵:2135,치아바타:1929.1,바타르:1892,펌퍼니클:2521,크루아상:2505};
 let RECIPES={
   단과자:{label:'단과자',total:2270,ings:[{n:'큐원',g:1135,pct:100,type:'flour'},{n:'K-블레',g:340,pct:30,type:'flour'},{n:'설탕',g:227,pct:20,type:'sugar'},{n:'소금',g:22.7,pct:2,type:'salt'},{n:'생이스트',g:34,pct:3,type:'yeast'},{n:'버터',g:113.5,pct:10,type:'fat'},{n:'전란',g:227,pct:20,type:'other'},{n:'우유',g:113.5,pct:10,type:'water'}]},
   바타르:{label:'바타르',total:1892,ings:[{n:'지라도 T65',g:1000,pct:100,type:'flour'},{n:'물',g:700,pct:70,type:'water'},{n:'레드',g:2,pct:0.2,type:'other'},{n:'소금',g:20,pct:2,type:'salt'},{n:'바시나주',g:20,pct:2,type:'water'},{n:'호밀 르방',g:150,pct:15,type:'other'}]},
   식빵:{label:'식빵',total:2715,ings:[{n:'K-블레',g:500,pct:50,type:'flour'},{n:'큐원',g:500,pct:50,type:'flour'},{n:'물',g:470,pct:47,type:'water'},{n:'설탕',g:100,pct:10,type:'sugar'},{n:'소금',g:20,pct:2,type:'salt'},{n:'탈지분유',g:20,pct:2,type:'other'},{n:'생이스트',g:35,pct:3.5,type:'yeast'},{n:'S500',g:10,pct:1,type:'other'},{n:'버터',g:80,pct:8,type:'fat'},{n:'물엿',g:30,pct:3,type:'sugar'},{n:'생크림',g:50,pct:5,type:'fat'},{n:'묵반',g:500,pct:50,type:'other'},{n:'크루 묵반',g:200,pct:20,type:'other'},{n:'탕종',g:200,pct:20,type:'other'}]},
+  탕종식빵:{label:'탕종식빵',total:2715,ings:[{n:'K-블레',g:500,pct:50,type:'flour'},{n:'큐원',g:500,pct:50,type:'flour'},{n:'물',g:470,pct:47,type:'water'},{n:'설탕',g:100,pct:10,type:'sugar'},{n:'소금',g:20,pct:2,type:'salt'},{n:'탈지분유',g:20,pct:2,type:'other'},{n:'생이스트',g:35,pct:3.5,type:'yeast'},{n:'S500',g:10,pct:1,type:'other'},{n:'버터',g:80,pct:8,type:'fat'},{n:'물엿',g:30,pct:3,type:'sugar'},{n:'생크림',g:50,pct:5,type:'fat'},{n:'묵반',g:500,pct:50,type:'other'},{n:'크루 묵반',g:200,pct:20,type:'other'},{n:'탕종',g:200,pct:20,type:'other'}]},
   모카빵:{label:'모카빵',total:3163,ings:[{n:'K-블레',g:1000,pct:100,type:'flour'},{n:'물',g:500,pct:50,type:'water'},{n:'설탕',g:150,pct:15,type:'sugar'},{n:'소금',g:18,pct:1.8,type:'salt'},{n:'생이스트',g:25,pct:2.5,type:'yeast'},{n:'버터',g:100,pct:10,type:'fat'},{n:'전란',g:200,pct:20,type:'other'},{n:'모카피',g:1000,pct:100,type:'other'}]},
   잡곡모닝:{label:'잡곡모닝',total:2135,ings:[{n:'K-블레',g:450,pct:43.3,type:'flour'},{n:'큐원',g:350,pct:33.7,type:'flour'},{n:'크라프트',g:200,pct:19.3,type:'flour'},{n:'설탕',g:100,pct:9.6,type:'sugar'},{n:'소금',g:10,pct:1,type:'salt'},{n:'골드',g:20,pct:1.9,type:'other'},{n:'S500',g:20,pct:1.9,type:'other'},{n:'버터',g:100,pct:9.6,type:'fat'},{n:'우유',g:190,pct:18.3,type:'water'},{n:'생크림',g:95,pct:9.1,type:'fat'},{n:'물',g:300,pct:28.9,type:'water'},{n:'묵반',g:100,pct:9.6,type:'other'},{n:'탕종',g:200,pct:19.3,type:'other'}]},
   잡곡식빵:{label:'잡곡식빵',total:2135,ings:[{n:'K-블레',g:450,pct:43.3,type:'flour'},{n:'큐원',g:350,pct:33.7,type:'flour'},{n:'크라프트',g:200,pct:19.3,type:'flour'},{n:'설탕',g:100,pct:9.6,type:'sugar'},{n:'소금',g:10,pct:1,type:'salt'},{n:'골드',g:20,pct:1.9,type:'other'},{n:'S500',g:20,pct:1.9,type:'other'},{n:'버터',g:100,pct:9.6,type:'fat'},{n:'우유',g:190,pct:18.3,type:'water'},{n:'생크림',g:95,pct:9.1,type:'fat'},{n:'물',g:300,pct:28.9,type:'water'},{n:'묵반',g:100,pct:9.6,type:'other'},{n:'탕종',g:200,pct:19.3,type:'other'}]},
@@ -449,7 +450,9 @@ function qtyFor(p,day){
 
 function calcBatchesFor(day){
   const result={};
-  DTYPES.forEach(dtype=>{
+  // 식빵은 다른 반죽의 묵반 소요량을 참조하므로 마지막에 계산
+  const order=[...DTYPES.filter(d=>d!=='식빵'),...DTYPES.filter(d=>d==='식빵')];
+  order.forEach(dtype=>{
     const prods=PRODUCTS.filter(p=>p.dtype===dtype);
     const recipe=RECIPE_TOTALS[dtype]; if(!recipe||!prods.length) return;
     let batches,total_g;
@@ -465,16 +468,13 @@ function calcBatchesFor(day){
       return;
     }
     if(dtype==='식빵'){
-      const normal=prods.filter(p=>p.name!=='소금빵'&&p.name!=='초코 모닝빵');
-      const normalG=normal.reduce((s,p)=>s+qtyFor(p,day)*p.split,0);
-      const sgP=prods.find(p=>p.name==='소금빵');
-      const chP=prods.find(p=>p.name==='초코 모닝빵');
-      const sgG=sgP?qtyFor(sgP,day)*70:0;
-      const chocoG=chP?qtyFor(chP,day)*29.1:0;
-      const mokaB=result['모카빵']?result['모카빵'].batches:0;
-      const normalB=normalG>0?Math.ceil(normalG/(SIK_TOTAL-MUKBAN)*10)/10:0;
-      const need=sgG+chocoG+(normalB+mokaB)*MUKBAN;
-      batches=Math.max(normalB, need>0?Math.ceil(need/(SIK_TOTAL-MUKBAN)*10)/10:0);
+      // 소금빵 + 초코모닝빵 + 다른 반죽에 들어가는 묵반 소요량
+      const ownG=prods.reduce((s,p)=>s+qtyFor(p,day)*p.split,0);
+      // 묵반을 쓰는 반죽들의 배합수 합 (탕종식빵, 모카빵, 잡곡류)
+      const mukbanUsers=['탕종식빵','모카빵','잡곡모닝','잡곡식빵'];
+      const mukbanB=mukbanUsers.reduce((s,dt)=>s+(result[dt]?.batches||0),0);
+      const need=ownG+mukbanB*MUKBAN;
+      batches=need>0?Math.ceil(need/(SIK_TOTAL-MUKBAN)*10)/10:0;
       total_g=batches*(SIK_TOTAL-MUKBAN);
     } else {
       total_g=prods.reduce((s,p)=>s+qtyFor(p,day)*p.split,0);
