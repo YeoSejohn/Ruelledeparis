@@ -59,7 +59,9 @@ tr:nth-child(even) td.qty-cell{background:#fafafa}
 .day-pick.on{background:#3b5bdb;border-color:#3b5bdb;color:#fff;font-weight:600}
 .day-pick.multi.on{background:#e65100;border-color:#e65100}
 .grp-tag{display:inline-block;font-size:9px;background:#fff3e0;color:#e65100;border:1px solid #ffcc80;border-radius:4px;padding:0 4px;margin-left:5px;font-weight:600}
-.p-split{font-size:10px;color:#aaa;margin-top:1px}
+.p-split{font-size:10px;color:#aaa;margin-top:1px;white-space:nowrap}
+.sl-total{color:#666;font-weight:700}
+.sl-detail{color:#e65100;font-size:9px}
 td.qty-cell{min-width:52px;padding:0}
 .q-inp{width:100%;height:38px;text-align:center;font-size:15px;font-weight:600;border:none;background:transparent;color:#111;font-family:inherit;-moz-appearance:textfield;padding:0}
 .q-inp::-webkit-inner-spin-button,.q-inp::-webkit-outer-spin-button{-webkit-appearance:none}
@@ -221,7 +223,8 @@ tr:nth-child(even) td.sc-split{background:#eef7f0}
 .sc-day-d{display:block;font-size:11px;color:#666;font-weight:600}
 .sc-day-b{display:block;font-size:13px;color:#3b5bdb;font-weight:700;margin-top:2px}
 .sc-day-item.off .sc-day-b{color:#ddd}
-.sc-day-split{display:block;font-size:10px;color:#1a6b3c;font-weight:700;margin-top:2px;background:#e8f5e9;border-radius:4px;padding:1px 0}
+.sc-day-split{display:block;font-size:11px;color:#1a6b3c;font-weight:700;margin-top:3px;background:#e8f5e9;border-radius:4px;padding:2px 0}
+.sc-day-b{color:#999!important;font-size:11px!important;font-weight:500!important}
 /* 충전물 - 계량표 */
 tr.sc-fill-divider td{background:#e65100;color:#fff;font-size:11px;font-weight:700;padding:8px 12px;letter-spacing:.08em;position:sticky;left:0;border-top:3px solid #bf360c}
 tr.sc-fill-prod td{background:#fff3e0;color:#e65100;font-size:12px;font-weight:700;padding:6px 12px;position:sticky;left:0}
@@ -501,6 +504,14 @@ function updateMultiBar(){
 }
 
 // ── 수량 테이블 ──
+// 분할 중량 표기: 총 500g (반죽 400 + 충전 100)
+function splitLabel(p){
+  const fp=fillPerPc(p.name);
+  if(fp<=0) return `${p.split}g`;
+  const dough=Math.max(0,p.split-fp);
+  return `<b class="sl-total">${p.split}g</b> <span class="sl-detail">(반죽 ${fmtG(dough)} + 충전 ${fmtG(fp)})</span>`;
+}
+
 function renderQtyTable(){
   const wrap=document.getElementById('qtyWrap');
   let rowCounter=0;
@@ -525,7 +536,7 @@ function renderQtyTable(){
         const esc=p.name.replace(/"/g,'&quot;');
         const bi=prods.indexOf(p);
         const barrows=sortMode?`<span class="arrows" onclick="event.stopPropagation()"><button class="ar-btn" ${bi===0?'disabled':''} onclick="moveProd('${dtype}',${bi},-1)">&#9650;</button><button class="ar-btn" ${bi===prods.length-1?'disabled':''} onclick="moveProd('${dtype}',${bi},1)">&#9660;</button></span>`:'';
-        h+=`<tr class="batch-input-row" data-pname="${esc}" data-dtype="${dtype}"><td class="name-cell" onclick="${sortMode?'':`openEditProd('${p.name.replace(/'/g,"\\'")}')`}"><div class="p-name">${barrows}${p.name}</div><div class="p-split">${p.split}g · 배합수</div></td>`;
+        h+=`<tr class="batch-input-row" data-pname="${esc}" data-dtype="${dtype}"><td class="name-cell" onclick="${sortMode?'':`openEditProd('${p.name.replace(/'/g,"\\'")}')`}"><div class="p-name">${barrows}${p.name}</div><div class="p-split">${splitLabel(p)} · 배합수</div></td>`;
         DAYS.forEach((d,di)=>{
           const v=batchQty[d]?.[p.name]??0;
           const zc=v===0?' zero':'';
@@ -552,7 +563,7 @@ function renderQtyTable(){
       const gTag=gg&&gg.days?.length?`<span class="grp-tag">${gg.weighDay}에 ${gg.days.join('+')}</span>`:'';
       const pi=prods.indexOf(p);
       const arrows=sortMode?`<span class="arrows" onclick="event.stopPropagation()"><button class="ar-btn" ${pi===0?'disabled':''} onclick="moveProd('${dtype}',${pi},-1)">&#9650;</button><button class="ar-btn" ${pi===prods.length-1?'disabled':''} onclick="moveProd('${dtype}',${pi},1)">&#9660;</button></span>`:'';
-      h+=`<tr data-pname="${esc}" data-dtype="${dtype}"><td class="name-cell" onclick="${sortMode?'':`openEditProd('${p.name.replace(/'/g,"\\'")}')`}"><div class="p-name">${arrows}${p.name}</div><div class="p-split">${p.split}g${gTag}</div></td>`;
+      h+=`<tr data-pname="${esc}" data-dtype="${dtype}"><td class="name-cell" onclick="${sortMode?'':`openEditProd('${p.name.replace(/'/g,"\\'")}')`}"><div class="p-name">${arrows}${p.name}</div><div class="p-split">${splitLabel(p)}${gTag}</div></td>`;
       DAYS.forEach((d,di)=>{
         const v=allQty[d]?.[p.name]??0;
         const zc=v===0?' zero':'';
@@ -820,7 +831,7 @@ function renderResultTable(){
       }
       prods.forEach(p=>{
         const off=OFFSETS[p.name]||0;
-        h+=`<tr class="prod-off-row"><td class="name-cell prod-sub-cell">${p.name}<span class="prod-g">${p.split}g</span></td>`;
+        h+=`<tr class="prod-off-row"><td class="name-cell prod-sub-cell">${p.name}<span class="prod-g">${splitLabel(p)}</span></td>`;
         h+=`<td class="off-cell"><input class="off-inp" type="number" min="0" max="6" value="${off}" data-pname="${p.name.replace(/"/g,'&quot;')}" oninput="onOffset(this)"><span class="off-hint">${off===0?'당일':'+'+off}</span></td>`;
         DAYS.forEach(d=>{
           const sd=saleDay(d,off);
@@ -912,7 +923,7 @@ function delDtype(dtype){
 function openAddProd(dtype){
   openModal(`${dtype} 제품 추가`,'제품명과 분할 중량을 입력하세요',
     `<div class="modal-row"><label>제품명</label><input class="modal-inp" id="mi-pname" placeholder="예: 크랜베리 식빵"></div>
-     <div class="modal-row"><label>분할 중량 (g)</label><input class="modal-inp" id="mi-split" type="number" min="1" placeholder="200"></div>
+     <div class="modal-row"><label>완제품 중량 (g) — 반죽+충전물</label><input class="modal-inp" id="mi-split" type="number" min="1" placeholder="200"></div>
      <div class="modal-row"><label>기본 수량 - 평일(월~목)</label><input class="modal-inp" id="mi-wd" type="number" min="0" value="0"></div>
      <div class="modal-row"><label>기본 수량 - 주말(금~토)</label><input class="modal-inp" id="mi-sat" type="number" min="0" value="0"></div>
      <div class="modal-row"><label>기본 수량 - 일요일</label><input class="modal-inp" id="mi-sun" type="number" min="0" value="0"></div>`,
@@ -941,7 +952,8 @@ function openEditProd(name){
        </select>
        <input class="modal-inp" id="mi-newdtype" placeholder="새 반죽 이름" style="display:none;margin-top:6px">
      </div>
-     <div class="modal-row"><label>분할 중량 (g)</label><input class="modal-inp" id="mi-split" type="number" value="${p.split}"></div>
+     <div class="modal-row"><label>완제품 중량 (g) — 반죽+충전물</label><input class="modal-inp" id="mi-split" type="number" value="${p.split}">
+     ${fillPerPc(p.name)>0?`<div style="font-size:11px;color:#e65100;margin-top:4px">충전물 ${fmtG(fillPerPc(p.name))}g 포함 → 반죽 ${fmtG(Math.max(0,p.split-fillPerPc(p.name)))}g</div>`:''}</div>
      <div class="modal-row"><label>기본 수량 - 평일(월~목)</label><input class="modal-inp" id="mi-wd" type="number" value="${p.wd}"></div>
      <div class="modal-row"><label>기본 수량 - 주말(금~토)</label><input class="modal-inp" id="mi-sat" type="number" value="${p.sat}"></div>
      <div class="modal-row"><label>기본 수량 - 일요일</label><input class="modal-inp" id="mi-sun" type="number" value="${p.sun}"></div>
@@ -1067,13 +1079,22 @@ function updateView(key){
 // ── 충전물 ──
 function prodsOf(dtype){ return PRODUCTS.filter(p=>p.dtype===dtype); }
 
+// 제품 1개당 충전물 g (per='pc' 인 것만)
+function fillPerPc(pname){
+  return (FILLINGS[pname]||[])
+    .filter(f=>(f.per||'pc')==='pc')
+    .reduce((s,f)=>s+f.g,0);
+}
+
 // 반죽 총량 기준 충전물 총량 계산
 function fillTotalFor(key,doughTot,batch){
   let tot=0;
   prodsOf(key).forEach(p=>{
     const fl=FILLINGS[p.name]||[];
     if(!fl.length) return;
-    const pcs=p.split>0?(doughTot/p.split):0;
+    const fpc=fillPerPc(p.name);
+    const doughPer=Math.max(1,p.split-fpc);   // 1개당 순수 반죽량
+    const pcs=doughPer>0?(doughTot/doughPer):0;
     fl.forEach(f=>{
       if((f.per||'pc')==='pc') tot+=f.g*pcs;
       else tot+=f.g*batch;
@@ -1240,8 +1261,8 @@ function saveRecipe(key){ RECIPES[key].total=RECIPES[key].ings.reduce((s,i)=>s+i
 // 예) 14.4배합, max 8 → 올림 15 → 2통 → [8,7]
 function splitBatch(batches,max){
   if(!batches||batches<=0) return [];
-  if(!max||max<=0||batches<=max) return [batches];
-  const rounded=Math.ceil(batches);          // 반올림(올림)
+  const rounded=Math.ceil(batches);          // 항상 올림 (9.2 → 10)
+  if(!max||max<=0||rounded<=max) return [rounded];
   const n=Math.ceil(rounded/max);            // 통 개수
   const base=Math.floor(rounded/n);          // 기본 배합
   const rem=rounded-base*n;                  // 나머지
@@ -1482,15 +1503,17 @@ function renderScaleTable(){
     h+=`<tr class="sc-fill-divider"><td colspan="${cols.length+1}">충전물</td></tr>`;
     fillProds.forEach(p=>{
       const fl=FILLINGS[p.name];
-      h+=`<tr class="sc-fill-prod"><td class="name-cell" colspan="${cols.length+1}">${p.name} <span class="sc-fill-note">1개 ${p.split}g 기준</span></td></tr>`;
+      const fpc=fillPerPc(p.name);
+      const doughPer=Math.max(1,p.split-fpc);
+      h+=`<tr class="sc-fill-prod"><td class="name-cell" colspan="${cols.length+1}">${p.name} <span class="sc-fill-note">완제품 ${p.split}g = 반죽 ${fmtG(doughPer)} + 충전 ${fmtG(fpc)}</span></td></tr>`;
       const doughPerBatch=rec.ings.reduce((s,i)=>s+i.g,0);
       fl.forEach(f=>{
         const isPc=(f.per||'pc')==='pc';
         h+=`<tr class="sc-fill-row"><td class="name-cell sc-name-cell"><span class="sc-dot" style="background:#e65100"></span>${f.n}<span class="per-tag">${isPc?'/개':'/배합'}</span></td>`;
         cols.forEach(c=>{
-          const v=isPc
-            ? f.g*(p.split>0?(doughPerBatch*c.mult/p.split):0)
-            : f.g*c.mult;
+          // 개수 = 반죽총량 / 1개당 반죽무게
+          const pcs=doughPer>0?(doughPerBatch*c.mult/doughPer):0;
+          const v=isPc ? f.g*pcs : f.g*c.mult;
           h+=`<td class="sc-cell sc-fill-cell">${fmtG(v)}</td>`;
         });
         h+='</tr>';
@@ -1508,7 +1531,9 @@ function renderScaleTable(){
     const parts=splitBatch(b,mx);
     const wk=(d==='토'||d==='일')?' wk':'';
     if(b>0){
-      dayNote+=`<div class="sc-day-item${wk}"><span class="sc-day-d">${d}</span><span class="sc-day-b">${b.toFixed(1)}배</span>${parts.length>1?`<span class="sc-day-split">${parts.join('+')}</span>`:''}</div>`;
+      const up=Math.ceil(b);
+      const upTxt=parts.length>1?parts.join('+'):`${up}배`;
+      dayNote+=`<div class="sc-day-item${wk}"><span class="sc-day-d">${d}</span><span class="sc-day-b">${b.toFixed(1)}배</span><span class="sc-day-split">${upTxt}</span></div>`;
     } else {
       dayNote+=`<div class="sc-day-item off${wk}"><span class="sc-day-d">${d}</span><span class="sc-day-b">-</span></div>`;
     }
@@ -1516,7 +1541,7 @@ function renderScaleTable(){
   dayNote+='</div></div>';
   h=dayNote+h;
 
-  if(mx) h+=`<div class="sc-max-note">1회 최대 <b>${mx}배합</b> 설정 — 초과분은 통별로 나눠 계량합니다</div>`;
+  h+=`<div class="sc-max-note">배합수는 <b>올림</b>하여 계량합니다 (예: 9.2배 → 10배)${mx?` · 1회 최대 <b>${mx}배합</b> 초과 시 통별 분할`:''}</div>`;
   h+=`<div class="sc-input-bar">
     <span class="sc-input-lbl">직접 입력 배합수</span>
     <input class="sc-input" type="number" min="0.1" step="0.1" value="${scaleCustom}" oninput="onScaleCustom(this)">
