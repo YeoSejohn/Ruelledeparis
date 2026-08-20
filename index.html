@@ -212,6 +212,16 @@ th.sc-split .sc-sub{color:#66bb6a}
 td.sc-split{background:#f5fbf6;color:#1a6b3c;font-weight:600}
 tr:nth-child(even) td.sc-split{background:#eef7f0}
 .sc-max-note{padding:10px 14px;font-size:12px;color:#1a6b3c;background:#f1f8f4;border-top:1px solid #c8e6c9}
+.sc-day-summary{padding:12px 14px;background:#fff;border-bottom:1px solid #eee}
+.sc-day-title{font-size:11px;font-weight:700;color:#888;letter-spacing:.06em;margin-bottom:8px}
+.sc-day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.sc-day-item{background:#f5f6ff;border:1px solid #e0e4ff;border-radius:8px;padding:6px 3px;text-align:center}
+.sc-day-item.off{background:#fafafa;border-color:#eee}
+.sc-day-item.wk .sc-day-d{color:#dc2626}
+.sc-day-d{display:block;font-size:11px;color:#666;font-weight:600}
+.sc-day-b{display:block;font-size:13px;color:#3b5bdb;font-weight:700;margin-top:2px}
+.sc-day-item.off .sc-day-b{color:#ddd}
+.sc-day-split{display:block;font-size:10px;color:#1a6b3c;font-weight:700;margin-top:2px;background:#e8f5e9;border-radius:4px;padding:1px 0}
 /* 충전물 - 계량표 */
 tr.sc-fill-divider td{background:#e65100;color:#fff;font-size:11px;font-weight:700;padding:8px 12px;letter-spacing:.08em;position:sticky;left:0;border-top:3px solid #bf360c}
 tr.sc-fill-prod td{background:#fff3e0;color:#e65100;font-size:12px;font-weight:700;padding:6px 12px;position:sticky;left:0}
@@ -235,9 +245,10 @@ tr:nth-child(even) td.sc-fill-cell{background:#fff5eb}
 .fill-block-name{font-size:12px;font-weight:700;color:#e65100;margin-bottom:6px}
 .fill-erow{border-color:#ffe0b2}
 .add-fill-btn{width:100%;padding:7px;border-radius:7px;border:1.5px dashed #ffcc80;background:transparent;color:#e65100;font-size:12px;cursor:pointer;font-family:inherit}
-.ing-arrows{display:flex;flex-direction:column;gap:2px;flex-shrink:0;align-self:center;margin-right:2px}
-.ar-btn.ing-ar{width:24px;height:17px;font-size:9px;background:#eef2ff;border-color:#c5cae9;color:#3b5bdb}
-.ar-btn.ing-ar:active{background:#3b5bdb;color:#fff}
+.ing-arrows{display:flex!important;flex-direction:column;gap:3px;flex-shrink:0;align-self:center;margin-right:4px;width:26px}
+.ar-btn.ing-ar{width:26px!important;height:19px!important;font-size:11px!important;background:#eef2ff!important;border:1.5px solid #a5b4fc!important;color:#3b5bdb!important;border-radius:5px;display:flex!important;align-items:center;justify-content:center;line-height:1;padding:0;cursor:pointer}
+.ar-btn.ing-ar:active{background:#3b5bdb!important;color:#fff!important}
+.ar-btn.ing-ar:disabled{opacity:.3;background:#f5f5f5!important;border-color:#ddd!important;color:#bbb!important}
 .per-sel{font-size:11px!important;padding:5px 2px!important}
 .per-tag{font-size:9px;color:#ff9800;margin-left:4px;font-weight:600}
 .tw-dough{color:#111;font-weight:700}
@@ -1118,7 +1129,7 @@ function renderFillEdit(key){
       const pn=p.name.replace(/'/g,"\\'");
       const per=f.per||'pc';
       return `<div class="erow fill-erow">
-      <div class="ing-arrows"><button class="ar-btn ing-ar" ${i===0?'disabled':''} onclick="moveFill('${key}','${pn}',${i},-1)">&#9650;</button><button class="ar-btn ing-ar" ${i===fl.length-1?'disabled':''} onclick="moveFill('${key}','${pn}',${i},1)">&#9660;</button></div>
+      <div class="ing-arrows"><button type="button" class="ar-btn ing-ar" ${i===0?'disabled':''} onclick="moveFill('${key}','${pn}',${i},-1)">▲</button><button type="button" class="ar-btn ing-ar" ${i===fl.length-1?'disabled':''} onclick="moveFill('${key}','${pn}',${i},1)">▼</button></div>
       <div class="ecol" style="flex:2;min-width:96px"><label>충전물</label><input class="einp" type="text" lang="ko" autocapitalize="none" autocorrect="off" autocomplete="off" spellcheck="false" value="${f.n}" oninput="setFill('${key}','${pn}',${i},'n',this.value)"></div>
       <div class="ecol" style="width:64px"><label>g</label><input class="einp eg" type="number" min="0" step="0.1" value="${f.g}" oninput="setFill('${key}','${pn}',${i},'g',this.value)"></div>
       <div class="ecol" style="width:74px"><label>기준</label><select class="esel per-sel" onchange="setFill('${key}','${pn}',${i},'per',this.value)"><option value="pc" ${per==='pc'?'selected':''}>1개당</option><option value="batch" ${per==='batch'?'selected':''}>1배합당</option></select></div>
@@ -1209,7 +1220,7 @@ function doCopyRecipe(){
 function toggleR(key){ const b=document.getElementById('rbody-'+key); const c=document.getElementById('chev-'+key); const o=b.style.display==='none'; b.style.display=o?'block':'none'; c.innerHTML=o?'&#9650;':'&#9660;'; if(o) updateView(key); }
 function toggleEdit(key){ const e=document.getElementById('edit-'+key); const o=e.style.display==='none'; e.style.display=o?'block':'none'; if(o) renderEditForm(key); }
 function renderEditForm(key){ const rec=RECIPES[key]; const e=document.getElementById('edit-'+key); const ft=flourTotal(rec.ings); e.innerHTML=`<div class="edit-section"><div class="flour-info">밀가루 합계: <span id="ef-${key}" style="color:#f59e0b;font-weight:700">${ft.toFixed(1)}g</span></div><div id="erows-${key}"></div><button class="add-ing-btn" onclick="addIng('${key}')">+ 재료 추가</button><button class="apply-btn" onclick="saveRecipe('${key}')">레시피 적용</button></div>`; renderERows(key); }
-function renderERows(key){ const rec=RECIPES[key]; const c=document.getElementById('erows-'+key); if(!c) return; c.innerHTML=rec.ings.map((ing,i)=>`<div class="erow"><div class="ing-arrows"><button class="ar-btn ing-ar" ${i===0?'disabled':''} onclick="moveIng('${key}',${i},-1)">&#9650;</button><button class="ar-btn ing-ar" ${i===rec.ings.length-1?'disabled':''} onclick="moveIng('${key}',${i},1)">&#9660;</button></div><div class="ecol" style="flex:2;min-width:96px"><label>재료명</label><input class="einp" type="text" lang="ko" autocapitalize="none" autocorrect="off" autocomplete="off" spellcheck="false" value="${ing.n}" id="en-${key}-${i}" oninput="RECIPES['${key}'].ings[${i}].n=this.value"><input class="einp stage-inp" type="text" lang="ko" autocapitalize="none" autocorrect="off" autocomplete="off" spellcheck="false" value="${ing.stage||''}" placeholder="단계 (예: 풀리쉬)" id="es-${key}-${i}" oninput="RECIPES['${key}'].ings[${i}].stage=this.value.trim()||undefined" style="margin-top:4px;font-size:11px;padding:4px 7px"></div><div class="ecol" style="width:64px"><label>g</label><input class="einp eg" type="number" min="0" step="0.1" value="${ing.g}" id="eg-${key}-${i}" oninput="onG('${key}',${i})"></div><div class="ecol" style="width:58px"><label>%</label><input class="einp ep" type="number" min="0" step="0.1" value="${typeof ing.pct==='number'?ing.pct:0}" id="ep-${key}-${i}" oninput="onP('${key}',${i})"></div><div class="ecol" style="width:68px"><label>종류</label><select class="esel" id="et-${key}-${i}" onchange="onT('${key}',${i})">${typeOptions(ing.type||'other')}</select></div><button class="del-ing-btn" onclick="delIng('${key}',${i})">&#215;</button></div>`).join(''); }
+function renderERows(key){ const rec=RECIPES[key]; const c=document.getElementById('erows-'+key); if(!c) return; c.innerHTML=rec.ings.map((ing,i)=>`<div class="erow"><div class="ing-arrows"><button type="button" class="ar-btn ing-ar" ${i===0?'disabled':''} onclick="moveIng('${key}',${i},-1)">▲</button><button type="button" class="ar-btn ing-ar" ${i===rec.ings.length-1?'disabled':''} onclick="moveIng('${key}',${i},1)">▼</button></div><div class="ecol" style="flex:2;min-width:96px"><label>재료명</label><input class="einp" type="text" lang="ko" autocapitalize="none" autocorrect="off" autocomplete="off" spellcheck="false" value="${ing.n}" id="en-${key}-${i}" oninput="RECIPES['${key}'].ings[${i}].n=this.value"><input class="einp stage-inp" type="text" lang="ko" autocapitalize="none" autocorrect="off" autocomplete="off" spellcheck="false" value="${ing.stage||''}" placeholder="단계 (예: 풀리쉬)" id="es-${key}-${i}" oninput="RECIPES['${key}'].ings[${i}].stage=this.value.trim()||undefined" style="margin-top:4px;font-size:11px;padding:4px 7px"></div><div class="ecol" style="width:64px"><label>g</label><input class="einp eg" type="number" min="0" step="0.1" value="${ing.g}" id="eg-${key}-${i}" oninput="onG('${key}',${i})"></div><div class="ecol" style="width:58px"><label>%</label><input class="einp ep" type="number" min="0" step="0.1" value="${typeof ing.pct==='number'?ing.pct:0}" id="ep-${key}-${i}" oninput="onP('${key}',${i})"></div><div class="ecol" style="width:68px"><label>종류</label><select class="esel" id="et-${key}-${i}" onchange="onT('${key}',${i})">${typeOptions(ing.type||'other')}</select></div><button class="del-ing-btn" onclick="delIng('${key}',${i})">&#215;</button></div>`).join(''); }
 function onG(key,i){ const r=RECIPES[key]; r.ings[i].g=parseFloat(document.getElementById('eg-'+key+'-'+i)?.value)||0; const ft=flourTotal(r.ings); if(ft>0) r.ings.forEach((ing,x)=>{ ing.pct=parseFloat((ing.g/ft*100).toFixed(2)); const el=document.getElementById('ep-'+key+'-'+x); if(el) el.value=ing.pct; }); const f=document.getElementById('ef-'+key); if(f) f.textContent=ft.toFixed(1)+'g'; updateView(key); }
 function onP(key,i){ const r=RECIPES[key]; const p=parseFloat(document.getElementById('ep-'+key+'-'+i)?.value)||0; r.ings[i].pct=p; const ft=flourTotal(r.ings); if(ft>0){ const g=parseFloat((p/100*ft).toFixed(2)); r.ings[i].g=g; const el=document.getElementById('eg-'+key+'-'+i); if(el) el.value=g; } updateView(key); }
 function onT(key,i){ const r=RECIPES[key]; const o=r.ings[i].type; const n=document.getElementById('et-'+key+'-'+i)?.value; r.ings[i].type=n; if(o==='flour'||n==='flour'){ const ft=flourTotal(r.ings); if(ft>0) r.ings.forEach((ing,x)=>{ ing.pct=parseFloat((ing.g/ft*100).toFixed(2)); const el=document.getElementById('ep-'+key+'-'+x); if(el) el.value=ing.pct; }); const f=document.getElementById('ef-'+key); if(f) f.textContent=ft.toFixed(1)+'g'; } updateView(key); }
@@ -1398,24 +1409,21 @@ function renderScaleTable(){
   const mx=MAXBATCH[scaleDtype]||0;
   const cols=[{label:'1배합',sub:'기준',mult:1,fixed:true}];
 
-  // 같은 배합수는 하나로 병합 (요일 목록만 합침)
-  const merged=new Map();  // key: 배합수 문자열, val: {mult, days:[], parts}
+  // 필요한 배합 단위를 모두 수집 (분할 포함) → 낮은 것부터 정렬
+  const unitMap=new Map();  // key: 배합수, val: {mult, days:Set}
   dayBatch.forEach(x=>{
     const parts=splitBatch(x.b,mx);
-    const key=parts.join(',');
-    if(merged.has(key)) merged.get(key).days.push(x.day);
-    else merged.set(key,{b:x.b,parts,days:[x.day]});
+    parts.forEach(pb=>{
+      const k=pb.toString();
+      if(!unitMap.has(k)) unitMap.set(k,{mult:pb,days:new Set()});
+      unitMap.get(k).days.add(x.day);
+    });
   });
-
-  merged.forEach(m=>{
-    const dayLbl=m.days.length>3?`${m.days[0]}외 ${m.days.length-1}일`:m.days.join('·');
-    if(m.parts.length>1){
-      m.parts.forEach((pb,i)=>{
-        cols.push({label:dayLbl,sub:`${i+1}통 ${pb}배`,mult:pb,split:true,days:m.days});
-      });
-    } else {
-      cols.push({label:dayLbl,sub:m.b.toFixed(1)+'배합',mult:m.b,days:m.days});
-    }
+  const units=[...unitMap.values()].sort((a,b)=>a.mult-b.mult);
+  units.forEach(u=>{
+    const ds=[...u.days];
+    const dayLbl=ds.length>3?`${ds[0]}외 ${ds.length-1}일`:ds.join('·');
+    cols.push({label:`${u.mult}배합`,sub:dayLbl,mult:u.mult,split:mx>0});
   });
   cols.push({label:'직접',sub:'입력',mult:scaleCustom,custom:true});
 
@@ -1493,7 +1501,22 @@ function renderScaleTable(){
   h+='</tbody></table>';
 
   // 직접입력 컨트롤
-  if(mx) h+=`<div class="sc-max-note">1회 최대 <b>${mx}배합</b> 설정 — 초과분은 통별로 나눠 표시됩니다</div>`;
+  // 요일별 배합수 요약
+  let dayNote='<div class="sc-day-summary"><div class="sc-day-title">요일별 배합수</div><div class="sc-day-grid">';
+  DAYS.forEach(d=>{
+    const b=byDay[d][scaleDtype]?.batches||0;
+    const parts=splitBatch(b,mx);
+    const wk=(d==='토'||d==='일')?' wk':'';
+    if(b>0){
+      dayNote+=`<div class="sc-day-item${wk}"><span class="sc-day-d">${d}</span><span class="sc-day-b">${b.toFixed(1)}배</span>${parts.length>1?`<span class="sc-day-split">${parts.join('+')}</span>`:''}</div>`;
+    } else {
+      dayNote+=`<div class="sc-day-item off${wk}"><span class="sc-day-d">${d}</span><span class="sc-day-b">-</span></div>`;
+    }
+  });
+  dayNote+='</div></div>';
+  h=dayNote+h;
+
+  if(mx) h+=`<div class="sc-max-note">1회 최대 <b>${mx}배합</b> 설정 — 초과분은 통별로 나눠 계량합니다</div>`;
   h+=`<div class="sc-input-bar">
     <span class="sc-input-lbl">직접 입력 배합수</span>
     <input class="sc-input" type="number" min="0.1" step="0.1" value="${scaleCustom}" oninput="onScaleCustom(this)">
