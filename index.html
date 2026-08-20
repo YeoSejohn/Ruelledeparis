@@ -182,6 +182,12 @@ tr.pumper-row td.prod-q{color:#e65100;font-weight:600}
 tr.sc-fill-note-row td{background:#fff8f0;color:#bf5000;font-size:10px;padding:7px 12px;text-align:center;line-height:1.5}
 .base-g{font-size:10px;color:#ffb74d;margin-left:5px;font-weight:500;white-space:nowrap}
 td.fp-qty-cell{background:#e3f2fd;color:#1565c0;font-size:12px;font-weight:700;text-align:center;padding:5px 3px;border-bottom:1px solid #bbdefb}
+.sc-sum-btn{padding:7px 12px;border-radius:20px;border:1.5px solid #90caf9;background:#fff;color:#1565c0;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit;font-weight:600}
+.sc-sum-btn.on{background:#1565c0;border-color:#1565c0;color:#fff}
+tr.sc-fillsum-hdr td{background:#1565c0;color:#fff;font-size:11px;font-weight:700;padding:8px 12px;letter-spacing:.06em;position:sticky;left:0;border-top:3px solid #0d47a1}
+tr.sc-fillsum-row td.name-cell{background:#e8f2fc;color:#0d47a1;font-weight:600;padding-left:14px}
+td.sc-fillsum-cell{background:#e8f2fc;color:#0d47a1;font-weight:700}
+tr.sc-fillsum-row:nth-child(even) td{background:#dceafa}
 .scale-table th.sc-name{min-width:100px}
 .scale-table th.sc-col{min-width:74px;padding:7px 4px;line-height:1.3}
 .sc-sub{display:block;font-size:10px;color:#888;font-weight:600;margin-top:2px;letter-spacing:.5px;white-space:nowrap}
@@ -1415,6 +1421,7 @@ function renderLevain(){
 let scaleDtype=null;   // 선택된 반죽
 let scaleCustom=1;     // 직접 입력 배합수
 let scaleRoundUp=true; // 배합수 올림 적용 여부
+let showFillSum=true;  // 충전물 재료 총합 표시
 
 function renderScale(){
   const picker=document.getElementById('scalePicker');
@@ -1424,13 +1431,49 @@ function renderScale(){
   picker.innerHTML=(avail.map(dt=>
     `<button class="sc-chip ${dt===scaleDtype?'on':''}" onclick="pickScale('${dt}')">${dt}</button>`
   ).join('')||'<div style="padding:20px;color:#bbb;font-size:13px">레시피가 등록된 반죽이 없습니다</div>')
-  +`<button class="sc-round-btn ${scaleRoundUp?'on':''}" onclick="toggleRoundUp()">${scaleRoundUp?'올림 ON':'올림 OFF'}</button>`;
+  +`<button class="sc-round-btn ${scaleRoundUp?'on':''}" onclick="toggleRoundUp()">${scaleRoundUp?'올림 ON':'올림 OFF'}</button>`
+  +`<button class="sc-sum-btn ${showFillSum?'on':''}" onclick="toggleFillSum()">재료합 ${showFillSum?'ON':'OFF'}</button>`;
 
   renderScaleTable();
 }
 
 function pickScale(dt){ scaleDtype=dt; renderScale(); }
 function toggleRoundUp(){ scaleRoundUp=!scaleRoundUp; renderScale(); showToast(scaleRoundUp?'배합수 올림 적용':'실제 배합수로 표시'); }
+function toggleFillSum(){ showFillSum=!showFillSum; renderScale(); }
+
+// 특정 제품·충전물·열에 대한 충전물 총량
+function fillAmount(p,f,c,doughPerBatch){
+  const isPc=(f.per||'pc')==='pc';
+  const isBatchMode=BATCH_MODE[scaleDtype];
+
+  if(isBatchMode){
+    // 배합수 직접입력 모드: 그 제품의 개별 배합수 사용
+    let pb;
+    if(c.fixed) pb=1;
+    else if(c.custom) pb=scaleCustom;
+    else if(c.days&&c.days.length){
+      const off=OFFSETS[p.name]||0;
+      const bs=c.days.map(d=>batchQty[saleDay(d,off)]?.[p.name]||0);
+      pb=bs.reduce((s,b)=>s+b,0)/bs.length;
+    } else pb=0;
+    if(!isPc) return f.g*pb;
+    const pcs=p.split>0?(doughPerBatch*pb/p.split):0;
+    return f.g*pcs;
+  }
+
+  // 개수 입력 모드
+  if(!isPc) return f.g*c.mult;
+  if(c.fixed||c.custom||!c.days||!c.days.length){
+    const pcs=p.split>0?(doughPerBatch*c.mult/p.split):0;
+    return f.g*pcs;
+  }
+  const qtys=c.days.map(d=>qtyFor(p,d));
+  const avgQty=qtys.reduce((s,q)=>s+q,0)/qtys.length;
+  const dayTotalB=c.days.map(d=>calcBatchesFor(d)[scaleDtype]?.batches||0);
+  const avgTotalB=dayTotalB.reduce((s,b)=>s+b,0)/dayTotalB.length;
+  const share=avgTotalB>0?Math.min(c.mult/Math.max(avgTotalB,c.mult),1):1;
+  return f.g*avgQty*share;
+}
 
 function renderScaleTable(){
   const wrap=document.getElementById('scaleWrap');
@@ -1550,29 +1593,34 @@ function renderScaleTable(){
         const isPc=(f.per||'pc')==='pc';
         h+=`<tr class="sc-fill-row"><td class="name-cell sc-name-cell"><span class="sc-dot" style="background:#e65100"></span>${f.n}<span class="base-g fill-base">(${fmtG(f.g)}${isPc?'/개':'/배합'})</span></td>`;
         cols.forEach(c=>{
-          let v;
-          if(!isPc){
-            v=f.g*c.mult;
-          } else if(c.fixed||c.custom||!c.days||!c.days.length){
-            // 1배합 기준·직접입력: 배합당 개수로 환산
-            const pcs=p.split>0?(doughPerBatch*c.mult/p.split):0;
-            v=f.g*pcs;
-          } else {
-            // 요일 열: 그 요일들의 실제 제품 수량 평균 사용
-            const qtys=c.days.map(d=>qtyFor(p,d));
-            const avgQty=qtys.reduce((s,q)=>s+q,0)/qtys.length;
-            // 그 요일 전체 배합수 대비 이 열(통)의 비중만큼 배분
-            const dayTotalB=c.days.map(d=>calcBatchesFor(d)[scaleDtype]?.batches||0);
-            const avgTotalB=dayTotalB.reduce((s,b)=>s+b,0)/dayTotalB.length;
-            const share=avgTotalB>0?(c.mult/Math.max(avgTotalB,c.mult)):1;
-            v=f.g*avgQty*Math.min(share,1);
-          }
+          const v=fillAmount(p,f,c,doughPerBatch);
           h+=`<td class="sc-cell sc-fill-cell">${fmtG(v)}</td>`;
         });
         h+='</tr>';
       });
     });
 
+    // ── 충전물 재료 총합 ──
+    if(showFillSum){
+      const sumMap=new Map();  // 재료명 → 열별 합계 배열
+      fillProds.forEach(p=>{
+        (FILLINGS[p.name]||[]).forEach(f=>{
+          const key=f.n.trim();
+          if(!key) return;
+          if(!sumMap.has(key)) sumMap.set(key,cols.map(()=>0));
+          const arr=sumMap.get(key);
+          cols.forEach((c,i)=>{ arr[i]+=fillAmount(p,f,c,doughPerBatch); });
+        });
+      });
+      if(sumMap.size){
+        h+=`<tr class="sc-fillsum-hdr"><td colspan="${cols.length+1}">충전물 재료 총합</td></tr>`;
+        [...sumMap.entries()].forEach(([name,arr])=>{
+          h+=`<tr class="sc-fillsum-row"><td class="name-cell sc-name-cell"><span class="sc-dot" style="background:#1565c0"></span>${name}</td>`;
+          arr.forEach(v=>{ h+=`<td class="sc-cell sc-fillsum-cell">${fmtG(v)}</td>`; });
+          h+='</tr>';
+        });
+      }
+    }
     h+=`<tr class="sc-fill-note-row"><td colspan="${cols.length+1}">1개당 충전물은 해당 요일의 <b>실제 제품 수량</b>으로 계산됩니다</td></tr>`;
   }
 
