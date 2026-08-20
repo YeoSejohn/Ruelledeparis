@@ -237,7 +237,7 @@ let PRODUCTS=[
   {name:'애플커스터드',dtype:'크루아상',split:80,sun:20,wd:20,sat:28},
   {name:'앙시오',dtype:'크루아상',split:65,sun:18,wd:18,sat:24},
 ];
-const RECIPE_TOTALS={단과자:2270,식빵:2715,탕종식빵:2715,모카빵:3163,잡곡모닝:2135,잡곡식빵:2135,치아바타:1929.1,바타르:1892,펌퍼니클:2521,크루아상:2505};
+let RECIPE_TOTALS={단과자:2270,식빵:2715,탕종식빵:2715,모카빵:3163,잡곡모닝:2135,잡곡식빵:2135,치아바타:1929.1,바타르:1892,펌퍼니클:2521,크루아상:2505};
 let RECIPES={
   단과자:{label:'단과자',total:2270,ings:[{n:'큐원',g:1135,pct:100,type:'flour'},{n:'K-블레',g:340,pct:30,type:'flour'},{n:'설탕',g:227,pct:20,type:'sugar'},{n:'소금',g:22.7,pct:2,type:'salt'},{n:'생이스트',g:34,pct:3,type:'yeast'},{n:'버터',g:113.5,pct:10,type:'fat'},{n:'전란',g:227,pct:20,type:'other'},{n:'우유',g:113.5,pct:10,type:'water'}]},
   바타르:{label:'바타르',total:1892,ings:[{n:'지라도 T65',g:1000,pct:100,type:'flour'},{n:'물',g:700,pct:70,type:'water'},{n:'레드',g:2,pct:0.2,type:'other'},{n:'소금',g:20,pct:2,type:'salt'},{n:'바시나주',g:20,pct:2,type:'water'},{n:'호밀 르방',g:150,pct:15,type:'other'}]},
@@ -270,6 +270,7 @@ function loadSaved(){
     PRODUCTS.forEach(initQty);
     if(p&&p.allQty) DAYS.forEach(d=>{ if(p.allQty[d]) Object.keys(p.allQty[d]).forEach(k=>{ if(!allQty[d]) allQty[d]={}; allQty[d][k]=p.allQty[d][k]; }); });
     if(p&&p.recipes) RECIPES=p.recipes;
+    if(p&&p.recipeTotals) RECIPE_TOTALS={...RECIPE_TOTALS,...p.recipeTotals};
     if(p&&p.offsets) OFFSETS=p.offsets;
     if(p&&p.batchMode) BATCH_MODE=p.batchMode;
     if(p&&p.batchQty) DAYS.forEach(d=>{ if(p.batchQty[d]) batchQty[d]={...batchQty[d],...p.batchQty[d]}; });
@@ -281,7 +282,7 @@ function loadSaved(){
 function saveData(){
   const now=new Date(); const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   document.getElementById('saveTime').textContent='저장 중...';
-  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,products:PRODUCTS,dtypes:DTYPES,offsets:OFFSETS,batchMode:BATCH_MODE,batchQty})})
+  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,recipeTotals:RECIPE_TOTALS,products:PRODUCTS,dtypes:DTYPES,offsets:OFFSETS,batchMode:BATCH_MODE,batchQty})})
     .then(()=>{ localStorage.setItem('bakery_savetime',str); document.getElementById('saveTime').textContent=str; showToast('저장했습니다'); })
     .catch(()=>showToast('저장 실패'));
 }
@@ -623,7 +624,10 @@ function doAddDtype(){
   const n=document.getElementById('mi-dtype')?.value?.trim();
   if(!n){ showToast('이름을 입력하세요'); return; }
   if(DTYPES.includes(n)){ showToast('이미 존재합니다'); return; }
-  DTYPES.push(n); closeModal(); renderQtyTable(); showToast(`'${n}' 추가됨`);
+  DTYPES.push(n);
+  if(!RECIPES[n]){ RECIPES[n]={label:n,total:0,ings:[]}; }
+  if(!RECIPE_TOTALS[n]) RECIPE_TOTALS[n]=RECIPES[n].total||1000;
+  closeModal(); renderQtyTable(); showToast(`'${n}' 추가됨`);
 }
 function delDtype(dtype){
   const c=PRODUCTS.filter(p=>p.dtype===dtype).length;
@@ -657,12 +661,23 @@ function openEditProd(name){
   const p=PRODUCTS.find(x=>x.name===name); if(!p) return;
   openModal(`제품 편집`,name,
     `<div class="modal-row"><label>제품명</label><input class="modal-inp" id="mi-pname" value="${p.name}"></div>
+     <div class="modal-row"><label>소속 반죽</label>
+       <select class="modal-sel" id="mi-dtype-sel">
+         ${DTYPES.map(dt=>`<option value="${dt}" ${dt===p.dtype?'selected':''}>${dt}</option>`).join('')}
+         <option value="__new__">+ 새 반죽 만들어 이동</option>
+       </select>
+       <input class="modal-inp" id="mi-newdtype" placeholder="새 반죽 이름" style="display:none;margin-top:6px">
+     </div>
      <div class="modal-row"><label>분할 중량 (g)</label><input class="modal-inp" id="mi-split" type="number" value="${p.split}"></div>
      <div class="modal-row"><label>기본 수량 - 평일(월~목)</label><input class="modal-inp" id="mi-wd" type="number" value="${p.wd}"></div>
      <div class="modal-row"><label>기본 수량 - 주말(금~토)</label><input class="modal-inp" id="mi-sat" type="number" value="${p.sat}"></div>
      <div class="modal-row"><label>기본 수량 - 일요일</label><input class="modal-inp" id="mi-sun" type="number" value="${p.sun}"></div>`,
     '저장','editProd',{oldName:name});
   document.getElementById('modalDelBtn').innerHTML=`<button class="modal-del" onclick="delProd('${name.replace(/'/g,"\\'")}')">삭제</button>`;
+  const sel=document.getElementById('mi-dtype-sel');
+  if(sel) sel.onchange=()=>{
+    document.getElementById('mi-newdtype').style.display=(sel.value==='__new__')?'block':'none';
+  };
 }
 function doEditProd(){
   const oldName=modalData.oldName;
@@ -673,9 +688,38 @@ function doEditProd(){
   const sun=parseInt(document.getElementById('mi-sun')?.value)||0;
   if(!newName||!split){ showToast('제품명과 중량을 입력하세요'); return; }
   const p=PRODUCTS.find(x=>x.name===oldName); if(!p) return;
-  if(newName!==oldName) DAYS.forEach(d=>{ if(allQty[d]){ allQty[d][newName]=allQty[d][oldName]; delete allQty[d][oldName]; } });
-  Object.assign(p,{name:newName,split,wd,sat,sun});
-  closeModal(); renderQtyTable(); showToast('수정됨');
+
+  // 소속 반죽 결정
+  let newDtype=document.getElementById('mi-dtype-sel')?.value||p.dtype;
+  if(newDtype==='__new__'){
+    const nd=document.getElementById('mi-newdtype')?.value?.trim();
+    if(!nd){ showToast('새 반죽 이름을 입력하세요'); return; }
+    if(!DTYPES.includes(nd)){
+      DTYPES.push(nd);
+      // 레시피가 없으면 원래 반죽 레시피를 복제해서 시작
+      if(!RECIPES[nd]&&RECIPES[p.dtype]){
+        RECIPES[nd]=JSON.parse(JSON.stringify(RECIPES[p.dtype]));
+        RECIPES[nd].label=nd;
+      }
+      if(!RECIPE_TOTALS[nd]) RECIPE_TOTALS[nd]=RECIPE_TOTALS[p.dtype]||(RECIPES[nd]?RECIPES[nd].total:0);
+    }
+    newDtype=nd;
+  }
+
+  // 이름 변경 시 수량 키 이동
+  if(newName!==oldName){
+    DAYS.forEach(d=>{
+      if(allQty[d]){ allQty[d][newName]=allQty[d][oldName]; delete allQty[d][oldName]; }
+      if(batchQty[d]&&batchQty[d][oldName]!==undefined){ batchQty[d][newName]=batchQty[d][oldName]; delete batchQty[d][oldName]; }
+    });
+    if(OFFSETS[oldName]!==undefined){ OFFSETS[newName]=OFFSETS[oldName]; delete OFFSETS[oldName]; }
+  }
+
+  const moved=(newDtype!==p.dtype);
+  Object.assign(p,{name:newName,dtype:newDtype,split,wd,sat,sun});
+  closeModal(); renderQtyTable();
+  if(curTab==='result') renderResultTable();
+  showToast(moved?`'${newName}' → ${newDtype}(으)로 이동됨`:'수정됨');
 }
 function delProd(name){
   closeModal();
