@@ -488,7 +488,7 @@ function loadSaved(){
     if(p&&p.levain) LEVAIN={...LEVAIN,...p.levain};
     if(p&&p.scaleOpts){
       if(typeof p.scaleOpts.roundUp==='boolean') scaleRoundUp=p.scaleOpts.roundUp;
-      if(typeof p.scaleOpts.showSum==='boolean') showFillSum=p.scaleOpts.showSum;
+      if(p.scaleOpts.fillSumBy) fillSumBy=p.scaleOpts.fillSumBy;
       if(p.scaleOpts.custom) scaleCustom=p.scaleOpts.custom;
       if(p.scaleOpts.dtype) scaleDtype=p.scaleOpts.dtype;
     }
@@ -501,7 +501,7 @@ function loadSaved(){
 function saveData(){
   const now=new Date(); const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   document.getElementById('saveTime').textContent='저장 중...';
-  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,recipeTotals:RECIPE_TOTALS,products:PRODUCTS,dtypes:DTYPES,offsets:OFFSETS,batchMode:BATCH_MODE,batchQty,grouped:GROUPED,maxBatch:MAXBATCH,fillings:FILLINGS,levain:LEVAIN,scaleOpts:{roundUp:scaleRoundUp,showSum:showFillSum,custom:scaleCustom,dtype:scaleDtype}})})
+  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,recipeTotals:RECIPE_TOTALS,products:PRODUCTS,dtypes:DTYPES,offsets:OFFSETS,batchMode:BATCH_MODE,batchQty,grouped:GROUPED,maxBatch:MAXBATCH,fillings:FILLINGS,levain:LEVAIN,scaleOpts:{roundUp:scaleRoundUp,fillSumBy,custom:scaleCustom,dtype:scaleDtype}})})
     .then(()=>{ localStorage.setItem('bakery_savetime',str); document.getElementById('saveTime').textContent=str; showToast('저장했습니다'); })
     .catch(()=>showToast('저장 실패'));
 }
@@ -1430,7 +1430,8 @@ function renderLevain(){
 let scaleDtype=null;   // 선택된 반죽
 let scaleCustom=1;     // 직접 입력 배합수
 let scaleRoundUp=true; // 배합수 올림 적용 여부
-let showFillSum=true;  // 충전물 재료 총합 표시
+let fillSumBy={};      // 반죽별 충전물 재료 총합 표시 여부
+function showSum(){ return fillSumBy[scaleDtype]!==false; }  // 기본 true
 
 function renderScale(){
   const picker=document.getElementById('scalePicker');
@@ -1443,7 +1444,7 @@ function renderScale(){
   }</div>
   <div class="sc-toggles">
     <button class="sc-tg ${scaleRoundUp?'on':''}" onclick="toggleRoundUp()">올림 ${scaleRoundUp?'ON':'OFF'}</button>
-    <button class="sc-tg blue ${showFillSum?'on':''}" onclick="toggleFillSum()">재료합 ${showFillSum?'ON':'OFF'}</button>
+    <button class="sc-tg blue ${showSum()?'on':''}" onclick="toggleFillSum()">재료합 ${showSum()?'ON':'OFF'}</button>
   </div>`;
 
   renderScaleTable();
@@ -1451,7 +1452,7 @@ function renderScale(){
 
 function pickScale(dt){ scaleDtype=dt; renderScale(); }
 function toggleRoundUp(){ scaleRoundUp=!scaleRoundUp; renderScale(); showToast((scaleRoundUp?'올림 적용':'실제 배합수')+' - 저장 버튼으로 유지'); }
-function toggleFillSum(){ showFillSum=!showFillSum; renderScale(); showToast('재료합 '+(showFillSum?'표시':'숨김')+' - 저장 버튼으로 유지'); }
+function toggleFillSum(){ if(!scaleDtype) return; fillSumBy[scaleDtype]=!showSum(); renderScale(); showToast(`${scaleDtype} 재료합 ${showSum()?'표시':'숨김'} - 저장 버튼으로 유지`); }
 
 // 특정 제품·충전물·열에 대한 충전물 총량
 function fillAmount(p,f,c,doughPerBatch){
@@ -1613,7 +1614,7 @@ function renderScaleTable(){
     });
 
     // ── 충전물 재료 총합 ──
-    if(showFillSum){
+    if(showSum()){
       const sumMap=new Map();  // 재료명 → 열별 합계 배열
       fillProds.forEach(p=>{
         (FILLINGS[p.name]||[]).forEach(f=>{
