@@ -64,6 +64,15 @@ tr:nth-child(even) td.off-cell{background:#eef0ff}
 .off-hint{display:block;font-size:9px;color:#7986cb;margin-top:1px}
 .batch-row.total-row td.off-cell{background:#1a1a2e}
 .off-guide{padding:12px 14px;font-size:11px;color:#888;line-height:1.6;background:#fff;border-top:1px solid #f0f0f0}
+td.dtype-cell{cursor:pointer;user-select:none}
+.exp-arrow{display:inline-block;width:14px;color:#999;font-size:11px}
+.off-summary{font-size:11px;color:#3b5bdb;font-weight:600}
+.off-summary.mixed{color:#f59e0b}
+tr.prod-off-row td{background:#fbfcff;border-bottom:1px solid #f0f2ff;padding:5px 2px}
+tr.prod-off-row td.name-cell{background:#fbfcff;padding:6px 12px 6px 26px;font-size:12px;color:#555;font-weight:400;cursor:default}
+.prod-g{font-size:10px;color:#bbb;margin-left:6px}
+td.prod-q{font-size:12px;color:#666;font-weight:500;text-align:center}
+.sale-day{display:block;font-size:9px;color:#c5cae9;margin-top:1px}
 /* 다중선택 바 */
 .multi-bar{background:#eef2ff;border-bottom:1px solid #c5cae9;padding:8px 14px;display:none;align-items:center;gap:8px;flex-wrap:wrap}
 .multi-bar.show{display:flex}
@@ -222,7 +231,7 @@ let RECIPES={
 
 let curTab='qty';
 let selDays=[];
-let OFFSETS={};  // 반죽별 생산일 오프셋 (0=당일, 1=다음날...)  // 다중 선택된 요일
+let OFFSETS={};  // 제품별 생산일 오프셋 (0=당일, 1=다음날...)  // 다중 선택된 요일
 const allQty={};
 function initQty(p){ DAYS.forEach(d=>{ if(!allQty[d]) allQty[d]={}; if(allQty[d][p.name]===undefined) allQty[d][p.name]=p[DAY_TYPE[d]]; }); }
 PRODUCTS.forEach(initQty);
@@ -344,26 +353,32 @@ function saleDay(day,offset){
   return DAYS[(i+(offset||0))%7];
 }
 
+// 제품 p의 판매일 수량 (계량일 day 기준)
+function qtyFor(p,day){
+  const off=OFFSETS[p.name]||0;
+  return (allQty[saleDay(day,off)]||{})[p.name]||0;
+}
+
 function calcBatchesFor(day){
   const result={};
   DTYPES.forEach(dtype=>{
     const prods=PRODUCTS.filter(p=>p.dtype===dtype);
     const recipe=RECIPE_TOTALS[dtype]; if(!recipe||!prods.length) return;
-    // 이 반죽의 생산일 오프셋 적용 → 판매일 수량 사용
-    const off=OFFSETS[dtype]||0;
-    const q=allQty[saleDay(day,off)]||{};
     let batches,total_g;
     if(dtype==='식빵'){
       const normal=prods.filter(p=>p.name!=='소금빵'&&p.name!=='초코 모닝빵');
-      const normalG=normal.reduce((s,p)=>s+(q[p.name]||0)*p.split,0);
-      const sgG=(q['소금빵']||0)*70, chocoG=(q['초코 모닝빵']||0)*29.1;
+      const normalG=normal.reduce((s,p)=>s+qtyFor(p,day)*p.split,0);
+      const sgP=prods.find(p=>p.name==='소금빵');
+      const chP=prods.find(p=>p.name==='초코 모닝빵');
+      const sgG=sgP?qtyFor(sgP,day)*70:0;
+      const chocoG=chP?qtyFor(chP,day)*29.1:0;
       const mokaB=result['모카빵']?result['모카빵'].batches:0;
       const normalB=normalG>0?Math.ceil(normalG/(SIK_TOTAL-MUKBAN)*10)/10:0;
       const need=sgG+chocoG+(normalB+mokaB)*MUKBAN;
       batches=Math.max(normalB, need>0?Math.ceil(need/(SIK_TOTAL-MUKBAN)*10)/10:0);
       total_g=batches*(SIK_TOTAL-MUKBAN);
     } else {
-      total_g=prods.reduce((s,p)=>s+(q[p.name]||0)*p.split,0);
+      total_g=prods.reduce((s,p)=>s+qtyFor(p,day)*p.split,0);
       batches=total_g>0?Math.ceil(total_g/recipe*10)/10:0;
     }
     result[dtype]={batches,total_g};
@@ -371,38 +386,72 @@ function calcBatchesFor(day){
   return result;
 }
 
+let expandedDtypes={};  // 반죽별 제품 목록 펼침 상태
+
 function renderResultTable(){
   const wrap=document.getElementById('resultWrap');
   const byDay={}; DAYS.forEach(d=>byDay[d]=calcBatchesFor(d));
-  let h='<table><thead><tr><th class="name-col">반죽</th><th class="off-col">생산일</th>';
+  let h='<table><thead><tr><th class="name-col">반죽 / 제품</th><th class="off-col">생산일</th>';
   DAYS.forEach(d=>{ const wk=(d==='토'||d==='일')?' weekend':''; h+=`<th class="day-col${wk}">${d}</th>`; });
   h+='</tr></thead><tbody>';
   const totals={}; DAYS.forEach(d=>totals[d]=0);
+
   DTYPES.forEach(dtype=>{
     if(!RECIPE_TOTALS[dtype]) return;
+    const prods=PRODUCTS.filter(p=>p.dtype===dtype);
+    if(!prods.length) return;
     const hasAny=DAYS.some(d=>byDay[d][dtype]?.batches>0);
     if(!hasAny) return;
-    const off=OFFSETS[dtype]||0;
-    h+=`<tr class="batch-row"><td class="name-cell">${dtype}</td>`;
-    h+=`<td class="off-cell"><input class="off-inp" type="number" min="0" max="6" value="${off}" data-dtype="${dtype}" oninput="onOffset(this)"><span class="off-hint">${off===0?'당일':'+'+off+'일'}</span></td>`;
+    const isOpen=expandedDtypes[dtype];
+    // 반죽 행
+    h+=`<tr class="batch-row"><td class="name-cell dtype-cell" onclick="toggleDtypeProds('${dtype}')">
+      <span class="exp-arrow">${isOpen?'&#9662;':'&#9656;'}</span>${dtype}</td>`;
+    h+=`<td class="off-cell off-mixed">${mixedOffsetLabel(prods)}</td>`;
     DAYS.forEach(d=>{
       const b=byDay[d][dtype]?.batches||0;
       totals[d]+=b;
       h+=`<td>${b>0?b.toFixed(1):'<span style="color:#ddd">-</span>'}</td>`;
     });
     h+='</tr>';
+    // 제품별 생산일 입력 행 (펼쳐진 경우)
+    if(isOpen){
+      prods.forEach(p=>{
+        const off=OFFSETS[p.name]||0;
+        h+=`<tr class="prod-off-row"><td class="name-cell prod-sub-cell">${p.name}<span class="prod-g">${p.split}g</span></td>`;
+        h+=`<td class="off-cell"><input class="off-inp" type="number" min="0" max="6" value="${off}" data-pname="${p.name.replace(/"/g,'&quot;')}" oninput="onOffset(this)"><span class="off-hint">${off===0?'당일':'+'+off}</span></td>`;
+        DAYS.forEach(d=>{
+          const sd=saleDay(d,off);
+          const q=(allQty[sd]||{})[p.name]||0;
+          h+=`<td class="prod-q">${q>0?q:'<span style="color:#ddd">-</span>'}<span class="sale-day">${sd}</span></td>`;
+        });
+        h+='</tr>';
+      });
+    }
   });
+
   h+='<tr class="batch-row total-row"><td class="name-cell">합계</td><td class="off-cell"></td>';
   DAYS.forEach(d=>{ h+=`<td>${totals[d].toFixed(1)}</td>`; });
   h+='</tr></tbody></table>';
-  h+='<div class="off-guide">생산일: 0=계량 당일 판매, 1=다음 날 판매, 2=이틀 뒤 판매 &nbsp;|&nbsp; 배합수는 <b>계량하는 날</b> 기준으로 표시됩니다</div>';
+  h+='<div class="off-guide"><b>반죽 이름을 탭하면</b> 제품별 생산일을 설정할 수 있습니다.<br>생산일 0=계량 당일 판매, 1=다음 날, 2=이틀 뒤 &nbsp;|&nbsp; 배합수는 <b>계량하는 날</b> 기준입니다.</div>';
   wrap.innerHTML=h;
 }
 
+// 반죽 내 제품들의 오프셋 요약 표시
+function mixedOffsetLabel(prods){
+  const offs=[...new Set(prods.map(p=>OFFSETS[p.name]||0))];
+  if(offs.length===1) return `<span class="off-summary">${offs[0]===0?'당일':'+'+offs[0]+'일'}</span>`;
+  return `<span class="off-summary mixed">혼합</span>`;
+}
+
+function toggleDtypeProds(dtype){
+  expandedDtypes[dtype]=!expandedDtypes[dtype];
+  renderResultTable();
+}
+
 function onOffset(el){
-  const dtype=el.dataset.dtype;
+  const pname=el.dataset.pname;
   const v=Math.max(0,Math.min(6,parseInt(el.value)||0));
-  OFFSETS[dtype]=v;
+  OFFSETS[pname]=v;
   renderResultTable();
 }
 
