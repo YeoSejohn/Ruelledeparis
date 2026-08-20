@@ -47,6 +47,11 @@ tr:nth-child(even) td.qty-cell{background:#fafafa}
 .ar-btn:disabled{opacity:.25;cursor:default;background:#f5f5f5;border-color:#e0e0e0;color:#bbb}
 .sort-btn{padding:9px 12px;border-radius:9px;background:transparent;color:#3b5bdb;border:1.5px solid #c5cae9;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap}
 .sort-btn.on{background:#3b5bdb;color:#fff;border-color:#3b5bdb;font-weight:600}
+.sec-name{display:flex;align-items:center;gap:6px}
+.dt-arrows{margin-right:2px}
+.ar-btn.dt-ar{width:24px;height:16px;background:#fff;border-color:#3b5bdb;color:#3b5bdb;font-size:9px}
+.ar-btn.dt-ar:active{background:#3b5bdb;color:#fff}
+.ar-btn.dt-ar:disabled{opacity:.25;background:#f0f0f0;border-color:#ddd;color:#bbb}
 .drag-handle:active{cursor:grabbing;color:#3b5bdb}
 .group-box{background:#f8f9ff;border:1px solid #e0e4ff;border-radius:10px;padding:12px}
 .day-picks{display:flex;gap:5px;flex-wrap:wrap}
@@ -335,7 +340,9 @@ function renderQtyTable(){
   DTYPES.forEach(dtype=>{
     const prods=PRODUCTS.filter(p=>p.dtype===dtype);
     const isBatch=BATCH_MODE[dtype];
-    h+=`<tr class="sec-row"><td colspan="${DAYS.length+1}"><div class="sec-inner"><span>${dtype}${isBatch?' <span class="batch-tag">배합수 입력</span>':''}</span><div style="display:flex;gap:5px"><button class="sec-mode" onclick="toggleBatchMode('${dtype}')">${isBatch?'개수로':'배합수로'}</button><button class="sec-del" onclick="delDtype('${dtype}')">삭제</button></div></div></td></tr>`;
+    const dti=DTYPES.indexOf(dtype);
+    const dtArrows=sortMode?`<span class="arrows dt-arrows"><button class="ar-btn dt-ar" ${dti===0?'disabled':''} onclick="moveDtype(${dti},-1)">&#9650;</button><button class="ar-btn dt-ar" ${dti===DTYPES.length-1?'disabled':''} onclick="moveDtype(${dti},1)">&#9660;</button></span>`:'';
+    h+=`<tr class="sec-row"><td colspan="${DAYS.length+1}"><div class="sec-inner"><span class="sec-name">${dtArrows}${dtype}${isBatch?' <span class="batch-tag">배합수 입력</span>':''}</span><div style="display:flex;gap:5px">${sortMode?'':`<button class="sec-mode" onclick="toggleBatchMode('${dtype}')">${isBatch?'개수로':'배합수로'}</button><button class="sec-del" onclick="delDtype('${dtype}')">삭제</button>`}</div></div></td></tr>`;
 
     // 배합수 직접입력 모드 — 제품별 배합수 입력
     if(isBatch){
@@ -393,7 +400,14 @@ function toggleSortMode(){
   btn.textContent=sortMode?'완료':'순서 변경';
   btn.classList.toggle('on',sortMode);
   renderQtyTable();
-  if(sortMode) showToast('화살표로 순서를 바꾸세요');
+  if(sortMode) showToast('반죽·제품 화살표로 순서를 바꾸세요');
+}
+
+function moveDtype(idx,dir){
+  const j=idx+dir;
+  if(j<0||j>=DTYPES.length) return;
+  const t=DTYPES[idx]; DTYPES[idx]=DTYPES[j]; DTYPES[j]=t;
+  renderQtyTable();
 }
 
 function moveProd(dtype,idx,dir){
