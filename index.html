@@ -233,6 +233,14 @@ tr:nth-child(even) td.sc-fill-cell{background:#fff5eb}
 .fill-block-name{font-size:12px;font-weight:700;color:#e65100;margin-bottom:6px}
 .fill-erow{border-color:#ffe0b2}
 .add-fill-btn{width:100%;padding:7px;border-radius:7px;border:1.5px dashed #ffcc80;background:transparent;color:#e65100;font-size:12px;cursor:pointer;font-family:inherit}
+.ing-arrows{display:flex;flex-direction:column;gap:2px;flex-shrink:0;align-self:flex-end;margin-bottom:1px}
+.ar-btn.ing-ar{width:20px;height:14px;font-size:7px}
+.per-sel{font-size:11px!important;padding:5px 2px!important}
+.per-tag{font-size:9px;color:#ff9800;margin-left:4px;font-weight:600}
+.tw-dough{color:#111;font-weight:700}
+.tw-plus{color:#bbb;margin:0 2px}
+.tw-fill{color:#e65100;font-weight:700}
+.tw-eq{color:#3b5bdb;font-weight:700;margin-left:3px}
 /* 르방 */
 .lv-note{padding:12px 14px;font-size:12px;color:#5b2c6f;background:#f8f0ff;border-bottom:1px solid #e1d5f0;line-height:1.6}
 tr.lv-user-row td{font-size:13px;text-align:center;padding:8px 3px;color:#666}
@@ -1024,7 +1032,7 @@ function renderRecipes(){
   const list=document.getElementById('recipeList'); list.innerHTML='';
   Object.entries(RECIPES).forEach(([key,rec])=>{
     const card=document.createElement('div'); card.className='recipe-card';
-    card.innerHTML=`<div class="recipe-hdr" onclick="toggleR('${key}')"><span class="recipe-title">${rec.label}</span><div style="display:flex;align-items:center;gap:6px" onclick="event.stopPropagation()"><div class="batch-wrap"><span class="batch-lbl">배합</span><input class="batch-inp" type="number" min="0.1" step="0.1" value="1" id="batch-${key}" oninput="updateView('${key}')"></div><span id="chev-${key}" style="font-size:14px;color:#ccc">&#9660;</span></div></div><div id="rbody-${key}" style="display:none"><div class="ing-hdr"><span>재료</span><div style="display:flex;gap:8px"><span style="min-width:52px;text-align:right">베이커스%</span><span style="min-width:62px;text-align:right">사용량(g)</span></div></div><div id="ing-view-${key}"></div><div class="recipe-footer"><span style="font-size:13px;color:#888">밀가루합계 / 총무게</span><span style="font-size:13px;font-weight:600" id="total-${key}">-</span></div><div id="fill-${key}"></div><div style="padding:8px 14px;border-top:1px solid #f0f0f0;display:flex;flex-wrap:wrap;align-items:center;gap:8px"><button class="edit-toggle-btn" onclick="toggleEdit('${key}')">레시피 편집</button><button class="fill-toggle-btn" onclick="toggleFill('${key}')">충전물 관리</button><div style="display:flex;gap:5px;flex-wrap:wrap">${Object.entries(ING_TYPES).map(([k,t])=>`<span style="display:flex;align-items:center;gap:3px;font-size:10px;color:#888"><span style="width:7px;height:7px;border-radius:50%;background:${t.color};display:inline-block"></span>${t.label}</span>`).join('')}</div></div><div id="edit-${key}" style="display:none"></div></div>`;
+    card.innerHTML=`<div class="recipe-hdr" onclick="toggleR('${key}')"><span class="recipe-title">${rec.label}</span><div style="display:flex;align-items:center;gap:6px" onclick="event.stopPropagation()"><div class="batch-wrap"><span class="batch-lbl">배합</span><input class="batch-inp" type="number" min="0.1" step="0.1" value="1" id="batch-${key}" oninput="updateView('${key}')"></div><span id="chev-${key}" style="font-size:14px;color:#ccc">&#9660;</span></div></div><div id="rbody-${key}" style="display:none"><div class="ing-hdr"><span>재료</span><div style="display:flex;gap:8px"><span style="min-width:52px;text-align:right">베이커스%</span><span style="min-width:62px;text-align:right">사용량(g)</span></div></div><div id="ing-view-${key}"></div><div class="recipe-footer"><span style="font-size:13px;color:#888">총무게</span><span style="font-size:13px;font-weight:600" id="total-${key}">-</span></div><div id="fill-${key}"></div><div style="padding:8px 14px;border-top:1px solid #f0f0f0;display:flex;flex-wrap:wrap;align-items:center;gap:8px"><button class="edit-toggle-btn" onclick="toggleEdit('${key}')">레시피 편집</button><button class="fill-toggle-btn" onclick="toggleFill('${key}')">충전물 관리</button><div style="display:flex;gap:5px;flex-wrap:wrap">${Object.entries(ING_TYPES).map(([k,t])=>`<span style="display:flex;align-items:center;gap:3px;font-size:10px;color:#888"><span style="width:7px;height:7px;border-radius:50%;background:${t.color};display:inline-block"></span>${t.label}</span>`).join('')}</div></div><div id="edit-${key}" style="display:none"></div></div>`;
     list.appendChild(card); updateView(key); renderFillView(key);
   });
 }
@@ -1035,22 +1043,29 @@ function updateView(key){
   c.innerHTML=rec.ings.map(i=>{ const t=ING_TYPES[i.type||'other']; const gv=i.g*b; const gs=gv>=100?Math.round(gv).toString():(gv>=10?gv.toFixed(1):gv.toFixed(2)); return `<div class="ing-row"><div class="ing-dot" style="background:${t.color}"></div><span class="ing-n">${i.n}</span><span class="ing-pct">${typeof i.pct==='number'?i.pct.toFixed(1)+'%':'--'}</span><span class="ing-g">${gs}g</span></div>`; }).join('');
   if(te){
     const doughTot=rec.ings.reduce((s,i)=>s+i.g,0)*b;
-    // 충전물 총량 = 각 제품 (1개당 충전물 × 개수)  — 1배합 기준 개수는 분할무게로 추정
-    let fillTot=0;
-    prodsOf(key).forEach(p=>{
-      const fl=FILLINGS[p.name]||[];
-      if(!fl.length) return;
-      const perPc=fl.reduce((s,f)=>s+f.g,0);
-      const pcs=p.split>0?(doughTot/p.split):0;
-      fillTot+=perPc*pcs;
-    });
+    const fillTot=fillTotalFor(key,doughTot,b);
     te.innerHTML=fillTot>0
-      ? `${Math.round(ft*b).toLocaleString()}g / <b>${Math.round(doughTot).toLocaleString()}g</b> <span style="color:#e65100">+충전 ${Math.round(fillTot).toLocaleString()}g</span>`
-      : `${Math.round(ft*b).toLocaleString()}g / ${Math.round(doughTot).toLocaleString()}g`;
+      ? `<span class="tw-dough">반죽 ${Math.round(doughTot).toLocaleString()}g</span> <span class="tw-plus">+</span> <span class="tw-fill">충전물 ${Math.round(fillTot).toLocaleString()}g</span> <span class="tw-eq">= ${Math.round(doughTot+fillTot).toLocaleString()}g</span>`
+      : `<span class="tw-dough">반죽 ${Math.round(doughTot).toLocaleString()}g</span>`;
   }
 }
 // ── 충전물 ──
 function prodsOf(dtype){ return PRODUCTS.filter(p=>p.dtype===dtype); }
+
+// 반죽 총량 기준 충전물 총량 계산
+function fillTotalFor(key,doughTot,batch){
+  let tot=0;
+  prodsOf(key).forEach(p=>{
+    const fl=FILLINGS[p.name]||[];
+    if(!fl.length) return;
+    const pcs=p.split>0?(doughTot/p.split):0;
+    fl.forEach(f=>{
+      if((f.per||'pc')==='pc') tot+=f.g*pcs;
+      else tot+=f.g*batch;
+    });
+  });
+  return tot;
+}
 
 function renderFillView(key){
   const box=document.getElementById('fill-'+key);
@@ -1062,9 +1077,11 @@ function renderFillView(key){
   let h='<div class="fill-view"><div class="fill-view-hdr">충전물 (제품별)</div>';
   withFill.forEach(p=>{
     const fl=FILLINGS[p.name]||[];
-    const sum=fl.reduce((s,f)=>s+f.g,0);
-    h+=`<div class="fill-prod"><div class="fill-prod-name">${p.name}<span class="fill-sum">1개당 ${fmtG(sum)}g</span></div>`;
-    h+=fl.map(f=>`<div class="fill-line"><span>${f.n}</span><span class="fill-g">${fmtG(f.g)}g</span></div>`).join('');
+    const pcSum=fl.filter(f=>(f.per||'pc')==='pc').reduce((s,f)=>s+f.g,0);
+    const bSum=fl.filter(f=>f.per==='batch').reduce((s,f)=>s+f.g,0);
+    const sumTxt=[pcSum?`1개당 ${fmtG(pcSum)}g`:'',bSum?`1배합당 ${fmtG(bSum)}g`:''].filter(Boolean).join(' · ');
+    h+=`<div class="fill-prod"><div class="fill-prod-name">${p.name}<span class="fill-sum">${sumTxt}</span></div>`;
+    h+=fl.map(f=>`<div class="fill-line"><span>${f.n}</span><span class="fill-g">${fmtG(f.g)}g<span class="per-tag">${(f.per||'pc')==='pc'?'/개':'/배합'}</span></span></div>`).join('');
     h+='</div>';
   });
   h+='</div>';
@@ -1093,15 +1110,27 @@ function renderFillEdit(key){
   prods.forEach(p=>{
     const fl=FILLINGS[p.name]||[];
     h+=`<div class="fill-block"><div class="fill-block-name">${p.name}</div>`;
-    h+=fl.map((f,i)=>`<div class="erow fill-erow">
-      <div class="ecol" style="flex:2"><label>충전물</label><input class="einp" type="text" value="${f.n}" oninput="setFill('${key}','${p.name.replace(/'/g,"\\'")}',${i},'n',this.value)"></div>
-      <div class="ecol" style="width:70px"><label>1개당 g</label><input class="einp eg" type="number" min="0" step="0.1" value="${f.g}" oninput="setFill('${key}','${p.name.replace(/'/g,"\\'")}',${i},'g',this.value)"></div>
-      <button class="del-ing-btn" onclick="delFill('${key}','${p.name.replace(/'/g,"\\'")}',${i})">&#215;</button>
-    </div>`).join('');
+    h+=fl.map((f,i)=>{
+      const pn=p.name.replace(/'/g,"\\'");
+      const per=f.per||'pc';
+      return `<div class="erow fill-erow">
+      <div class="ing-arrows"><button class="ar-btn ing-ar" ${i===0?'disabled':''} onclick="moveFill('${key}','${pn}',${i},-1)">&#9650;</button><button class="ar-btn ing-ar" ${i===fl.length-1?'disabled':''} onclick="moveFill('${key}','${pn}',${i},1)">&#9660;</button></div>
+      <div class="ecol" style="flex:2"><label>충전물</label><input class="einp" type="text" lang="ko" inputmode="text" autocapitalize="off" autocorrect="off" spellcheck="false" value="${f.n}" oninput="setFill('${key}','${pn}',${i},'n',this.value)"></div>
+      <div class="ecol" style="width:64px"><label>g</label><input class="einp eg" type="number" min="0" step="0.1" value="${f.g}" oninput="setFill('${key}','${pn}',${i},'g',this.value)"></div>
+      <div class="ecol" style="width:74px"><label>기준</label><select class="esel per-sel" onchange="setFill('${key}','${pn}',${i},'per',this.value)"><option value="pc" ${per==='pc'?'selected':''}>1개당</option><option value="batch" ${per==='batch'?'selected':''}>1배합당</option></select></div>
+      <button class="del-ing-btn" onclick="delFill('${key}','${pn}',${i})">&#215;</button>
+    </div>`;}).join('');
     h+=`<button class="add-fill-btn" onclick="addFill('${key}','${p.name.replace(/'/g,"\\'")}')">+ ${p.name} 충전물 추가</button></div>`;
   });
   h+='<button class="apply-btn" onclick="applyFill(\''+key+'\')">충전물 적용</button></div>';
   box.innerHTML=h;
+}
+
+function moveFill(key,pname,i,dir){
+  const arr=FILLINGS[pname]; if(!arr) return;
+  const j=i+dir; if(j<0||j>=arr.length) return;
+  [arr[i],arr[j]]=[arr[j],arr[i]];
+  renderFillEdit(key); renderFillView(key);
 }
 
 function setFill(key,pname,i,field,val){
@@ -1111,7 +1140,7 @@ function setFill(key,pname,i,field,val){
 }
 function addFill(key,pname){
   if(!FILLINGS[pname]) FILLINGS[pname]=[];
-  FILLINGS[pname].push({n:'',g:0});
+  FILLINGS[pname].push({n:'',g:0,per:'pc'});
   renderFillEdit(key);
 }
 function delFill(key,pname,i){
@@ -1138,10 +1167,18 @@ function applyFill(key){
 function toggleR(key){ const b=document.getElementById('rbody-'+key); const c=document.getElementById('chev-'+key); const o=b.style.display==='none'; b.style.display=o?'block':'none'; c.innerHTML=o?'&#9650;':'&#9660;'; if(o) updateView(key); }
 function toggleEdit(key){ const e=document.getElementById('edit-'+key); const o=e.style.display==='none'; e.style.display=o?'block':'none'; if(o) renderEditForm(key); }
 function renderEditForm(key){ const rec=RECIPES[key]; const e=document.getElementById('edit-'+key); const ft=flourTotal(rec.ings); e.innerHTML=`<div class="edit-section"><div class="flour-info">밀가루 합계: <span id="ef-${key}" style="color:#f59e0b;font-weight:700">${ft.toFixed(1)}g</span></div><div id="erows-${key}"></div><button class="add-ing-btn" onclick="addIng('${key}')">+ 재료 추가</button><button class="apply-btn" onclick="saveRecipe('${key}')">레시피 적용</button></div>`; renderERows(key); }
-function renderERows(key){ const rec=RECIPES[key]; const c=document.getElementById('erows-'+key); if(!c) return; c.innerHTML=rec.ings.map((ing,i)=>`<div class="erow"><div class="ecol" style="flex:2"><label>재료명</label><input class="einp" type="text" value="${ing.n}" id="en-${key}-${i}" oninput="RECIPES['${key}'].ings[${i}].n=this.value"><input class="einp stage-inp" type="text" value="${ing.stage||''}" placeholder="단계 (예: 풀리쉬)" id="es-${key}-${i}" oninput="RECIPES['${key}'].ings[${i}].stage=this.value.trim()||undefined" style="margin-top:4px;font-size:11px;padding:4px 7px"></div><div class="ecol" style="width:64px"><label>g</label><input class="einp eg" type="number" min="0" step="0.1" value="${ing.g}" id="eg-${key}-${i}" oninput="onG('${key}',${i})"></div><div class="ecol" style="width:58px"><label>%</label><input class="einp ep" type="number" min="0" step="0.1" value="${typeof ing.pct==='number'?ing.pct:0}" id="ep-${key}-${i}" oninput="onP('${key}',${i})"></div><div class="ecol" style="width:68px"><label>종류</label><select class="esel" id="et-${key}-${i}" onchange="onT('${key}',${i})">${typeOptions(ing.type||'other')}</select></div><button class="del-ing-btn" onclick="delIng('${key}',${i})">&#215;</button></div>`).join(''); }
+function renderERows(key){ const rec=RECIPES[key]; const c=document.getElementById('erows-'+key); if(!c) return; c.innerHTML=rec.ings.map((ing,i)=>`<div class="erow"><div class="ing-arrows"><button class="ar-btn ing-ar" ${i===0?'disabled':''} onclick="moveIng('${key}',${i},-1)">&#9650;</button><button class="ar-btn ing-ar" ${i===rec.ings.length-1?'disabled':''} onclick="moveIng('${key}',${i},1)">&#9660;</button></div><div class="ecol" style="flex:2"><label>재료명</label><input class="einp" type="text" lang="ko" inputmode="text" autocapitalize="off" autocorrect="off" spellcheck="false" value="${ing.n}" id="en-${key}-${i}" oninput="RECIPES['${key}'].ings[${i}].n=this.value"><input class="einp stage-inp" type="text" lang="ko" inputmode="text" autocapitalize="off" autocorrect="off" spellcheck="false" value="${ing.stage||''}" placeholder="단계 (예: 풀리쉬)" id="es-${key}-${i}" oninput="RECIPES['${key}'].ings[${i}].stage=this.value.trim()||undefined" style="margin-top:4px;font-size:11px;padding:4px 7px"></div><div class="ecol" style="width:64px"><label>g</label><input class="einp eg" type="number" min="0" step="0.1" value="${ing.g}" id="eg-${key}-${i}" oninput="onG('${key}',${i})"></div><div class="ecol" style="width:58px"><label>%</label><input class="einp ep" type="number" min="0" step="0.1" value="${typeof ing.pct==='number'?ing.pct:0}" id="ep-${key}-${i}" oninput="onP('${key}',${i})"></div><div class="ecol" style="width:68px"><label>종류</label><select class="esel" id="et-${key}-${i}" onchange="onT('${key}',${i})">${typeOptions(ing.type||'other')}</select></div><button class="del-ing-btn" onclick="delIng('${key}',${i})">&#215;</button></div>`).join(''); }
 function onG(key,i){ const r=RECIPES[key]; r.ings[i].g=parseFloat(document.getElementById('eg-'+key+'-'+i)?.value)||0; const ft=flourTotal(r.ings); if(ft>0) r.ings.forEach((ing,x)=>{ ing.pct=parseFloat((ing.g/ft*100).toFixed(2)); const el=document.getElementById('ep-'+key+'-'+x); if(el) el.value=ing.pct; }); const f=document.getElementById('ef-'+key); if(f) f.textContent=ft.toFixed(1)+'g'; updateView(key); }
 function onP(key,i){ const r=RECIPES[key]; const p=parseFloat(document.getElementById('ep-'+key+'-'+i)?.value)||0; r.ings[i].pct=p; const ft=flourTotal(r.ings); if(ft>0){ const g=parseFloat((p/100*ft).toFixed(2)); r.ings[i].g=g; const el=document.getElementById('eg-'+key+'-'+i); if(el) el.value=g; } updateView(key); }
 function onT(key,i){ const r=RECIPES[key]; const o=r.ings[i].type; const n=document.getElementById('et-'+key+'-'+i)?.value; r.ings[i].type=n; if(o==='flour'||n==='flour'){ const ft=flourTotal(r.ings); if(ft>0) r.ings.forEach((ing,x)=>{ ing.pct=parseFloat((ing.g/ft*100).toFixed(2)); const el=document.getElementById('ep-'+key+'-'+x); if(el) el.value=ing.pct; }); const f=document.getElementById('ef-'+key); if(f) f.textContent=ft.toFixed(1)+'g'; } updateView(key); }
+function moveIng(key,i,dir){
+  const arr=RECIPES[key].ings;
+  const j=i+dir;
+  if(j<0||j>=arr.length) return;
+  [arr[i],arr[j]]=[arr[j],arr[i]];
+  renderERows(key); updateView(key);
+}
+
 function addIng(key){ RECIPES[key].ings.push({n:'',g:0,pct:0,type:'other',stage:''}); renderERows(key); }
 function delIng(key,i){ if(!confirm('재료를 삭제할까요?')) return; RECIPES[key].ings.splice(i,1); const ft=flourTotal(RECIPES[key].ings); if(ft>0) RECIPES[key].ings.forEach(ing=>{ ing.pct=parseFloat((ing.g/ft*100).toFixed(2)); }); renderERows(key); updateView(key); const f=document.getElementById('ef-'+key); if(f) f.textContent=ft.toFixed(1)+'g'; }
 function saveRecipe(key){ RECIPES[key].total=RECIPES[key].ings.reduce((s,i)=>s+i.g,0); document.getElementById('edit-'+key).style.display='none'; updateView(key); showToast('적용됨 - 저장 버튼으로 서버 반영'); }
@@ -1396,13 +1433,15 @@ function renderScaleTable(){
     fillProds.forEach(p=>{
       const fl=FILLINGS[p.name];
       h+=`<tr class="sc-fill-prod"><td class="name-cell" colspan="${cols.length+1}">${p.name} <span class="sc-fill-note">1개 ${p.split}g 기준</span></td></tr>`;
+      const doughPerBatch=rec.ings.reduce((s,i)=>s+i.g,0);
       fl.forEach(f=>{
-        h+=`<tr class="sc-fill-row"><td class="name-cell sc-name-cell"><span class="sc-dot" style="background:#e65100"></span>${f.n}</td>`;
+        const isPc=(f.per||'pc')==='pc';
+        h+=`<tr class="sc-fill-row"><td class="name-cell sc-name-cell"><span class="sc-dot" style="background:#e65100"></span>${f.n}<span class="per-tag">${isPc?'/개':'/배합'}</span></td>`;
         cols.forEach(c=>{
-          // 배합당 개수 = 1배합 반죽총량 / 분할무게
-          const doughPerBatch=rec.ings.reduce((s,i)=>s+i.g,0);
-          const pcs=p.split>0?(doughPerBatch*c.mult/p.split):0;
-          h+=`<td class="sc-cell sc-fill-cell">${fmtG(f.g*pcs)}</td>`;
+          const v=isPc
+            ? f.g*(p.split>0?(doughPerBatch*c.mult/p.split):0)
+            : f.g*c.mult;
+          h+=`<td class="sc-cell sc-fill-cell">${fmtG(v)}</td>`;
         });
         h+='</tr>';
       });
