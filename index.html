@@ -211,6 +211,60 @@ th.sc-split .sc-sub{color:#66bb6a}
 td.sc-split{background:#f5fbf6;color:#1a6b3c;font-weight:600}
 tr:nth-child(even) td.sc-split{background:#eef7f0}
 .sc-max-note{padding:10px 14px;font-size:12px;color:#1a6b3c;background:#f1f8f4;border-top:1px solid #c8e6c9}
+/* 충전물 - 계량표 */
+tr.sc-fill-divider td{background:#e65100;color:#fff;font-size:11px;font-weight:700;padding:8px 12px;letter-spacing:.08em;position:sticky;left:0;border-top:3px solid #bf360c}
+tr.sc-fill-prod td{background:#fff3e0;color:#e65100;font-size:12px;font-weight:700;padding:6px 12px;position:sticky;left:0}
+.sc-fill-note{font-size:10px;color:#ff9800;font-weight:400;margin-left:6px}
+tr.sc-fill-row td.name-cell{background:#fffaf5;padding-left:22px}
+td.sc-fill-cell{background:#fffaf5;color:#e65100;font-weight:600}
+tr:nth-child(even) td.sc-fill-cell{background:#fff5eb}
+/* 충전물 - 레시피 */
+.fill-toggle-btn{font-size:11px;color:#e65100;background:#fff3e0;border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-family:inherit}
+.fill-view{border-top:1px solid #ffe0b2;background:#fffaf5}
+.fill-view-hdr{font-size:11px;font-weight:700;color:#e65100;padding:8px 14px 4px;letter-spacing:.05em}
+.fill-prod{padding:0 14px 8px}
+.fill-prod-name{font-size:12px;font-weight:600;color:#333;display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+.fill-sum{font-size:11px;color:#e65100;font-weight:700}
+.fill-line{display:flex;justify-content:space-between;font-size:12px;color:#666;padding:3px 0 3px 10px}
+.fill-g{color:#e65100;font-weight:600}
+.fill-edit{background:#fffaf5;border-top:1px solid #ffe0b2}
+.fill-block{margin-bottom:14px;padding-bottom:10px;border-bottom:1px dashed #ffcc80}
+.fill-block:last-of-type{border-bottom:none}
+.fill-block-name{font-size:12px;font-weight:700;color:#e65100;margin-bottom:6px}
+.fill-erow{border-color:#ffe0b2}
+.add-fill-btn{width:100%;padding:7px;border-radius:7px;border:1.5px dashed #ffcc80;background:transparent;color:#e65100;font-size:12px;cursor:pointer;font-family:inherit}
+/* 르방 */
+.lv-note{padding:12px 14px;font-size:12px;color:#5b2c6f;background:#f8f0ff;border-bottom:1px solid #e1d5f0;line-height:1.6}
+tr.lv-user-row td{font-size:13px;text-align:center;padding:8px 3px;color:#666}
+tr.lv-user-row td.name-cell{text-align:left;font-size:12px;color:#333}
+.lv-sub{display:block;font-size:10px;color:#aaa}
+tr.lv-need-row td{background:#f0f2f5;font-weight:700;text-align:center;padding:9px 3px;font-size:13px}
+tr.lv-need-row td.name-cell{background:#f0f2f5;text-align:left;font-size:12px}
+tr.lv-loss-row td{background:#fff3e0;color:#e65100;font-weight:700;text-align:center;padding:9px 3px;font-size:13px}
+tr.lv-loss-row td.name-cell{background:#fff3e0;text-align:left;font-size:12px}
+tr.lv-stage td{background:#5b2c6f;color:#fff;font-size:11px;font-weight:700;padding:8px 12px;letter-spacing:.05em;position:sticky;left:0}
+tr.lv-stage.ev td{background:#37306b}
+tr.lv-ing td{text-align:center;font-size:13px;padding:7px 3px;color:#5b2c6f}
+tr.lv-ing td.name-cell{text-align:left;font-size:12px;color:#333;padding-left:22px}
+tr.lv-ing.ev td{color:#37306b}
+tr.lv-subtotal td{background:#ede7f6;font-weight:700;text-align:center;padding:8px 3px;font-size:13px;color:#5b2c6f}
+tr.lv-subtotal td.name-cell{background:#ede7f6;text-align:left;font-size:12px}
+tr.lv-subtotal.ev td{background:#e8eaf6;color:#37306b}
+.lv-settings{padding:16px 14px;background:#fff;border-top:1px solid #eee}
+.lv-set-title{font-size:12px;font-weight:700;color:#5b2c6f;margin-bottom:8px}
+.lv-set-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.lv-set-row label{font-size:13px;color:#666;min-width:80px}
+.lv-inp{width:70px;padding:7px 10px;border-radius:8px;border:1.5px solid #d1c4e9;font-size:14px;font-weight:600;color:#5b2c6f;text-align:center;font-family:inherit;background:#faf7ff;-moz-appearance:textfield}
+.lv-inp::-webkit-inner-spin-button,.lv-inp::-webkit-outer-spin-button{-webkit-appearance:none}
+.lv-inp:focus{outline:none;border-color:#5b2c6f}
+.lv-ratio{display:flex;gap:8px;flex-wrap:wrap}
+.lv-r{display:flex;flex-direction:column;gap:3px}
+.lv-r label{font-size:11px;color:#888;text-align:center}
+.lv-user{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.lv-sel{flex:1;padding:7px 10px;border-radius:8px;border:1.5px solid #d1c4e9;font-size:13px;font-family:inherit;background:#faf7ff;color:#5b2c6f}
+.lv-unit{font-size:11px;color:#999}
+.lv-del{width:28px;height:28px;border-radius:6px;border:none;background:#fee2e2;color:#dc2626;font-size:16px;cursor:pointer}
+.lv-add{width:100%;padding:8px;border-radius:8px;border:1.5px dashed #d1c4e9;background:transparent;color:#5b2c6f;font-size:12px;cursor:pointer;font-family:inherit;margin-top:4px}
 </style>
 </head>
 <body>
@@ -236,6 +290,7 @@ tr:nth-child(even) td.sc-split{background:#eef7f0}
   <div class="tab active" id="tabQty" onclick="switchTab('qty')">수량 입력</div>
   <div class="tab" id="tabResult" onclick="switchTab('result')">배합수</div>
   <div class="tab" id="tabScale" onclick="switchTab('scale')">계량표</div>
+  <div class="tab" id="tabLevain" onclick="switchTab('levain')">르방</div>
   <div class="tab" id="tabRecipe" onclick="switchTab('recipe')">레시피</div>
 </div>
 <div class="action-bar">
@@ -257,6 +312,7 @@ tr:nth-child(even) td.sc-split{background:#eef7f0}
   <div class="wrap" id="scaleWrap"></div>
   <div class="spacer"></div>
 </div>
+<div id="levainTab" style="display:none"><div id="levainBody"></div><div class="spacer"></div></div>
 <div id="recipeTab" style="display:none"><div style="height:8px"></div><div id="recipeList"></div><div class="spacer"></div></div>
 
 <script>
@@ -340,6 +396,13 @@ let BATCH_MODE={치아바타:true};  // true면 개수 대신 배합수 직접 �
 let GROUPED={};  // 묶음 계량: GROUPED[제품명]={weighDay:'토',days:['일','월']}
 let sortMode=false;  // 순서 변경 모드
 let MAXBATCH={};  // 반죽별 1회 최대 배합수 (초과 시 분할)
+let FILLINGS={};  // 제품별 충전물: FILLINGS[제품명]=[{n,g}]
+let LEVAIN={
+  users:[{dtype:'바타르',gPerBatch:150},{dtype:'펌퍼니클',gPerBatch:250}],
+  loss:5,                                    // 손실 %
+  morning:{seed:1,water:1,t65:0.7,rye:0.3},  // 아침 리프레쉬 비율
+  evening:{seed:1,water:130,t65:91,rye:39}   // 저녁 리프레쉬 비율
+};
 let batchQty={};  // 배합수 직접입력 값: batchQty[요일][반죽]=배합수
 DAYS.forEach(d=>batchQty[d]={});  // 다중 선택된 요일
 const allQty={};
@@ -383,6 +446,7 @@ function loadSaved(){
     if(p&&p.batchMode) BATCH_MODE=p.batchMode;
     if(p&&p.grouped) GROUPED=p.grouped;
     if(p&&p.maxBatch) MAXBATCH=p.maxBatch;
+    if(p&&p.fillings) FILLINGS=p.fillings;
     if(p&&p.batchQty) DAYS.forEach(d=>{ if(p.batchQty[d]) batchQty[d]={...batchQty[d],...p.batchQty[d]}; });
     const t=localStorage.getItem('bakery_savetime');
     document.getElementById('saveTime').textContent=t||'--';
@@ -392,7 +456,7 @@ function loadSaved(){
 function saveData(){
   const now=new Date(); const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   document.getElementById('saveTime').textContent='저장 중...';
-  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,recipeTotals:RECIPE_TOTALS,products:PRODUCTS,dtypes:DTYPES,offsets:OFFSETS,batchMode:BATCH_MODE,batchQty,grouped:GROUPED,maxBatch:MAXBATCH})})
+  fetch(FIREBASE_URL+'/bakery.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({allQty,recipes:RECIPES,recipeTotals:RECIPE_TOTALS,products:PRODUCTS,dtypes:DTYPES,offsets:OFFSETS,batchMode:BATCH_MODE,batchQty,grouped:GROUPED,maxBatch:MAXBATCH,fillings:FILLINGS,levain:LEVAIN})})
     .then(()=>{ localStorage.setItem('bakery_savetime',str); document.getElementById('saveTime').textContent=str; showToast('저장했습니다'); })
     .catch(()=>showToast('저장 실패'));
 }
@@ -960,8 +1024,8 @@ function renderRecipes(){
   const list=document.getElementById('recipeList'); list.innerHTML='';
   Object.entries(RECIPES).forEach(([key,rec])=>{
     const card=document.createElement('div'); card.className='recipe-card';
-    card.innerHTML=`<div class="recipe-hdr" onclick="toggleR('${key}')"><span class="recipe-title">${rec.label}</span><div style="display:flex;align-items:center;gap:6px" onclick="event.stopPropagation()"><div class="batch-wrap"><span class="batch-lbl">배합</span><input class="batch-inp" type="number" min="0.1" step="0.1" value="1" id="batch-${key}" oninput="updateView('${key}')"></div><span id="chev-${key}" style="font-size:14px;color:#ccc">&#9660;</span></div></div><div id="rbody-${key}" style="display:none"><div class="ing-hdr"><span>재료</span><div style="display:flex;gap:8px"><span style="min-width:52px;text-align:right">베이커스%</span><span style="min-width:62px;text-align:right">사용량(g)</span></div></div><div id="ing-view-${key}"></div><div class="recipe-footer"><span style="font-size:13px;color:#888">밀가루합계 / 총무게</span><span style="font-size:13px;font-weight:600" id="total-${key}">-</span></div><div style="padding:8px 14px;border-top:1px solid #f0f0f0;display:flex;flex-wrap:wrap;align-items:center;gap:8px"><button class="edit-toggle-btn" onclick="toggleEdit('${key}')">레시피 편집</button><div style="display:flex;gap:5px;flex-wrap:wrap">${Object.entries(ING_TYPES).map(([k,t])=>`<span style="display:flex;align-items:center;gap:3px;font-size:10px;color:#888"><span style="width:7px;height:7px;border-radius:50%;background:${t.color};display:inline-block"></span>${t.label}</span>`).join('')}</div></div><div id="edit-${key}" style="display:none"></div></div>`;
-    list.appendChild(card); updateView(key);
+    card.innerHTML=`<div class="recipe-hdr" onclick="toggleR('${key}')"><span class="recipe-title">${rec.label}</span><div style="display:flex;align-items:center;gap:6px" onclick="event.stopPropagation()"><div class="batch-wrap"><span class="batch-lbl">배합</span><input class="batch-inp" type="number" min="0.1" step="0.1" value="1" id="batch-${key}" oninput="updateView('${key}')"></div><span id="chev-${key}" style="font-size:14px;color:#ccc">&#9660;</span></div></div><div id="rbody-${key}" style="display:none"><div class="ing-hdr"><span>재료</span><div style="display:flex;gap:8px"><span style="min-width:52px;text-align:right">베이커스%</span><span style="min-width:62px;text-align:right">사용량(g)</span></div></div><div id="ing-view-${key}"></div><div class="recipe-footer"><span style="font-size:13px;color:#888">밀가루합계 / 총무게</span><span style="font-size:13px;font-weight:600" id="total-${key}">-</span></div><div id="fill-${key}"></div><div style="padding:8px 14px;border-top:1px solid #f0f0f0;display:flex;flex-wrap:wrap;align-items:center;gap:8px"><button class="edit-toggle-btn" onclick="toggleEdit('${key}')">레시피 편집</button><button class="fill-toggle-btn" onclick="toggleFill('${key}')">충전물 관리</button><div style="display:flex;gap:5px;flex-wrap:wrap">${Object.entries(ING_TYPES).map(([k,t])=>`<span style="display:flex;align-items:center;gap:3px;font-size:10px;color:#888"><span style="width:7px;height:7px;border-radius:50%;background:${t.color};display:inline-block"></span>${t.label}</span>`).join('')}</div></div><div id="edit-${key}" style="display:none"></div></div>`;
+    list.appendChild(card); updateView(key); renderFillView(key);
   });
 }
 function updateView(key){
@@ -969,8 +1033,108 @@ function updateView(key){
   const ft=flourTotal(rec.ings); const c=document.getElementById('ing-view-'+key); const te=document.getElementById('total-'+key);
   if(!c) return;
   c.innerHTML=rec.ings.map(i=>{ const t=ING_TYPES[i.type||'other']; const gv=i.g*b; const gs=gv>=100?Math.round(gv).toString():(gv>=10?gv.toFixed(1):gv.toFixed(2)); return `<div class="ing-row"><div class="ing-dot" style="background:${t.color}"></div><span class="ing-n">${i.n}</span><span class="ing-pct">${typeof i.pct==='number'?i.pct.toFixed(1)+'%':'--'}</span><span class="ing-g">${gs}g</span></div>`; }).join('');
-  if(te){ const tot=rec.ings.reduce((s,i)=>s+i.g,0)*b; te.textContent=`${Math.round(ft*b).toLocaleString()}g / ${Math.round(tot).toLocaleString()}g`; }
+  if(te){
+    const doughTot=rec.ings.reduce((s,i)=>s+i.g,0)*b;
+    // 충전물 총량 = 각 제품 (1개당 충전물 × 개수)  — 1배합 기준 개수는 분할무게로 추정
+    let fillTot=0;
+    prodsOf(key).forEach(p=>{
+      const fl=FILLINGS[p.name]||[];
+      if(!fl.length) return;
+      const perPc=fl.reduce((s,f)=>s+f.g,0);
+      const pcs=p.split>0?(doughTot/p.split):0;
+      fillTot+=perPc*pcs;
+    });
+    te.innerHTML=fillTot>0
+      ? `${Math.round(ft*b).toLocaleString()}g / <b>${Math.round(doughTot).toLocaleString()}g</b> <span style="color:#e65100">+충전 ${Math.round(fillTot).toLocaleString()}g</span>`
+      : `${Math.round(ft*b).toLocaleString()}g / ${Math.round(doughTot).toLocaleString()}g`;
+  }
 }
+// ── 충전물 ──
+function prodsOf(dtype){ return PRODUCTS.filter(p=>p.dtype===dtype); }
+
+function renderFillView(key){
+  const box=document.getElementById('fill-'+key);
+  if(!box) return;
+  const prods=prodsOf(key);
+  const withFill=prods.filter(p=>(FILLINGS[p.name]||[]).length);
+  if(!withFill.length){ box.innerHTML=''; return; }
+  const b=parseFloat(document.getElementById('batch-'+key)?.value)||1;
+  let h='<div class="fill-view"><div class="fill-view-hdr">충전물 (제품별)</div>';
+  withFill.forEach(p=>{
+    const fl=FILLINGS[p.name]||[];
+    const sum=fl.reduce((s,f)=>s+f.g,0);
+    h+=`<div class="fill-prod"><div class="fill-prod-name">${p.name}<span class="fill-sum">1개당 ${fmtG(sum)}g</span></div>`;
+    h+=fl.map(f=>`<div class="fill-line"><span>${f.n}</span><span class="fill-g">${fmtG(f.g)}g</span></div>`).join('');
+    h+='</div>';
+  });
+  h+='</div>';
+  box.innerHTML=h;
+}
+
+function toggleFill(key){
+  const ed=document.getElementById('edit-'+key);
+  // 충전물 편집은 별도 영역
+  let box=document.getElementById('filledit-'+key);
+  if(!box){
+    box=document.createElement('div');
+    box.id='filledit-'+key;
+    ed.parentNode.insertBefore(box,ed);
+  }
+  const open=box.style.display==='none'||!box.innerHTML;
+  box.style.display=open?'block':'none';
+  if(open) renderFillEdit(key);
+}
+
+function renderFillEdit(key){
+  const box=document.getElementById('filledit-'+key);
+  const prods=prodsOf(key);
+  if(!prods.length){ box.innerHTML='<div class="edit-section" style="font-size:12px;color:#888">이 반죽에 등록된 제품이 없습니다</div>'; return; }
+  let h='<div class="edit-section fill-edit"><div class="flour-info">제품별 충전물 (1개당 g)</div>';
+  prods.forEach(p=>{
+    const fl=FILLINGS[p.name]||[];
+    h+=`<div class="fill-block"><div class="fill-block-name">${p.name}</div>`;
+    h+=fl.map((f,i)=>`<div class="erow fill-erow">
+      <div class="ecol" style="flex:2"><label>충전물</label><input class="einp" type="text" value="${f.n}" oninput="setFill('${key}','${p.name.replace(/'/g,"\\'")}',${i},'n',this.value)"></div>
+      <div class="ecol" style="width:70px"><label>1개당 g</label><input class="einp eg" type="number" min="0" step="0.1" value="${f.g}" oninput="setFill('${key}','${p.name.replace(/'/g,"\\'")}',${i},'g',this.value)"></div>
+      <button class="del-ing-btn" onclick="delFill('${key}','${p.name.replace(/'/g,"\\'")}',${i})">&#215;</button>
+    </div>`).join('');
+    h+=`<button class="add-fill-btn" onclick="addFill('${key}','${p.name.replace(/'/g,"\\'")}')">+ ${p.name} 충전물 추가</button></div>`;
+  });
+  h+='<button class="apply-btn" onclick="applyFill(\''+key+'\')">충전물 적용</button></div>';
+  box.innerHTML=h;
+}
+
+function setFill(key,pname,i,field,val){
+  if(!FILLINGS[pname]) FILLINGS[pname]=[];
+  if(field==='g') FILLINGS[pname][i][field]=parseFloat(val)||0;
+  else FILLINGS[pname][i][field]=val;
+}
+function addFill(key,pname){
+  if(!FILLINGS[pname]) FILLINGS[pname]=[];
+  FILLINGS[pname].push({n:'',g:0});
+  renderFillEdit(key);
+}
+function delFill(key,pname,i){
+  if(!confirm('충전물을 삭제할까요?')) return;
+  FILLINGS[pname].splice(i,1);
+  if(!FILLINGS[pname].length) delete FILLINGS[pname];
+  renderFillEdit(key);
+  renderFillView(key);
+}
+function applyFill(key){
+  // 빈 이름 제거
+  prodsOf(key).forEach(p=>{
+    if(FILLINGS[p.name]) {
+      FILLINGS[p.name]=FILLINGS[p.name].filter(f=>f.n&&f.g>0);
+      if(!FILLINGS[p.name].length) delete FILLINGS[p.name];
+    }
+  });
+  document.getElementById('filledit-'+key).style.display='none';
+  renderFillView(key);
+  updateView(key);
+  showToast('충전물 적용됨 - 저장 버튼으로 서버 반영');
+}
+
 function toggleR(key){ const b=document.getElementById('rbody-'+key); const c=document.getElementById('chev-'+key); const o=b.style.display==='none'; b.style.display=o?'block':'none'; c.innerHTML=o?'&#9650;':'&#9660;'; if(o) updateView(key); }
 function toggleEdit(key){ const e=document.getElementById('edit-'+key); const o=e.style.display==='none'; e.style.display=o?'block':'none'; if(o) renderEditForm(key); }
 function renderEditForm(key){ const rec=RECIPES[key]; const e=document.getElementById('edit-'+key); const ft=flourTotal(rec.ings); e.innerHTML=`<div class="edit-section"><div class="flour-info">밀가루 합계: <span id="ef-${key}" style="color:#f59e0b;font-weight:700">${ft.toFixed(1)}g</span></div><div id="erows-${key}"></div><button class="add-ing-btn" onclick="addIng('${key}')">+ 재료 추가</button><button class="apply-btn" onclick="saveRecipe('${key}')">레시피 적용</button></div>`; renderERows(key); }
@@ -994,6 +1158,132 @@ function splitBatch(batches,max){
   const out=[];
   for(let i=0;i<n;i++) out.push(base+(i<rem?1:0));
   return out.sort((a,b)=>b-a);               // 큰 것부터
+}
+
+// ══════════════════════════════════════════
+// 르방 탭
+// ══════════════════════════════════════════
+function levainNeedFor(day){
+  // 그 날 계량하는 반죽들이 쓰는 르방 총량(g)
+  const byDay=calcBatchesFor(day);
+  let total=0; const detail=[];
+  (LEVAIN.users||[]).forEach(u=>{
+    const b=byDay[u.dtype]?.batches||0;
+    const g=b*u.gPerBatch;
+    if(g>0) detail.push({dtype:u.dtype,batches:b,g});
+    total+=g;
+  });
+  return {total,detail};
+}
+
+function renderLevain(){
+  const body=document.getElementById('levainBody');
+  const loss=(LEVAIN.loss??5)/100;
+  const M=LEVAIN.morning, E=LEVAIN.evening;
+  const mSum=M.seed+M.water+M.t65+M.rye;
+  const eSum=E.seed+E.water+E.t65+E.rye;
+
+  let h='<div class="lv-note">계량하는 날 <b>저녁 리프레쉬</b> → 다음 날 <b>아침 리프레쉬</b> → 반죽 투입<br>아침 리프레쉬 결과물이 필요량 + 손실 '+(LEVAIN.loss??5)+'% 가 되도록 역산합니다.</div>';
+
+  h+='<div class="wrap"><table><thead><tr><th class="name-col">항목</th>';
+  DAYS.forEach(d=>{ const wk=(d==='토'||d==='일')?' weekend':''; h+=`<th class="day-col${wk}">${d}</th>`; });
+  h+='</tr></thead><tbody>';
+
+  // 사용처별 소요량
+  (LEVAIN.users||[]).forEach(u=>{
+    h+=`<tr class="lv-user-row"><td class="name-cell">${u.dtype}<span class="lv-sub">1배합당 ${u.gPerBatch}g</span></td>`;
+    DAYS.forEach(d=>{
+      const bd=calcBatchesFor(d);
+      const b=bd[u.dtype]?.batches||0;
+      h+=`<td>${b>0?Math.round(b*u.gPerBatch).toLocaleString():'<span style="color:#ddd">-</span>'}</td>`;
+    });
+    h+='</tr>';
+  });
+
+  // 필요량 + 손실
+  h+='<tr class="lv-need-row"><td class="name-cell">필요량 합계</td>';
+  const needs={};
+  DAYS.forEach(d=>{
+    const n=levainNeedFor(d).total;
+    needs[d]=n;
+    h+=`<td>${n>0?Math.round(n).toLocaleString():'<span style="color:#ddd">-</span>'}</td>`;
+  });
+  h+='</tr>';
+
+  h+=`<tr class="lv-loss-row"><td class="name-cell">+ 손실 ${LEVAIN.loss??5}%</td>`;
+  const targets={};
+  DAYS.forEach(d=>{
+    const t=needs[d]*(1+loss);
+    targets[d]=t;
+    h+=`<td>${t>0?Math.round(t).toLocaleString():'<span style="color:#ddd">-</span>'}</td>`;
+  });
+  h+='</tr>';
+
+  // ── 아침 리프레쉬 ──
+  h+=`<tr class="lv-stage"><td colspan="${DAYS.length+1}">아침 리프레쉬 &nbsp;(초종 ${M.seed} : 물 ${M.water} : T65 ${M.t65} : 호밀 ${M.rye})</td></tr>`;
+  const mSeed={};
+  [['초종','seed'],['물','water'],['T65','t65'],['호밀','rye']].forEach(([lbl,k])=>{
+    h+=`<tr class="lv-ing"><td class="name-cell">${lbl}</td>`;
+    DAYS.forEach(d=>{
+      const v=targets[d]/mSum*M[k];
+      if(k==='seed') mSeed[d]=v;
+      h+=`<td>${v>0?fmtG(v):'<span style="color:#ddd">-</span>'}</td>`;
+    });
+    h+='</tr>';
+  });
+  h+='<tr class="lv-subtotal"><td class="name-cell">아침 결과물</td>';
+  DAYS.forEach(d=>{ h+=`<td>${targets[d]>0?Math.round(targets[d]).toLocaleString():'<span style="color:#ddd">-</span>'}</td>`; });
+  h+='</tr>';
+
+  // ── 저녁 리프레쉬 (전날 저녁 = 아침 초종을 만드는 단계) ──
+  h+=`<tr class="lv-stage ev"><td colspan="${DAYS.length+1}">저녁 리프레쉬 &nbsp;(초종 ${E.seed} : 물 ${E.water} : T65 ${E.t65} : 호밀 ${E.rye}) — <b>전날 저녁</b>에 진행</td></tr>`;
+  // 저녁 결과물 = 다음날 아침의 초종량
+  const evTarget={};
+  DAYS.forEach((d,i)=>{
+    const next=DAYS[(i+1)%7];
+    evTarget[d]=mSeed[next]||0;
+  });
+  [['초종','seed'],['물','water'],['T65','t65'],['호밀','rye']].forEach(([lbl,k])=>{
+    h+=`<tr class="lv-ing ev"><td class="name-cell">${lbl}</td>`;
+    DAYS.forEach(d=>{
+      const v=evTarget[d]/eSum*E[k];
+      h+=`<td>${v>0?fmtG(v):'<span style="color:#ddd">-</span>'}</td>`;
+    });
+    h+='</tr>';
+  });
+  h+='<tr class="lv-subtotal ev"><td class="name-cell">저녁 결과물</td>';
+  DAYS.forEach(d=>{ h+=`<td>${evTarget[d]>0?fmtG(evTarget[d]):'<span style="color:#ddd">-</span>'}</td>`; });
+  h+='</tr>';
+
+  h+='</tbody></table></div>';
+
+  // 설정
+  h+=`<div class="lv-settings">
+    <div class="lv-set-title">설정</div>
+    <div class="lv-set-row"><label>손실률 (%)</label><input class="lv-inp" type="number" min="0" step="0.5" value="${LEVAIN.loss??5}" oninput="LEVAIN.loss=parseFloat(this.value)||0;renderLevain()"></div>
+    <div class="lv-set-title" style="margin-top:14px">아침 리프레쉬 비율</div>
+    <div class="lv-ratio">
+      ${['seed','water','t65','rye'].map((k,i)=>`<div class="lv-r"><label>${['초종','물','T65','호밀'][i]}</label><input class="lv-inp" type="number" min="0" step="0.1" value="${M[k]}" oninput="LEVAIN.morning.${k}=parseFloat(this.value)||0;renderLevain()"></div>`).join('')}
+    </div>
+    <div class="lv-set-title" style="margin-top:14px">저녁 리프레쉬 비율</div>
+    <div class="lv-ratio">
+      ${['seed','water','t65','rye'].map((k,i)=>`<div class="lv-r"><label>${['초종','물','T65','호밀'][i]}</label><input class="lv-inp" type="number" min="0" step="1" value="${E[k]}" oninput="LEVAIN.evening.${k}=parseFloat(this.value)||0;renderLevain()"></div>`).join('')}
+    </div>
+    <div class="lv-set-title" style="margin-top:14px">르방 사용 반죽</div>
+    <div id="lv-users">${(LEVAIN.users||[]).map((u,i)=>`
+      <div class="lv-user">
+        <select class="lv-sel" onchange="LEVAIN.users[${i}].dtype=this.value;renderLevain()">
+          ${DTYPES.map(dt=>`<option value="${dt}" ${dt===u.dtype?'selected':''}>${dt}</option>`).join('')}
+        </select>
+        <input class="lv-inp" type="number" min="0" value="${u.gPerBatch}" oninput="LEVAIN.users[${i}].gPerBatch=parseFloat(this.value)||0;renderLevain()">
+        <span class="lv-unit">g/배합</span>
+        <button class="lv-del" onclick="LEVAIN.users.splice(${i},1);renderLevain()">&#215;</button>
+      </div>`).join('')}
+    </div>
+    <button class="lv-add" onclick="LEVAIN.users.push({dtype:DTYPES[0],gPerBatch:100});renderLevain()">+ 사용 반죽 추가</button>
+  </div>`;
+
+  body.innerHTML=h;
 }
 
 // ══════════════════════════════════════════
@@ -1028,15 +1318,24 @@ function renderScaleTable(){
   // 열 구성: 1배합 고정 + 요일별 배합수 + 직접입력
   const mx=MAXBATCH[scaleDtype]||0;
   const cols=[{label:'1배합',sub:'기준',mult:1,fixed:true}];
+
+  // 같은 배합수는 하나로 병합 (요일 목록만 합침)
+  const merged=new Map();  // key: 배합수 문자열, val: {mult, days:[], parts}
   dayBatch.forEach(x=>{
     const parts=splitBatch(x.b,mx);
-    if(parts.length>1){
-      // 분할: 통별로 열 생성
-      parts.forEach((pb,i)=>{
-        cols.push({label:x.day,sub:`${i+1}통 ${pb}배합`,mult:pb,split:true});
+    const key=parts.join(',');
+    if(merged.has(key)) merged.get(key).days.push(x.day);
+    else merged.set(key,{b:x.b,parts,days:[x.day]});
+  });
+
+  merged.forEach(m=>{
+    const dayLbl=m.days.length>3?`${m.days[0]}외 ${m.days.length-1}일`:m.days.join('·');
+    if(m.parts.length>1){
+      m.parts.forEach((pb,i)=>{
+        cols.push({label:dayLbl,sub:`${i+1}통 ${pb}배`,mult:pb,split:true,days:m.days});
       });
     } else {
-      cols.push({label:x.day,sub:x.b.toFixed(1)+'배합',mult:x.b});
+      cols.push({label:dayLbl,sub:m.b.toFixed(1)+'배합',mult:m.b,days:m.days});
     }
   });
   cols.push({label:'직접',sub:'입력',mult:scaleCustom,custom:true});
@@ -1086,9 +1385,31 @@ function renderScaleTable(){
     }
   });
 
-  h+=`<tr class="sc-total"><td class="name-cell">총합계</td>`;
+  h+=`<tr class="sc-total"><td class="name-cell">반죽 총합계</td>`;
   grandTotals.forEach((t,i)=>{ h+=`<td>${fmtG(t)}</td>`; });
-  h+='</tr></tbody></table>';
+  h+='</tr>';
+
+  // ── 충전물 섹션 ──
+  const fillProds=prodsOf(scaleDtype).filter(p=>(FILLINGS[p.name]||[]).length);
+  if(fillProds.length){
+    h+=`<tr class="sc-fill-divider"><td colspan="${cols.length+1}">충전물</td></tr>`;
+    fillProds.forEach(p=>{
+      const fl=FILLINGS[p.name];
+      h+=`<tr class="sc-fill-prod"><td class="name-cell" colspan="${cols.length+1}">${p.name} <span class="sc-fill-note">1개 ${p.split}g 기준</span></td></tr>`;
+      fl.forEach(f=>{
+        h+=`<tr class="sc-fill-row"><td class="name-cell sc-name-cell"><span class="sc-dot" style="background:#e65100"></span>${f.n}</td>`;
+        cols.forEach(c=>{
+          // 배합당 개수 = 1배합 반죽총량 / 분할무게
+          const doughPerBatch=rec.ings.reduce((s,i)=>s+i.g,0);
+          const pcs=p.split>0?(doughPerBatch*c.mult/p.split):0;
+          h+=`<td class="sc-cell sc-fill-cell">${fmtG(f.g*pcs)}</td>`;
+        });
+        h+='</tr>';
+      });
+    });
+  }
+
+  h+='</tbody></table>';
 
   // 직접입력 컨트롤
   if(mx) h+=`<div class="sc-max-note">1회 최대 <b>${mx}배합</b> 설정 — 초과분은 통별로 나눠 표시됩니다</div>`;
@@ -1118,10 +1439,11 @@ function onScaleCustom(el){
 
 function switchTab(tab){
   curTab=tab;
-  ['qty','result','scale','recipe'].forEach(t=>{ document.getElementById(t+'Tab').style.display=t===tab?'block':'none'; document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active',t===tab); });
+  ['qty','result','scale','levain','recipe'].forEach(t=>{ document.getElementById(t+'Tab').style.display=t===tab?'block':'none'; document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active',t===tab); });
   document.getElementById('multiBar').style.display=(tab==='qty'&&selDays.length>0)?'flex':'none';
   if(tab==='result') renderResultTable();
   if(tab==='scale') renderScale();
+  if(tab==='levain') renderLevain();
   if(tab==='recipe') renderRecipes();
 }
 
