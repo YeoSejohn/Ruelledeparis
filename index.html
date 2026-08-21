@@ -428,7 +428,7 @@ let RECIPES={
   치아바타:{label:'치아바타/포카치아',total:1929.1,ings:[{n:'T55',g:281.5,pct:28.2,type:'flour',stage:'풀리쉬'},{n:'레드',g:4.6,pct:0.5,type:'yeast',stage:'풀리쉬'},{n:'물',g:281.5,pct:28.2,type:'water',stage:'풀리쉬'},{n:'키알라',g:177,pct:17.7,type:'flour',stage:'본반죽'},{n:'큐원',g:177,pct:17.7,type:'flour',stage:'본반죽'},{n:'T55',g:364.5,pct:36.5,type:'flour',stage:'본반죽'},{n:'소금',g:12,pct:1.2,type:'salt',stage:'본반죽'},{n:'레드',g:12,pct:1.2,type:'yeast',stage:'본반죽'},{n:'물',g:468,pct:46.8,type:'water',stage:'본반죽'},{n:'몰트',g:12,pct:1.2,type:'other',stage:'본반죽'},{n:'오일',g:71,pct:7.1,type:'fat',stage:'본반죽'},{n:'바시나주',g:68,pct:6.8,type:'water',stage:'본반죽'}]},
 };
 
-let curTab='qty';
+let curTab=localStorage.getItem('bakery_tab')||'qty';
 let selDays=[];
 let OFFSETS={};  // 제품별 생산일 오프셋 (0=당일, 1=다음날...)
 let BATCH_MODE={치아바타:true};  // true면 개수 대신 배합수 직접 입력
@@ -718,6 +718,16 @@ function resetWeek(){
 }
 
 // ── 배합수 테이블 ──
+// 반죽 1배합 총무게 (레시피 실제 합계 우선)
+function doughTotalOf(dtype){
+  const r=RECIPES[dtype];
+  if(r&&r.ings&&r.ings.length){
+    const s=r.ings.reduce((a,i)=>a+(i.g||0),0);
+    if(s>0) return s;
+  }
+  return RECIPE_TOTALS[dtype]||0;
+}
+
 // 계량일(day)에서 offset일 후의 판매 요일 반환
 function saleDay(day,offset){
   const i=DAYS.indexOf(day);
@@ -1288,16 +1298,6 @@ function addIng(key){ RECIPES[key].ings.push({n:'',g:0,pct:0,type:'other',stage:
 function delIng(key,i){ if(!confirm('재료를 삭제할까요?')) return; RECIPES[key].ings.splice(i,1); const ft=flourTotal(RECIPES[key].ings); if(ft>0) RECIPES[key].ings.forEach(ing=>{ ing.pct=parseFloat((ing.g/ft*100).toFixed(2)); }); renderERows(key); updateView(key); const f=document.getElementById('ef-'+key); if(f) f.textContent=ft.toFixed(1)+'g'; }
 function saveRecipe(key){ RECIPES[key].total=RECIPES[key].ings.reduce((s,i)=>s+i.g,0); RECIPE_TOTALS[key]=RECIPES[key].total; document.getElementById('edit-'+key).style.display='none'; updateView(key); showToast('적용됨 - 저장 버튼으로 서버 반영'); }
 
-// 반죽 1배합 총무게 (레시피 실제 합계 우선)
-function doughTotalOf(dtype){
-  const r=RECIPES[dtype];
-  if(r&&r.ings&&r.ings.length){
-    const s=r.ings.reduce((a,i)=>a+(i.g||0),0);
-    if(s>0) return s;
-  }
-  return RECIPE_TOTALS[dtype]||0;
-}
-
 // 배합수를 최대치 기준으로 분할
 // 예) 14.4배합, max 8 → 올림 15 → 2통 → [8,7]
 function splitBatch(batches,max,roundUp){
@@ -1697,7 +1697,7 @@ function renderScaleTable(){
   h+=`<div class="sc-max-note">${isRoundUp()?'배합수 <b>올림</b> 적용 중 (예: 9.2배 → 10배)':'실제 계산된 배합수 그대로 표시'}${mx?` · 1회 최대 <b>${mx}배합</b> 초과 시 통별 분할`:''}</div>`;
   h+=`<div class="sc-input-bar">
     <span class="sc-input-lbl">직접 입력 배합수</span>
-    <input class="sc-input" type="number" min="0" step="0.1" inputmode="decimal" value="${scaleCustomRaw}" oninput="onScaleCustom(this)">
+    <input class="sc-input" type="number" min="0" step="0.1" inputmode="decimal" value="${scaleCustomRaw}" oninput="onScaleCustom(this)" onblur="commitCustom()" onchange="commitCustom()">
     <span class="sc-input-hint">입력하면 '직접' 열이 자동 계산됩니다</span>
   </div>`;
   wrap.innerHTML=h;
@@ -1712,22 +1712,64 @@ function fmtG(g){
 }
 
 let scaleCustomRaw='1';
+let customTimer=null;
+
 function onScaleCustom(el){
-  scaleCustomRaw=el.value;             // 입력 중인 원본 문자열 보존
+  scaleCustomRaw=el.value;
   const v=parseFloat(el.value);
   scaleCustom=(isNaN(v)||v<0)?0:v;
-  const pos=el.selectionStart;
+  // 입력 중엔 '직접' 열의 셀 값만 직접 갱신 (리렌더 X → 커서 유지)
+  updateCustomColumn();
+}
+
+// '직접' 열만 부분 갱신
+function updateCustomColumn(){
+  const table=document.querySelector('.scale-table');
+  if(!table||!scaleDtype) return;
+  const rec=RECIPES[scaleDtype]; if(!rec) return;
+  const ths=[...table.querySelectorAll('thead th')];
+  const ci=ths.findIndex(th=>th.classList.contains('sc-custom'));
+  if(ci<0) return;
+  const doughPerBatch=rec.ings.reduce((s,i)=>s+i.g,0);
+  const col={mult:scaleCustom,custom:true};
+
+  // 재료 행
+  let ingIdx=0;
+  const stagesOrder=[];
+  const stages={};
+  rec.ings.forEach(ing=>{ const st=ing.stage||'본반죽'; if(!stages[st]){stages[st]=[];stagesOrder.push(st);} stages[st].push(ing); });
+  const ORDER=['풀리쉬','폴리쉬','사전반죽','탕종','본반죽','충전'];
+  const sorted=stagesOrder.sort((a,b)=>{const ia=ORDER.indexOf(a),ib=ORDER.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib);});
+  const flatIngs=[]; sorted.forEach(st=>flatIngs.push(...stages[st]));
+
+  const rows=[...table.querySelectorAll('tbody tr')];
+  let gTot=0;
+  rows.forEach(tr=>{
+    const cells=tr.children;
+    if(!cells[ci]) return;
+    if(tr.classList.contains('sc-stage')||tr.classList.contains('sc-fill-divider')||
+       tr.classList.contains('sc-fill-prod')||tr.classList.contains('sc-fillsum-hdr')||
+       tr.classList.contains('sc-fill-note-row')) return;
+
+    if(tr.classList.contains('sc-total')){
+      cells[ci].innerHTML=fmtG(gTot); return;
+    }
+    if(tr.classList.contains('sc-subtotal')) return;  // 소계는 아래서 처리 생략
+    if(tr.classList.contains('sc-fill-row')||tr.classList.contains('sc-fillsum-row')) return;
+
+    const ing=flatIngs[ingIdx++];
+    if(ing){ const g=ing.g*scaleCustom; gTot+=g; cells[ci].innerHTML=fmtG(g); }
+  });
+}
+
+// 입력 완료 시 전체 리렌더
+function commitCustom(){
   renderScaleTable();
-  const ni=document.querySelector('.sc-input');
-  if(ni){
-    ni.value=scaleCustomRaw;
-    ni.focus();
-    try{ ni.setSelectionRange(pos,pos); }catch(e){}
-  }
 }
 
 function switchTab(tab){
   curTab=tab;
+  try{ localStorage.setItem('bakery_tab',tab); }catch(e){}
   ['qty','result','scale','levain','recipe'].forEach(t=>{ document.getElementById(t+'Tab').style.display=t===tab?'block':'none'; document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active',t===tab); });
   document.getElementById('multiBar').style.display=(tab==='qty'&&selDays.length>0)?'flex':'none';
   if(tab==='result') renderResultTable();
@@ -1738,6 +1780,8 @@ function switchTab(tab){
 
 loadSaved();
 renderQtyTable();
+// 마지막으로 보던 탭 복원
+if(curTab&&curTab!=='qty') switchTab(curTab);
 </script>
 </body>
 </html>
