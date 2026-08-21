@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="반죽 계량표">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>반죽 계량표</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -172,7 +175,11 @@ tr.pumper-row td.prod-q{color:#e65100;font-weight:600}
 .modal-cancel{padding:12px 18px;border-radius:10px;background:#f5f5f5;color:#666;border:none;font-size:15px;cursor:pointer;font-family:inherit}
 .modal-del{padding:12px 14px;border-radius:10px;background:#fee2e2;color:#dc2626;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
 .spacer{height:20px}
-.loading-bar{padding:14px;text-align:center;font-size:13px;color:#888;background:#fafafa;border-bottom:1px solid #eee}
+.load-ov{position:fixed;inset:0;background:#f5f5f5;z-index:200;display:flex;align-items:center;justify-content:center}
+.load-box{text-align:center}
+.load-spin{width:34px;height:34px;border:3px solid #e0e0e0;border-top-color:#1a1a2e;border-radius:50%;margin:0 auto 12px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-txt{font-size:13px;color:#888}
 /* 계량표 */
 .scale-picker{background:#fff;border-bottom:1px solid #eee}
 .sc-chips{display:flex;gap:6px;padding:10px 14px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -347,8 +354,8 @@ tr.lv-subtotal.ev td{background:#e8eaf6;color:#37306b}
   <button class="multi-btn solid" onclick="clearMulti()">해제</button>
 </div>
 
-<div id="loadingBar" class="loading-bar">데이터 불러오는 중...</div>
-<div id="qtyTab"><div class="wrap" id="qtyWrap"></div><button class="add-dtype-btn" onclick="openAddDtype()">+ 새 반죽 추가</button><div class="spacer"></div></div>
+<div id="loadingOverlay" class="load-ov"><div class="load-box"><div class="load-spin"></div><div class="load-txt">데이터 불러오는 중...</div></div></div>
+<div id="qtyTab" style="display:none"><div class="wrap" id="qtyWrap"></div><button class="add-dtype-btn" onclick="openAddDtype()">+ 새 반죽 추가</button><div class="spacer"></div></div>
 <div id="resultTab" style="display:none"><div class="wrap" id="resultWrap"></div><div class="spacer"></div></div>
 <div id="scaleTab" style="display:none">
   <div class="scale-picker" id="scalePicker"></div>
@@ -457,7 +464,7 @@ PRODUCTS.forEach(initQty);
 // ── Firebase ──
 function loadSaved(){
   document.getElementById('saveTime').textContent='불러오는 중...';
-  fetch(FIREBASE_URL+'/bakery.json').then(r=>r.json()).then(p=>{
+  fetch(FIREBASE_URL+'/bakery.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(p=>{
     if(p&&p.products){ PRODUCTS=p.products; }
     if(p&&p.dtypes) DTYPES=p.dtypes;
     PRODUCTS.forEach(initQty);
@@ -513,18 +520,21 @@ function loadSaved(){
     const t=localStorage.getItem('bakery_savetime');
     document.getElementById('saveTime').textContent=t||'--';
     dataLoaded=true;
-    document.getElementById('loadingBar').style.display='none';
-    renderQtyTable();
-    switchTab(savedTab);
+    finishLoad();
   })
   .catch(()=>{
     document.getElementById('saveTime').textContent='오프라인';
-    document.getElementById('loadingBar').style.display='none';
     dataLoaded=true;
-    renderQtyTable();
-    switchTab(savedTab);
+    finishLoad();
   });
 }
+function finishLoad(){
+  const ov=document.getElementById('loadingOverlay');
+  if(ov) ov.style.display='none';
+  renderQtyTable();
+  switchTab(savedTab);
+}
+
 function saveData(){
   const now=new Date(); const str=`${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   document.getElementById('saveTime').textContent='저장 중...';
@@ -892,10 +902,16 @@ function renderResultTable(){
         const off=OFFSETS[p.name]||0;
         h+=`<tr class="prod-off-row"><td class="name-cell prod-sub-cell">${p.name}<span class="prod-g">${splitLabel(p)}</span></td>`;
         h+=`<td class="off-cell"><input class="off-inp" type="number" min="0" max="6" value="${off}" data-pname="${p.name.replace(/"/g,'&quot;')}" oninput="onOffset(this)"><span class="off-hint">${off===0?'당일':'+'+off}</span></td>`;
+        const gp=GROUPED[p.name];
         DAYS.forEach(d=>{
+          const q=qtyFor(p,d);              // 실제 계산과 동일한 값 사용
           const sd=saleDay(d,off);
-          const q=(allQty[sd]||{})[p.name]||0;
-          h+=`<td class="prod-q">${q>0?q:'<span style="color:#ddd">-</span>'}<span class="sale-day">${sd}</span></td>`;
+          let note=sd;
+          if(gp&&gp.days&&gp.days.length){
+            if(d===gp.weighDay) note=gp.days.join('+');
+            else if(gp.days.includes(sd)) note='묶음';
+          }
+          h+=`<td class="prod-q">${q>0?q:'<span style="color:#ddd">-</span>'}<span class="sale-day">${note}</span></td>`;
         });
         h+='</tr>';
       });
