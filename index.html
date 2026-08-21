@@ -218,6 +218,8 @@ tr.sc-total td.name-cell{background:#1a1a2e;text-align:left;padding-left:12px;fo
 .sc-input-hint{font-size:11px;color:#aaa}
 .stage-inp{color:#7986cb!important;background:#f8f9ff!important}
 .max-tag{font-size:9px;background:#e8f5e9;color:#1a6b3c;border:1px solid #a5d6a7;border-radius:4px;padding:1px 5px;margin-left:5px;font-weight:600;white-space:nowrap}
+.calc-basis{font-size:10px;color:#aaa;font-weight:400;margin-top:2px}
+.need-g{display:block;font-size:9px;color:#bbb;font-weight:400;margin-top:1px}
 .split-hint{display:block;font-size:10px;color:#1a6b3c;font-weight:600;margin-top:1px}
 .split-txt{color:#1a6b3c;font-weight:700;font-size:12px}
 tr.maxb-row td{background:#f1f8f4}
@@ -428,7 +430,7 @@ let RECIPES={
   치아바타:{label:'치아바타/포카치아',total:1929.1,ings:[{n:'T55',g:281.5,pct:28.2,type:'flour',stage:'풀리쉬'},{n:'레드',g:4.6,pct:0.5,type:'yeast',stage:'풀리쉬'},{n:'물',g:281.5,pct:28.2,type:'water',stage:'풀리쉬'},{n:'키알라',g:177,pct:17.7,type:'flour',stage:'본반죽'},{n:'큐원',g:177,pct:17.7,type:'flour',stage:'본반죽'},{n:'T55',g:364.5,pct:36.5,type:'flour',stage:'본반죽'},{n:'소금',g:12,pct:1.2,type:'salt',stage:'본반죽'},{n:'레드',g:12,pct:1.2,type:'yeast',stage:'본반죽'},{n:'물',g:468,pct:46.8,type:'water',stage:'본반죽'},{n:'몰트',g:12,pct:1.2,type:'other',stage:'본반죽'},{n:'오일',g:71,pct:7.1,type:'fat',stage:'본반죽'},{n:'바시나주',g:68,pct:6.8,type:'water',stage:'본반죽'}]},
 };
 
-let curTab=localStorage.getItem('bakery_tab')||'qty';
+let curTab='qty';
 let selDays=[];
 let OFFSETS={};  // 제품별 생산일 오프셋 (0=당일, 1=다음날...)
 let BATCH_MODE={치아바타:true};  // true면 개수 대신 배합수 직접 입력
@@ -825,14 +827,16 @@ function renderResultTable(){
     const dispName=dtype==='잡곡식빵'?'잡곡식빵 <span class="incl-tag">펌퍼니클 포함</span>':dtype;
     const mx=MAXBATCH[dtype]||0;
     h+=`<tr class="batch-row"><td class="name-cell dtype-cell" onclick="toggleDtypeProds('${dtype}')">
-      <span class="exp-arrow">${isOpen?'&#9662;':'&#9656;'}</span>${dispName}${BATCH_MODE[dtype]?'<span class="direct-tag">직접</span>':''}${mx?`<span class="max-tag">최대 ${mx}</span>`:''}</td>`;
+      <span class="exp-arrow">${isOpen?'&#9662;':'&#9656;'}</span>${dispName}${BATCH_MODE[dtype]?'<span class="direct-tag">직접</span>':''}${mx?`<span class="max-tag">최대 ${mx}</span>`:''}
+      <div class="calc-basis">1배합 ${Math.round(doughTotalOf(dtype)).toLocaleString()}g</div></td>`;
     h+=`<td class="off-cell off-mixed">${mixedOffsetLabel(prods)}</td>`;
     DAYS.forEach(d=>{
       const b=byDay[d][dtype]?.batches||0;
       totals[d]+=b;
       const parts=splitBatch(b,mx);
       const need=mx&&b>mx;
-      h+=`<td>${b>0?b.toFixed(1)+(need?`<span class="split-hint">${parts.join('+')}</span>`:''):'<span style="color:#ddd">-</span>'}</td>`;
+      const tg=byDay[d][dtype]?.total_g||0;
+      h+=`<td>${b>0?b.toFixed(1)+(need?`<span class="split-hint">${parts.join('+')}</span>`:'')+`<span class="need-g">${Math.round(tg).toLocaleString()}g</span>`:'<span style="color:#ddd">-</span>'}</td>`;
     });
     h+='</tr>';
     // 최대 배합수 설정 행 (펼침 시)
@@ -1778,10 +1782,11 @@ function switchTab(tab){
   if(tab==='recipe') renderRecipes();
 }
 
+// 마지막으로 보던 탭 복원
+const savedTab=localStorage.getItem('bakery_tab')||'qty';
 loadSaved();
 renderQtyTable();
-// 마지막으로 보던 탭 복원
-if(curTab&&curTab!=='qty') switchTab(curTab);
+setTimeout(()=>{ switchTab(savedTab); },50);
 </script>
 </body>
 </html>
