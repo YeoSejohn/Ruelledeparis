@@ -1044,13 +1044,14 @@ function openEditProd(name){
          </div>
          <div style="font-size:11px;color:#888;margin:10px 0 5px">여기서 만들 판매일 (복수 선택)</div>
          <div class="day-picks" id="mi-grp-days">
-           ${DAYS.map(d=>`<span class="day-pick multi ${GROUPED[name]?.days?.includes(d)?'on':''}" onclick="this.classList.toggle('on')" data-d="${d}">${d}</span>`).join('')}
+           ${DAYS.map(d=>`<span class="day-pick multi ${GROUPED[name]?.days?.includes(d)?'on':''}" onclick="this.classList.toggle('on');updateGrpDesc()" data-d="${d}">${d}</span>`).join('')}
          </div>
-         <div style="font-size:11px;color:#e65100;margin-top:8px;line-height:1.5">예) 계량하는 날 <b>토</b>, 판매일 <b>일·월</b> 선택 시<br>토요일 계량분에 일요일+월요일 수량이 합산됩니다.</div>
+         <div id="mi-grp-desc" style="font-size:11px;color:#e65100;margin-top:8px;line-height:1.5"></div>
        </div>
      </div>`,
     '저장','editProd',{oldName:name});
   document.getElementById('modalDelBtn').innerHTML=`<button class="modal-del" onclick="delProd('${name.replace(/'/g,"\\'")}')">삭제</button>`;
+  updateGrpDesc();
   const sel=document.getElementById('mi-dtype-sel');
   if(sel) sel.onchange=()=>{
     document.getElementById('mi-newdtype').style.display=(sel.value==='__new__')?'block':'none';
@@ -1061,9 +1062,23 @@ function toggleGrpUI(){
   const on=document.getElementById('mi-grp-on')?.checked;
   const w=document.getElementById('mi-grp-wrap');
   if(w) w.style.display=on?'block':'none';
+  if(on) updateGrpDesc();
 }
 function pickWeighDay(d){
   document.querySelectorAll('#mi-grp-weigh .day-pick').forEach(el=>el.classList.toggle('on',el.dataset.d===d));
+  updateGrpDesc();
+}
+
+function updateGrpDesc(){
+  const box=document.getElementById('mi-grp-desc');
+  if(!box) return;
+  const wd=[...document.querySelectorAll('#mi-grp-weigh .day-pick.on')].map(el=>el.dataset.d)[0];
+  const days=[...document.querySelectorAll('#mi-grp-days .day-pick.on')].map(el=>el.dataset.d);
+  if(!wd||!days.length){
+    box.innerHTML='<span style="color:#aaa">계량하는 날과 판매일을 선택하세요</span>';
+    return;
+  }
+  box.innerHTML=`<b>${wd}요일</b> 계량분에 <b>${days.map(d=>d+'요일').join(' + ')}</b> 수량이 합산됩니다.`;
 }
 function doEditProd(){
   const oldName=modalData.oldName;
